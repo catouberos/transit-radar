@@ -65,6 +65,7 @@
           protoc-gen-go-grpc
 
           sqlc
+          sleek
         ];
       };
     });
