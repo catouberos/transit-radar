@@ -1,3 +1,4 @@
+-- +goose Up
 CREATE TABLE geolocations (
     degree float4,
     latitude float4,
@@ -15,4 +16,7 @@ CREATE TABLE geolocations (
 
 CREATE UNIQUE INDEX idx_vehicleid_timestamp ON geolocations(vehicle_id, "timestamp");
 
-CREATE UNIQUE INDEX idx_vehicleid_routeid_timestamp ON hypertable_example(vehicle_id, route_id, "timestamp");
+CREATE UNIQUE INDEX idx_vehicleid_routeid_timestamp ON geolocations(vehicle_id, route_id, "timestamp");
+
+-- +goose Down
+DROP TABLE geolocations;
