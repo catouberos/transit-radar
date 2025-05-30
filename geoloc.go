@@ -1,13 +1,16 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"log"
 	"os"
 
 	"github.com/catouberos/geoloc/base"
+	"github.com/catouberos/geoloc/models"
 	"github.com/catouberos/geoloc/protos"
 	"github.com/catouberos/geoloc/rpc"
+	"github.com/jackc/pgx/v5"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/jmoiron/sqlx"
 	"google.golang.org/grpc"
@@ -22,15 +25,19 @@ func main() {
 		log.Fatalln("Database connection has not been defined")
 	}
 
-	db, err := sqlx.Connect("pgx", connection)
+	ctx := context.Background()
+
+	conn, err := pgx.Connect(ctx, connection)
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatal(err)
 	}
-	defer db.Close()
+	defer conn.Close(ctx)
+
+	queries := models.New(conn)
 
 	s := grpc.NewServer()
 
-	app := base.InitApp(db.DB, s)
+	app := base.InitApp(queries, s)
 
 	protos.RegisterGeolocationServer(s, &rpc.GeolocationServer{
 		App: app,

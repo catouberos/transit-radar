@@ -1,21 +1,21 @@
 package base
 
 import (
-	"database/sql"
 	"net"
 
+	"github.com/catouberos/geoloc/models"
 	"google.golang.org/grpc"
 )
 
 type App struct {
-	DB   *sql.DB
-	GRPC *grpc.Server
+	Queries *models.Queries
+	GRPC    *grpc.Server
 }
 
-func InitApp(db *sql.DB, grpc *grpc.Server) *App {
+func InitApp(queries *models.Queries, grpc *grpc.Server) *App {
 	app := &App{
-		DB:   db,
-		GRPC: grpc,
+		Queries: queries,
+		GRPC:    grpc,
 	}
 
 	return app
