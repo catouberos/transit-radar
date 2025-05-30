@@ -1,10 +1,10 @@
 version: "2"
 sql:
   - engine: "postgresql"
-    queries: "data/query.sql"
-    schema: "data/schema.sql"
+    queries: "query.sql"
+    schema: "schema.sql"
     gen:
       go:
-        package: "geoloc"
-        out: "modal"
+        package: "models"
+        out: "models"
         sql_package: "pgx/v5"
