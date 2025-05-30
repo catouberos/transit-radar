@@ -6,15 +6,25 @@ import "google/protobuf/timestamp.proto";
 option go_package = "github.com/catouberos/geoloc/protos";
 
 service Geolocation {
-  rpc CreateGeolocation(GeolocationRequest) returns (GeolocationRequest) {}
+  rpc CreateGeolocation(GeolocationRequest) returns (GeolocationResponse) {}
 }
 
 message GeolocationRequest {
-  float deg = 1;
-  float lat = 2;
-  float lng = 3;
+  float degree = 1;
+  float latitude = 2;
+  float longitude = 3;
   float speed = 4;
   int32 vehicleId = 5;
   int32 routeId = 6;
-  google.protobuf.Timestamp updateTime = 7;
+  google.protobuf.Timestamp timestamp = 7;
+}
+
+message GeolocationResponse {
+  float degree = 1;
+  float latitude = 2;
+  float longitude = 3;
+  float speed = 4;
+  int32 vehicleId = 5;
+  int32 routeId = 6;
+  google.protobuf.Timestamp timestamp = 7;
 }

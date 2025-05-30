@@ -26,7 +26,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type GeolocationClient interface {
-	CreateGeolocation(ctx context.Context, in *GeolocationRequest, opts ...grpc.CallOption) (*GeolocationRequest, error)
+	CreateGeolocation(ctx context.Context, in *GeolocationRequest, opts ...grpc.CallOption) (*GeolocationResponse, error)
 }
 
 type geolocationClient struct {
@@ -37,9 +37,9 @@ func NewGeolocationClient(cc grpc.ClientConnInterface) GeolocationClient {
 	return &geolocationClient{cc}
 }
 
-func (c *geolocationClient) CreateGeolocation(ctx context.Context, in *GeolocationRequest, opts ...grpc.CallOption) (*GeolocationRequest, error) {
+func (c *geolocationClient) CreateGeolocation(ctx context.Context, in *GeolocationRequest, opts ...grpc.CallOption) (*GeolocationResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GeolocationRequest)
+	out := new(GeolocationResponse)
 	err := c.cc.Invoke(ctx, Geolocation_CreateGeolocation_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -51,7 +51,7 @@ func (c *geolocationClient) CreateGeolocation(ctx context.Context, in *Geolocati
 // All implementations must embed UnimplementedGeolocationServer
 // for forward compatibility.
 type GeolocationServer interface {
-	CreateGeolocation(context.Context, *GeolocationRequest) (*GeolocationRequest, error)
+	CreateGeolocation(context.Context, *GeolocationRequest) (*GeolocationResponse, error)
 	mustEmbedUnimplementedGeolocationServer()
 }
 
@@ -62,7 +62,7 @@ type GeolocationServer interface {
 // pointer dereference when methods are called.
 type UnimplementedGeolocationServer struct{}
 
-func (UnimplementedGeolocationServer) CreateGeolocation(context.Context, *GeolocationRequest) (*GeolocationRequest, error) {
+func (UnimplementedGeolocationServer) CreateGeolocation(context.Context, *GeolocationRequest) (*GeolocationResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateGeolocation not implemented")
 }
 func (UnimplementedGeolocationServer) mustEmbedUnimplementedGeolocationServer() {}
