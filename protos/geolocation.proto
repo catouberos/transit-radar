@@ -1,0 +1,20 @@
+syntax = "proto3";
+package protos;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/catouberos/geoloc/protos";
+
+service Geolocation {
+  rpc CreateGeolocation(GeolocationRequest) returns (GeolocationRequest) {}
+}
+
+message GeolocationRequest {
+  float deg = 1;
+  float lat = 2;
+  float lng = 3;
+  float speed = 4;
+  int32 vehicleId = 5;
+  int32 routeId = 6;
+  google.protobuf.Timestamp updateTime = 7;
+}
