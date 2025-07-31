@@ -20,7 +20,7 @@ type Geolocation struct {
 
 type Route struct {
 	ID     int64
-	Number int32
+	Number string
 	Name   string
 }
 

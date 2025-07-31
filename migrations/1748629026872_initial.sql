@@ -6,7 +6,7 @@ CREATE TABLE vehicles (
 
 CREATE TABLE routes (
     id bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    number int NOT NULL UNIQUE,
+    number varchar(10) NOT NULL UNIQUE,
     name text NOT NULL
 );
 
