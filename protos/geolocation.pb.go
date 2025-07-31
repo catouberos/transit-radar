@@ -9,7 +9,6 @@ package protos
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
-	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -22,33 +21,27 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type GeolocationRequest struct {
+type VehiclesByRouteRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Degree        float32                `protobuf:"fixed32,1,opt,name=degree,proto3" json:"degree,omitempty"`
-	Latitude      float32                `protobuf:"fixed32,2,opt,name=latitude,proto3" json:"latitude,omitempty"`
-	Longitude     float32                `protobuf:"fixed32,3,opt,name=longitude,proto3" json:"longitude,omitempty"`
-	Speed         float32                `protobuf:"fixed32,4,opt,name=speed,proto3" json:"speed,omitempty"`
-	VehicleId     int32                  `protobuf:"varint,5,opt,name=vehicleId,proto3" json:"vehicleId,omitempty"`
-	RouteId       int32                  `protobuf:"varint,6,opt,name=routeId,proto3" json:"routeId,omitempty"`
-	Timestamp     *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	RouteId       float32                `protobuf:"fixed32,1,opt,name=routeId,proto3" json:"routeId,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *GeolocationRequest) Reset() {
-	*x = GeolocationRequest{}
+func (x *VehiclesByRouteRequest) Reset() {
+	*x = VehiclesByRouteRequest{}
 	mi := &file_protos_geolocation_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *GeolocationRequest) String() string {
+func (x *VehiclesByRouteRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GeolocationRequest) ProtoMessage() {}
+func (*VehiclesByRouteRequest) ProtoMessage() {}
 
-func (x *GeolocationRequest) ProtoReflect() protoreflect.Message {
+func (x *VehiclesByRouteRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_protos_geolocation_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -60,87 +53,39 @@ func (x *GeolocationRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GeolocationRequest.ProtoReflect.Descriptor instead.
-func (*GeolocationRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use VehiclesByRouteRequest.ProtoReflect.Descriptor instead.
+func (*VehiclesByRouteRequest) Descriptor() ([]byte, []int) {
 	return file_protos_geolocation_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *GeolocationRequest) GetDegree() float32 {
-	if x != nil {
-		return x.Degree
-	}
-	return 0
-}
-
-func (x *GeolocationRequest) GetLatitude() float32 {
-	if x != nil {
-		return x.Latitude
-	}
-	return 0
-}
-
-func (x *GeolocationRequest) GetLongitude() float32 {
-	if x != nil {
-		return x.Longitude
-	}
-	return 0
-}
-
-func (x *GeolocationRequest) GetSpeed() float32 {
-	if x != nil {
-		return x.Speed
-	}
-	return 0
-}
-
-func (x *GeolocationRequest) GetVehicleId() int32 {
-	if x != nil {
-		return x.VehicleId
-	}
-	return 0
-}
-
-func (x *GeolocationRequest) GetRouteId() int32 {
+func (x *VehiclesByRouteRequest) GetRouteId() float32 {
 	if x != nil {
 		return x.RouteId
 	}
 	return 0
 }
 
-func (x *GeolocationRequest) GetTimestamp() *timestamppb.Timestamp {
-	if x != nil {
-		return x.Timestamp
-	}
-	return nil
-}
-
-type GeolocationResponse struct {
+type VehiclesByRouteResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Degree        float32                `protobuf:"fixed32,1,opt,name=degree,proto3" json:"degree,omitempty"`
-	Latitude      float32                `protobuf:"fixed32,2,opt,name=latitude,proto3" json:"latitude,omitempty"`
-	Longitude     float32                `protobuf:"fixed32,3,opt,name=longitude,proto3" json:"longitude,omitempty"`
-	Speed         float32                `protobuf:"fixed32,4,opt,name=speed,proto3" json:"speed,omitempty"`
-	VehicleId     int32                  `protobuf:"varint,5,opt,name=vehicleId,proto3" json:"vehicleId,omitempty"`
-	RouteId       int32                  `protobuf:"varint,6,opt,name=routeId,proto3" json:"routeId,omitempty"`
-	Timestamp     *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	Vehicles      []*Vehicle             `protobuf:"bytes,1,rep,name=vehicles,proto3" json:"vehicles,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *GeolocationResponse) Reset() {
-	*x = GeolocationResponse{}
+func (x *VehiclesByRouteResponse) Reset() {
+	*x = VehiclesByRouteResponse{}
 	mi := &file_protos_geolocation_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *GeolocationResponse) String() string {
+func (x *VehiclesByRouteResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GeolocationResponse) ProtoMessage() {}
+func (*VehiclesByRouteResponse) ProtoMessage() {}
 
-func (x *GeolocationResponse) ProtoReflect() protoreflect.Message {
+func (x *VehiclesByRouteResponse) ProtoReflect() protoreflect.Message {
 	mi := &file_protos_geolocation_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -152,83 +97,159 @@ func (x *GeolocationResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GeolocationResponse.ProtoReflect.Descriptor instead.
-func (*GeolocationResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use VehiclesByRouteResponse.ProtoReflect.Descriptor instead.
+func (*VehiclesByRouteResponse) Descriptor() ([]byte, []int) {
 	return file_protos_geolocation_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *GeolocationResponse) GetDegree() float32 {
+func (x *VehiclesByRouteResponse) GetVehicles() []*Vehicle {
 	if x != nil {
-		return x.Degree
-	}
-	return 0
-}
-
-func (x *GeolocationResponse) GetLatitude() float32 {
-	if x != nil {
-		return x.Latitude
-	}
-	return 0
-}
-
-func (x *GeolocationResponse) GetLongitude() float32 {
-	if x != nil {
-		return x.Longitude
-	}
-	return 0
-}
-
-func (x *GeolocationResponse) GetSpeed() float32 {
-	if x != nil {
-		return x.Speed
-	}
-	return 0
-}
-
-func (x *GeolocationResponse) GetVehicleId() int32 {
-	if x != nil {
-		return x.VehicleId
-	}
-	return 0
-}
-
-func (x *GeolocationResponse) GetRouteId() int32 {
-	if x != nil {
-		return x.RouteId
-	}
-	return 0
-}
-
-func (x *GeolocationResponse) GetTimestamp() *timestamppb.Timestamp {
-	if x != nil {
-		return x.Timestamp
+		return x.Vehicles
 	}
 	return nil
+}
+
+type VehiclesByStationRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	StationId     float32                `protobuf:"fixed32,1,opt,name=stationId,proto3" json:"stationId,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *VehiclesByStationRequest) Reset() {
+	*x = VehiclesByStationRequest{}
+	mi := &file_protos_geolocation_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *VehiclesByStationRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*VehiclesByStationRequest) ProtoMessage() {}
+
+func (x *VehiclesByStationRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_protos_geolocation_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use VehiclesByStationRequest.ProtoReflect.Descriptor instead.
+func (*VehiclesByStationRequest) Descriptor() ([]byte, []int) {
+	return file_protos_geolocation_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *VehiclesByStationRequest) GetStationId() float32 {
+	if x != nil {
+		return x.StationId
+	}
+	return 0
+}
+
+type VehiclesByStationResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Vehicles      []*Vehicle             `protobuf:"bytes,1,rep,name=vehicles,proto3" json:"vehicles,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *VehiclesByStationResponse) Reset() {
+	*x = VehiclesByStationResponse{}
+	mi := &file_protos_geolocation_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *VehiclesByStationResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*VehiclesByStationResponse) ProtoMessage() {}
+
+func (x *VehiclesByStationResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_protos_geolocation_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use VehiclesByStationResponse.ProtoReflect.Descriptor instead.
+func (*VehiclesByStationResponse) Descriptor() ([]byte, []int) {
+	return file_protos_geolocation_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *VehiclesByStationResponse) GetVehicles() []*Vehicle {
+	if x != nil {
+		return x.Vehicles
+	}
+	return nil
+}
+
+type Vehicle struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Vehicle) Reset() {
+	*x = Vehicle{}
+	mi := &file_protos_geolocation_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Vehicle) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Vehicle) ProtoMessage() {}
+
+func (x *Vehicle) ProtoReflect() protoreflect.Message {
+	mi := &file_protos_geolocation_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Vehicle.ProtoReflect.Descriptor instead.
+func (*Vehicle) Descriptor() ([]byte, []int) {
+	return file_protos_geolocation_proto_rawDescGZIP(), []int{4}
 }
 
 var File_protos_geolocation_proto protoreflect.FileDescriptor
 
 const file_protos_geolocation_proto_rawDesc = "" +
 	"\n" +
-	"\x18protos/geolocation.proto\x12\x06protos\x1a\x1fgoogle/protobuf/timestamp.proto\"\xee\x01\n" +
-	"\x12GeolocationRequest\x12\x16\n" +
-	"\x06degree\x18\x01 \x01(\x02R\x06degree\x12\x1a\n" +
-	"\blatitude\x18\x02 \x01(\x02R\blatitude\x12\x1c\n" +
-	"\tlongitude\x18\x03 \x01(\x02R\tlongitude\x12\x14\n" +
-	"\x05speed\x18\x04 \x01(\x02R\x05speed\x12\x1c\n" +
-	"\tvehicleId\x18\x05 \x01(\x05R\tvehicleId\x12\x18\n" +
-	"\arouteId\x18\x06 \x01(\x05R\arouteId\x128\n" +
-	"\ttimestamp\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\ttimestamp\"\xef\x01\n" +
-	"\x13GeolocationResponse\x12\x16\n" +
-	"\x06degree\x18\x01 \x01(\x02R\x06degree\x12\x1a\n" +
-	"\blatitude\x18\x02 \x01(\x02R\blatitude\x12\x1c\n" +
-	"\tlongitude\x18\x03 \x01(\x02R\tlongitude\x12\x14\n" +
-	"\x05speed\x18\x04 \x01(\x02R\x05speed\x12\x1c\n" +
-	"\tvehicleId\x18\x05 \x01(\x05R\tvehicleId\x12\x18\n" +
-	"\arouteId\x18\x06 \x01(\x05R\arouteId\x128\n" +
-	"\ttimestamp\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\ttimestamp2]\n" +
-	"\vGeolocation\x12N\n" +
-	"\x11CreateGeolocation\x12\x1a.protos.GeolocationRequest\x1a\x1b.protos.GeolocationResponse\"\x00B%Z#github.com/catouberos/geoloc/protosb\x06proto3"
+	"\x18protos/geolocation.proto\x12\x06protos\"2\n" +
+	"\x16VehiclesByRouteRequest\x12\x18\n" +
+	"\arouteId\x18\x01 \x01(\x02R\arouteId\"F\n" +
+	"\x17VehiclesByRouteResponse\x12+\n" +
+	"\bvehicles\x18\x01 \x03(\v2\x0f.protos.VehicleR\bvehicles\"8\n" +
+	"\x18VehiclesByStationRequest\x12\x1c\n" +
+	"\tstationId\x18\x01 \x01(\x02R\tstationId\"H\n" +
+	"\x19VehiclesByStationResponse\x12+\n" +
+	"\bvehicles\x18\x01 \x03(\v2\x0f.protos.VehicleR\bvehicles\"\t\n" +
+	"\aVehicle2\xc5\x01\n" +
+	"\vGeolocation\x12W\n" +
+	"\x12GetVehiclesByRoute\x12\x1e.protos.VehiclesByRouteRequest\x1a\x1f.protos.VehiclesByRouteResponse\"\x00\x12]\n" +
+	"\x14GetVehiclesByStation\x12 .protos.VehiclesByStationRequest\x1a!.protos.VehiclesByStationResponse\"\x00B%Z#github.com/catouberos/geoloc/protosb\x06proto3"
 
 var (
 	file_protos_geolocation_proto_rawDescOnce sync.Once
@@ -242,19 +263,23 @@ func file_protos_geolocation_proto_rawDescGZIP() []byte {
 	return file_protos_geolocation_proto_rawDescData
 }
 
-var file_protos_geolocation_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_protos_geolocation_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
 var file_protos_geolocation_proto_goTypes = []any{
-	(*GeolocationRequest)(nil),    // 0: protos.GeolocationRequest
-	(*GeolocationResponse)(nil),   // 1: protos.GeolocationResponse
-	(*timestamppb.Timestamp)(nil), // 2: google.protobuf.Timestamp
+	(*VehiclesByRouteRequest)(nil),    // 0: protos.VehiclesByRouteRequest
+	(*VehiclesByRouteResponse)(nil),   // 1: protos.VehiclesByRouteResponse
+	(*VehiclesByStationRequest)(nil),  // 2: protos.VehiclesByStationRequest
+	(*VehiclesByStationResponse)(nil), // 3: protos.VehiclesByStationResponse
+	(*Vehicle)(nil),                   // 4: protos.Vehicle
 }
 var file_protos_geolocation_proto_depIdxs = []int32{
-	2, // 0: protos.GeolocationRequest.timestamp:type_name -> google.protobuf.Timestamp
-	2, // 1: protos.GeolocationResponse.timestamp:type_name -> google.protobuf.Timestamp
-	0, // 2: protos.Geolocation.CreateGeolocation:input_type -> protos.GeolocationRequest
-	1, // 3: protos.Geolocation.CreateGeolocation:output_type -> protos.GeolocationResponse
-	3, // [3:4] is the sub-list for method output_type
-	2, // [2:3] is the sub-list for method input_type
+	4, // 0: protos.VehiclesByRouteResponse.vehicles:type_name -> protos.Vehicle
+	4, // 1: protos.VehiclesByStationResponse.vehicles:type_name -> protos.Vehicle
+	0, // 2: protos.Geolocation.GetVehiclesByRoute:input_type -> protos.VehiclesByRouteRequest
+	2, // 3: protos.Geolocation.GetVehiclesByStation:input_type -> protos.VehiclesByStationRequest
+	1, // 4: protos.Geolocation.GetVehiclesByRoute:output_type -> protos.VehiclesByRouteResponse
+	3, // 5: protos.Geolocation.GetVehiclesByStation:output_type -> protos.VehiclesByStationResponse
+	4, // [4:6] is the sub-list for method output_type
+	2, // [2:4] is the sub-list for method input_type
 	2, // [2:2] is the sub-list for extension type_name
 	2, // [2:2] is the sub-list for extension extendee
 	0, // [0:2] is the sub-list for field type_name
@@ -271,7 +296,7 @@ func file_protos_geolocation_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_protos_geolocation_proto_rawDesc), len(file_protos_geolocation_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   5,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

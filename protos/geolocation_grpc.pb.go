@@ -19,14 +19,16 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Geolocation_CreateGeolocation_FullMethodName = "/protos.Geolocation/CreateGeolocation"
+	Geolocation_GetVehiclesByRoute_FullMethodName   = "/protos.Geolocation/GetVehiclesByRoute"
+	Geolocation_GetVehiclesByStation_FullMethodName = "/protos.Geolocation/GetVehiclesByStation"
 )
 
 // GeolocationClient is the client API for Geolocation service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type GeolocationClient interface {
-	CreateGeolocation(ctx context.Context, in *GeolocationRequest, opts ...grpc.CallOption) (*GeolocationResponse, error)
+	GetVehiclesByRoute(ctx context.Context, in *VehiclesByRouteRequest, opts ...grpc.CallOption) (*VehiclesByRouteResponse, error)
+	GetVehiclesByStation(ctx context.Context, in *VehiclesByStationRequest, opts ...grpc.CallOption) (*VehiclesByStationResponse, error)
 }
 
 type geolocationClient struct {
@@ -37,10 +39,20 @@ func NewGeolocationClient(cc grpc.ClientConnInterface) GeolocationClient {
 	return &geolocationClient{cc}
 }
 
-func (c *geolocationClient) CreateGeolocation(ctx context.Context, in *GeolocationRequest, opts ...grpc.CallOption) (*GeolocationResponse, error) {
+func (c *geolocationClient) GetVehiclesByRoute(ctx context.Context, in *VehiclesByRouteRequest, opts ...grpc.CallOption) (*VehiclesByRouteResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GeolocationResponse)
-	err := c.cc.Invoke(ctx, Geolocation_CreateGeolocation_FullMethodName, in, out, cOpts...)
+	out := new(VehiclesByRouteResponse)
+	err := c.cc.Invoke(ctx, Geolocation_GetVehiclesByRoute_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *geolocationClient) GetVehiclesByStation(ctx context.Context, in *VehiclesByStationRequest, opts ...grpc.CallOption) (*VehiclesByStationResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(VehiclesByStationResponse)
+	err := c.cc.Invoke(ctx, Geolocation_GetVehiclesByStation_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -51,7 +63,8 @@ func (c *geolocationClient) CreateGeolocation(ctx context.Context, in *Geolocati
 // All implementations must embed UnimplementedGeolocationServer
 // for forward compatibility.
 type GeolocationServer interface {
-	CreateGeolocation(context.Context, *GeolocationRequest) (*GeolocationResponse, error)
+	GetVehiclesByRoute(context.Context, *VehiclesByRouteRequest) (*VehiclesByRouteResponse, error)
+	GetVehiclesByStation(context.Context, *VehiclesByStationRequest) (*VehiclesByStationResponse, error)
 	mustEmbedUnimplementedGeolocationServer()
 }
 
@@ -62,8 +75,11 @@ type GeolocationServer interface {
 // pointer dereference when methods are called.
 type UnimplementedGeolocationServer struct{}
 
-func (UnimplementedGeolocationServer) CreateGeolocation(context.Context, *GeolocationRequest) (*GeolocationResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CreateGeolocation not implemented")
+func (UnimplementedGeolocationServer) GetVehiclesByRoute(context.Context, *VehiclesByRouteRequest) (*VehiclesByRouteResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetVehiclesByRoute not implemented")
+}
+func (UnimplementedGeolocationServer) GetVehiclesByStation(context.Context, *VehiclesByStationRequest) (*VehiclesByStationResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetVehiclesByStation not implemented")
 }
 func (UnimplementedGeolocationServer) mustEmbedUnimplementedGeolocationServer() {}
 func (UnimplementedGeolocationServer) testEmbeddedByValue()                     {}
@@ -86,20 +102,38 @@ func RegisterGeolocationServer(s grpc.ServiceRegistrar, srv GeolocationServer) {
 	s.RegisterService(&Geolocation_ServiceDesc, srv)
 }
 
-func _Geolocation_CreateGeolocation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GeolocationRequest)
+func _Geolocation_GetVehiclesByRoute_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(VehiclesByRouteRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(GeolocationServer).CreateGeolocation(ctx, in)
+		return srv.(GeolocationServer).GetVehiclesByRoute(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Geolocation_CreateGeolocation_FullMethodName,
+		FullMethod: Geolocation_GetVehiclesByRoute_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GeolocationServer).CreateGeolocation(ctx, req.(*GeolocationRequest))
+		return srv.(GeolocationServer).GetVehiclesByRoute(ctx, req.(*VehiclesByRouteRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Geolocation_GetVehiclesByStation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(VehiclesByStationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GeolocationServer).GetVehiclesByStation(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Geolocation_GetVehiclesByStation_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GeolocationServer).GetVehiclesByStation(ctx, req.(*VehiclesByStationRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -112,8 +146,12 @@ var Geolocation_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*GeolocationServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "CreateGeolocation",
-			Handler:    _Geolocation_CreateGeolocation_Handler,
+			MethodName: "GetVehiclesByRoute",
+			Handler:    _Geolocation_GetVehiclesByRoute_Handler,
+		},
+		{
+			MethodName: "GetVehiclesByStation",
+			Handler:    _Geolocation_GetVehiclesByStation_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
