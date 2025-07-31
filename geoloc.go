@@ -8,9 +8,9 @@ import (
 	"os"
 
 	"github.com/catouberos/geoloc/base"
+	"github.com/catouberos/geoloc/internal/rpc"
 	"github.com/catouberos/geoloc/models"
 	"github.com/catouberos/geoloc/protos"
-	"github.com/catouberos/geoloc/rpc"
 	"github.com/jackc/pgx/v5"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/pressly/goose/v3"
