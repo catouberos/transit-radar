@@ -27,12 +27,12 @@ VALUES
 `
 
 type CreateGeolocationParams struct {
-	Degree    pgtype.Float4
-	Latitude  pgtype.Float4
-	Longitude pgtype.Float4
-	Speed     pgtype.Float4
-	VehicleID pgtype.Int4
-	RouteID   pgtype.Int4
+	Degree    float32
+	Latitude  float32
+	Longitude float32
+	Speed     float32
+	VehicleID int64
+	RouteID   int64
 	Timestamp pgtype.Timestamptz
 }
 
@@ -70,7 +70,7 @@ LIMIT
     1
 `
 
-func (q *Queries) GetLatestByRoute(ctx context.Context, routeID pgtype.Int4) (Geolocation, error) {
+func (q *Queries) GetLatestByRoute(ctx context.Context, routeID int64) (Geolocation, error) {
 	row := q.db.QueryRow(ctx, getLatestByRoute, routeID)
 	var i Geolocation
 	err := row.Scan(

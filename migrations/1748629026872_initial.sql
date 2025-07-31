@@ -1,12 +1,23 @@
 -- +goose Up
+CREATE TABLE vehicles (
+    id bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    number_plate varchar(10) NOT NULL UNIQUE
+);
+
+CREATE TABLE routes (
+    id bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    number int NOT NULL UNIQUE,
+    name text NOT NULL
+);
+
 CREATE TABLE geolocations (
-    degree float4,
-    latitude float4,
-    longitude float4,
-    speed float4,
-    vehicle_id int,
-    route_id int,
-    "timestamp" timestamptz
+    degree real NOT NULL,
+    latitude real NOT NULL,
+    longitude real NOT NULL,
+    speed real NOT NULL,
+    vehicle_id bigint NOT NULL REFERENCES vehicles(id),
+    route_id bigint NOT NULL REFERENCES routes(id),
+    "timestamp" timestamptz NOT NULL
 ) WITH (
     tsdb.hypertable,
     tsdb.partition_column = 'timestamp',
