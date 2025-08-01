@@ -5,6 +5,7 @@ go 1.24.3
 require (
 	github.com/jackc/pgx/v5 v5.7.5
 	github.com/pressly/goose/v3 v3.24.3
+	github.com/rabbitmq/amqp091-go v1.10.0
 	google.golang.org/grpc v1.73.0
 	google.golang.org/protobuf v1.36.6
 )

@@ -16,6 +16,8 @@ import (
 	"github.com/pressly/goose/v3"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
+
+	amqp "github.com/rabbitmq/amqp091-go"
 )
 
 //go:embed migrations/*.sql
@@ -51,13 +53,11 @@ func main() {
 	db.Close()
 
 	// setup main connection
-	ctx := context.Background()
-
-	conn, err := pgx.Connect(ctx, connection)
+	conn, err := pgx.Connect(context.Background(), connection)
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer conn.Close(ctx)
+	defer conn.Close(context.Background())
 
 	// setup models
 	queries := models.New(conn)
@@ -65,8 +65,23 @@ func main() {
 	// setup grpc
 	s := grpc.NewServer()
 
+	// setup rabbitmq
+	amqp, err := amqp.Dial("amqp://guest:guest@192.168.64.3:5672/")
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	ch, err := amqp.Channel()
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer ch.Close()
+
 	// initialise app
-	app := base.InitApp(queries, s)
+	app := base.InitApp(queries, s, ch)
 
 	protos.RegisterGeolocationServer(s, &rpc.GeolocationServer{
 		App: app,
