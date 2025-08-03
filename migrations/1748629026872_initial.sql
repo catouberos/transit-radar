@@ -1,13 +1,22 @@
 -- +goose Up
 CREATE TABLE vehicles (
     id bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    number_plate varchar(10) NOT NULL UNIQUE
+    license_plate varchar(10) UNIQUE NOT NULL
 );
 
 CREATE TABLE routes (
     id bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    number varchar(10) NOT NULL UNIQUE,
-    name text NOT NULL
+    number varchar(10) UNIQUE NOT NULL,
+    name text NOT NULL,
+    ebms_id bigint,
+    active boolean NOT NULL DEFAULT TRUE
+);
+
+CREATE TABLE variations (
+    id bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    name text NOT NULL,
+    ebms_id bigint,
+    route_id bigint NOT NULL REFERENCES routes(id)
 );
 
 CREATE TABLE geolocations (

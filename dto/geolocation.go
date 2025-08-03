@@ -3,11 +3,23 @@ package dto
 import "time"
 
 type GeolocationInsert struct {
-	Degree    float32   `json:"deg"`
-	Latitude  float32   `json:"lat"`
-	Longitude float32   `json:"lng"`
-	Speed     float32   `json:"spd"`
-	VehicleID int64     `json:"vID"`
-	RouteID   int64     `json:"rID"`
-	Timestamp time.Time `json:"dts"`
+	Degree      float32   `json:"degree"`
+	Latitude    float32   `json:"latitude"`
+	Longitude   float32   `json:"longitude"`
+	Speed       float32   `json:"speed"`
+	VehicleID   int64     `json:"vehicleID"`
+	RouteID     int64     `json:"routeID"`
+	VariationID int64     `json:"variationID"`
+	Timestamp   time.Time `json:"timestamp"`
+}
+
+type GeolocationByPlateInsert struct {
+	Degree       float32   `json:"degree"`
+	Latitude     float32   `json:"latitude"`
+	Longitude    float32   `json:"longitude"`
+	Speed        float32   `json:"speed"`
+	LicensePlate string    `json:"licensePlate"`
+	RouteID      int64     `json:"routeID"`
+	VariationID  int64     `json:"variationID"`
+	Timestamp    time.Time `json:"timestamp"`
 }

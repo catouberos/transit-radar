@@ -22,9 +22,18 @@ type Route struct {
 	ID     int64
 	Number string
 	Name   string
+	EbmsID pgtype.Int8
+	Active bool
+}
+
+type Variation struct {
+	ID      int64
+	Name    string
+	EbmsID  pgtype.Int8
+	RouteID int64
 }
 
 type Vehicle struct {
-	ID          int64
-	NumberPlate string
+	ID           int64
+	LicensePlate string
 }
