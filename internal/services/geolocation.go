@@ -4,12 +4,12 @@ import (
 	"context"
 
 	"github.com/catouberos/geoloc/base"
-	"github.com/catouberos/geoloc/internal/events"
+	"github.com/catouberos/geoloc/dto"
 	"github.com/catouberos/geoloc/models"
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-func NewGeolocation(ctx context.Context, app *base.App, data *events.GeolocationInsert) (*models.Geolocation, error) {
+func NewGeolocation(ctx context.Context, app *base.App, data *dto.GeolocationInsert) (*models.Geolocation, error) {
 	result, err := app.Queries.CreateGeolocation(ctx, models.CreateGeolocationParams{
 		Degree:    data.Degree,
 		Latitude:  data.Latitude,
