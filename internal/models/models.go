@@ -27,10 +27,11 @@ type Route struct {
 }
 
 type Variation struct {
-	ID      int64
-	Name    string
-	EbmsID  pgtype.Int8
-	RouteID int64
+	ID         int64
+	Name       string
+	EbmsID     pgtype.Int8
+	IsOutbound bool
+	RouteID    int64
 }
 
 type Vehicle struct {

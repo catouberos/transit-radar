@@ -8,14 +8,15 @@ CREATE TABLE routes (
     id bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     number varchar(10) UNIQUE NOT NULL,
     name text NOT NULL,
-    ebms_id bigint,
+    ebms_id bigint UNIQUE NULLS NOT DISTINCT,
     active boolean NOT NULL DEFAULT TRUE
 );
 
 CREATE TABLE variations (
     id bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     name text NOT NULL,
-    ebms_id bigint,
+    ebms_id bigint UNIQUE NULLS NOT DISTINCT,
+    is_outbound boolean NOT NULL DEFAULT TRUE,
     route_id bigint NOT NULL REFERENCES routes(id)
 );
 
