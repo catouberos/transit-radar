@@ -3,8 +3,8 @@ package base
 import (
 	"context"
 
-	"github.com/catouberos/geoloc/dto"
-	"github.com/catouberos/geoloc/internal/models"
+	"github.com/catouberos/transit-radar/dto"
+	"github.com/catouberos/transit-radar/internal/models"
 	"github.com/jackc/pgx/v5/pgtype"
 )
 

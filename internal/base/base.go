@@ -3,16 +3,14 @@ package base
 import (
 	"io/fs"
 	"log/slog"
-	"net"
+	"net/http"
 
-	"github.com/catouberos/geoloc/internal/models"
-	"github.com/catouberos/geoloc/internal/queues"
+	"github.com/catouberos/transit-radar/internal/models"
+	"github.com/catouberos/transit-radar/internal/queues"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/jackc/pgx/v5/stdlib"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/pressly/goose/v3"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/reflection"
 )
 
 type App struct {
@@ -20,17 +18,17 @@ type App struct {
 	migrations fs.FS
 
 	query *models.Queries
-	rpc   *grpc.Server
+	mux   *http.ServeMux
 	queue *queues.Client
 }
 
-func NewApp(dbConn *pgxpool.Pool, migrations fs.FS, grpc *grpc.Server, amqp *queues.Client) *App {
+func NewApp(dbConn *pgxpool.Pool, migrations fs.FS, mux *http.ServeMux, queue *queues.Client) *App {
 	app := &App{
 		dbPool:     dbConn,
 		migrations: migrations,
 
-		rpc:   grpc,
-		queue: amqp,
+		mux:   mux,
+		queue: queue,
 	}
 
 	return app
@@ -47,15 +45,7 @@ func (app *App) Serve() error {
 		return err
 	}
 
-	lis, err := net.Listen("tcp", ":5005")
-	if err != nil {
-		return err
-	}
-
-	// grpc: enable reflection
-	reflection.Register(app.rpc)
-
-	return app.rpc.Serve(lis)
+	return http.ListenAndServe("localhost:5000", app.mux)
 }
 
 func (app *App) Query() *models.Queries {

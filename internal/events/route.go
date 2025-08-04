@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"log/slog"
 
-	"github.com/catouberos/geoloc/base"
-	"github.com/catouberos/geoloc/dto"
+	"github.com/catouberos/transit-radar/dto"
+	"github.com/catouberos/transit-radar/internal/base"
 )
 
 func registerRouteUpsertHandler(ctx context.Context, app *base.App) error {

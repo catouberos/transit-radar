@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/catouberos/geoloc/base"
+	"github.com/catouberos/transit-radar/internal/base"
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
