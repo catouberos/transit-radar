@@ -6,6 +6,16 @@ CREATE TABLE vehicles (
 
 CREATE UNIQUE INDEX idx_vehicle_licenseplate ON vehicles(license_plate);
 
+CREATE TABLE routes (
+    id bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    number varchar(10) UNIQUE NOT NULL,
+    name text NOT NULL,
+    ebms_id bigint UNIQUE NULLS NOT DISTINCT,
+    active boolean NOT NULL DEFAULT TRUE
+);
+
+CREATE INDEX idx_route_ebmsid ON routes(ebms_id);
+
 CREATE TABLE variations (
     id bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     name text NOT NULL,
@@ -17,16 +27,6 @@ CREATE TABLE variations (
 CREATE INDEX idx_variation_ebmsid ON variations(ebms_id);
 
 CREATE UNIQUE INDEX idx_variation_outbound_routeid ON variations(is_outbound, route_id);
-
-CREATE TABLE routes (
-    id bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    number varchar(10) UNIQUE NOT NULL,
-    name text NOT NULL,
-    ebms_id bigint UNIQUE NULLS NOT DISTINCT,
-    active boolean NOT NULL DEFAULT TRUE
-);
-
-CREATE INDEX idx_route_ebmsid ON routes(ebms_id);
 
 CREATE TABLE geolocations (
     degree real NOT NULL,
@@ -48,10 +48,10 @@ CREATE UNIQUE INDEX idx_geolocation_vehicleid_timestamp ON geolocations(vehicle_
 CREATE UNIQUE INDEX idx_geolocation_vehicleid_routeid_timestamp ON geolocations(vehicle_id, route_id, "timestamp");
 
 -- +goose Down
-DROP TABLE vehicles;
+DROP TABLE geolocations;
 
 DROP TABLE variations;
 
 DROP TABLE routes;
 
-DROP TABLE geolocations;
+DROP TABLE vehicles;
