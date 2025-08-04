@@ -2,96 +2,78 @@ package main
 
 import (
 	"context"
-	"database/sql"
 	"embed"
 	"log"
 	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/catouberos/geoloc/base"
+	"github.com/catouberos/geoloc/internal/events"
+	"github.com/catouberos/geoloc/internal/queues"
 	"github.com/catouberos/geoloc/internal/rpc"
-	"github.com/catouberos/geoloc/models"
 	"github.com/catouberos/geoloc/protos"
-	"github.com/jackc/pgx/v5"
-	_ "github.com/jackc/pgx/v5/stdlib"
-	"github.com/pressly/goose/v3"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/reflection"
-
-	amqp "github.com/rabbitmq/amqp091-go"
 )
 
 //go:embed migrations/*.sql
 var embedMigrations embed.FS
 
 func main() {
+	done := make(chan bool)
+
 	// set up database
 	connection, exists := os.LookupEnv("DATABASE_CONNECTION")
 	if !exists {
 		log.Fatalln("Database connection has not been defined")
 	}
 
-	// runs migration if present
-	db, err := sql.Open("pgx", connection)
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	goose.SetBaseFS(embedMigrations)
-
-	if err := goose.SetDialect("postgres"); err != nil {
-		log.Fatalln(err)
-	}
-
-	log.Println("Running migrations...")
-
-	if err := goose.Up(db, "migrations"); err != nil {
-		log.Fatalln(err)
-	}
-
-	log.Println("Migration completed!")
-
-	db.Close()
-
 	// setup main connection
-	conn, err := pgx.Connect(context.Background(), connection)
+	pool, err := pgxpool.New(context.Background(), connection)
 	if err != nil {
-		log.Fatal(err)
+		log.Panicln(err)
 	}
-	defer conn.Close(context.Background())
-
-	// setup models
-	queries := models.New(conn)
+	defer pool.Close()
 
 	// setup grpc
-	s := grpc.NewServer()
+	server := grpc.NewServer()
+	defer server.Stop()
 
 	// setup rabbitmq
-	amqp, err := amqp.Dial("amqp://guest:guest@192.168.64.3:5672/")
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	ch, err := amqp.Channel()
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	defer ch.Close()
+	queue := queues.New("amqp://guest:guest@localhost:5672/")
+	defer queue.Close()
 
 	// initialise app
-	app := base.InitApp(queries, s, ch)
+	app := base.NewApp(pool, embedMigrations, server, queue)
 
-	protos.RegisterGeolocationServer(s, &rpc.GeolocationServer{
+	protos.RegisterGeolocationServer(server, &rpc.GeolocationServer{
 		App: app,
 	})
 
-	// grpc: enable reflection
-	reflection.Register(s)
+	// listen for interrupt signal to gracefully shutdown the application
+	go func() {
+		sigChan := make(chan os.Signal, 1)
+		signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
+		<-sigChan
+
+		done <- true
+	}()
+
+	go func() {
+		events.RegisterConsumer(app)
+
+		done <- true
+	}()
 
 	// serve
-	if err := app.Start(); err != nil {
-		log.Fatalln(err)
-	}
+	go func() {
+		if err := app.Serve(); err != nil {
+			log.Fatalln(err)
+		}
+
+		done <- true
+	}()
+
+	<-done
 }

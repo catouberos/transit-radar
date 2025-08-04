@@ -1,38 +1,95 @@
 package base
 
 import (
+	"io/fs"
+	"log/slog"
 	"net"
 
-	"github.com/catouberos/geoloc/models"
-	amqp "github.com/rabbitmq/amqp091-go"
+	"github.com/catouberos/geoloc/internal/models"
+	"github.com/catouberos/geoloc/internal/queues"
+	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/jackc/pgx/v5/stdlib"
+	_ "github.com/jackc/pgx/v5/stdlib"
+	"github.com/pressly/goose/v3"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 )
 
 type App struct {
-	Queries *models.Queries
-	GRPC    *grpc.Server
-	AMQP    *amqp.Channel
+	dbPool     *pgxpool.Pool
+	migrations fs.FS
+
+	query *models.Queries
+	rpc   *grpc.Server
+	queue *queues.Client
 }
 
-func InitApp(queries *models.Queries, grpc *grpc.Server, amqp *amqp.Channel) *App {
+func NewApp(dbConn *pgxpool.Pool, migrations fs.FS, grpc *grpc.Server, amqp *queues.Client) *App {
 	app := &App{
-		Queries: queries,
-		GRPC:    grpc,
-		AMQP:    amqp,
+		dbPool:     dbConn,
+		migrations: migrations,
+
+		rpc:   grpc,
+		queue: amqp,
 	}
 
 	return app
 }
 
-func (app *App) Start() error {
+func (app *App) Serve() error {
+	err := app.runMigrations()
+	if err != nil {
+		return err
+	}
+
+	err = app.initQueries()
+	if err != nil {
+		return err
+	}
+
 	lis, err := net.Listen("tcp", ":5005")
 	if err != nil {
 		return err
 	}
 
-	if err := app.GRPC.Serve(lis); err != nil {
+	// grpc: enable reflection
+	reflection.Register(app.rpc)
+
+	return app.rpc.Serve(lis)
+}
+
+func (app *App) Query() *models.Queries {
+	return app.query
+}
+
+func (app *App) Queue() *queues.Client {
+	return app.queue
+}
+
+// runs migration if present
+func (app *App) runMigrations() error {
+	goose.SetBaseFS(app.migrations)
+
+	db := stdlib.OpenDBFromPool(app.dbPool)
+	defer db.Close()
+
+	if err := goose.SetDialect("postgres"); err != nil {
 		return err
 	}
+
+	slog.Info("Running migrations...")
+
+	if err := goose.Up(db, "migrations"); err != nil {
+		return err
+	}
+
+	slog.Info("Migration completed!")
+
+	return nil
+}
+
+func (app *App) initQueries() error {
+	app.query = models.New(app.dbPool)
 
 	return nil
 }

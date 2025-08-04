@@ -3,38 +3,32 @@ package events
 import (
 	"context"
 	"log"
+	"log/slog"
 
-	"github.com/catouberos/geoloc/base"
+	"github.com/catouberos/geoloc/internal/queues"
 )
 
-func registerGeolocationInsertHandler(app *base.App) error {
-	ctx := context.Background()
-
-	msgs, err := app.AMQP.ConsumeWithContext(
-		ctx,
-		"geolocation.insert", // queue
-		"",                   // consumer
-		true,                 // auto-ack
-		false,                // exclusive
-		false,                // no-local
-		false,                // no-wait
-		nil,                  // args
+func registerGeolocationInsertHandler(ctx context.Context, queue *queues.Client) error {
+	deliveries, err := queue.Consume(
+		"geolocationCreated", // queue
 	)
-
 	if err != nil {
-		return err
+		slog.Error("Error creating consumer", "error", err)
 	}
 
-	go func(ctx context.Context) {
-		go func() {
-			for d := range msgs {
-				log.Printf("Received a message: %s", d.Body)
+	go func() {
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case delivery := <-deliveries:
+				log.Printf("Received a message: %s", delivery.Body)
+				if err := delivery.Ack(false); err != nil {
+					slog.Error("error acknowledging message: %s\n", "error", err)
+				}
 			}
-		}()
-
-		// run until canclled
-		<-ctx.Done()
-	}(ctx)
+		}
+	}()
 
 	return nil
 }
