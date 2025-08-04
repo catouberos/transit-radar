@@ -2,23 +2,18 @@ package main
 
 import (
 	"context"
-	"embed"
 	"log"
 	"os"
 	"os/signal"
 	"syscall"
 
-	"github.com/catouberos/geoloc/base"
-	"github.com/catouberos/geoloc/internal/events"
-	"github.com/catouberos/geoloc/internal/queues"
-	"github.com/catouberos/geoloc/internal/rpc"
-	"github.com/catouberos/geoloc/protos"
+	"github.com/catouberos/transit-radar/internal/base"
+	"github.com/catouberos/transit-radar/internal/events"
+	"github.com/catouberos/transit-radar/internal/queues"
+	"github.com/catouberos/transit-radar/internal/server"
+	"github.com/catouberos/transit-radar/migrations"
 	"github.com/jackc/pgx/v5/pgxpool"
-	"google.golang.org/grpc"
 )
-
-//go:embed migrations/*.sql
-var embedMigrations embed.FS
 
 func main() {
 	done := make(chan bool)
@@ -36,20 +31,15 @@ func main() {
 	}
 	defer pool.Close()
 
-	// setup grpc
-	server := grpc.NewServer()
-	defer server.Stop()
+	// setup connectrpc
+	mux := server.NewRPCServer()
 
 	// setup rabbitmq
 	queue := queues.New("amqp://guest:guest@localhost:5672/")
 	defer queue.Close()
 
 	// initialise app
-	app := base.NewApp(pool, embedMigrations, server, queue)
-
-	protos.RegisterGeolocationServer(server, &rpc.GeolocationServer{
-		App: app,
-	})
+	app := base.NewApp(pool, migrations.Migrations, mux, queue)
 
 	// listen for interrupt signal to gracefully shutdown the application
 	go func() {
