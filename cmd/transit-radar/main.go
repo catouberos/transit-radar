@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"embed"
 	"log"
 	"os"
 	"os/signal"
@@ -11,9 +12,11 @@ import (
 	"github.com/catouberos/transit-radar/internal/events"
 	"github.com/catouberos/transit-radar/internal/queues"
 	"github.com/catouberos/transit-radar/internal/server"
-	"github.com/catouberos/transit-radar/migrations"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
+
+//go:embed migrations/*.sql
+var migrations embed.FS
 
 func main() {
 	done := make(chan bool)
@@ -39,7 +42,7 @@ func main() {
 	defer queue.Close()
 
 	// initialise app
-	app := base.NewApp(pool, migrations.Migrations, mux, queue)
+	app := base.NewApp(pool, migrations, mux, queue)
 
 	// listen for interrupt signal to gracefully shutdown the application
 	go func() {
