@@ -9,13 +9,13 @@ import (
 )
 
 type Geolocation struct {
-	Degree    float32
-	Latitude  float32
-	Longitude float32
-	Speed     float32
-	VehicleID int64
-	RouteID   int64
-	Timestamp pgtype.Timestamptz
+	Degree      float32
+	Latitude    float32
+	Longitude   float32
+	Speed       float32
+	VehicleID   int64
+	VariationID int64
+	Timestamp   pgtype.Timestamptz
 }
 
 type Route struct {

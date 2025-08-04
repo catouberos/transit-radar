@@ -34,7 +34,7 @@ CREATE TABLE geolocations (
     longitude real NOT NULL,
     speed real NOT NULL,
     vehicle_id bigint NOT NULL REFERENCES vehicles(id),
-    route_id bigint NOT NULL REFERENCES routes(id),
+    variation_id bigint NOT NULL REFERENCES variations(id),
     "timestamp" timestamptz NOT NULL
 ) WITH (
     tsdb.hypertable,
@@ -45,7 +45,7 @@ CREATE TABLE geolocations (
 
 CREATE UNIQUE INDEX idx_geolocation_vehicleid_timestamp ON geolocations(vehicle_id, "timestamp");
 
-CREATE UNIQUE INDEX idx_geolocation_vehicleid_routeid_timestamp ON geolocations(vehicle_id, route_id, "timestamp");
+CREATE UNIQUE INDEX idx_geolocation_vehicleid_variationid_timestamp ON geolocations(vehicle_id, variation_id, "timestamp");
 
 -- +goose Down
 DROP TABLE geolocations;

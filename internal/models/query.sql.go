@@ -19,21 +19,21 @@ INSERT INTO
         longitude,
         speed,
         vehicle_id,
-        route_id,
+        variation_id,
         "timestamp"
     )
 VALUES
-    ($1, $2, $3, $4, $5, $6, $7) RETURNING degree, latitude, longitude, speed, vehicle_id, route_id, timestamp
+    ($1, $2, $3, $4, $5, $6, $7) RETURNING degree, latitude, longitude, speed, vehicle_id, variation_id, timestamp
 `
 
 type CreateGeolocationParams struct {
-	Degree    float32
-	Latitude  float32
-	Longitude float32
-	Speed     float32
-	VehicleID int64
-	RouteID   int64
-	Timestamp pgtype.Timestamptz
+	Degree      float32
+	Latitude    float32
+	Longitude   float32
+	Speed       float32
+	VehicleID   int64
+	VariationID int64
+	Timestamp   pgtype.Timestamptz
 }
 
 func (q *Queries) CreateGeolocation(ctx context.Context, arg CreateGeolocationParams) (Geolocation, error) {
@@ -43,7 +43,7 @@ func (q *Queries) CreateGeolocation(ctx context.Context, arg CreateGeolocationPa
 		arg.Longitude,
 		arg.Speed,
 		arg.VehicleID,
-		arg.RouteID,
+		arg.VariationID,
 		arg.Timestamp,
 	)
 	var i Geolocation
@@ -53,25 +53,137 @@ func (q *Queries) CreateGeolocation(ctx context.Context, arg CreateGeolocationPa
 		&i.Longitude,
 		&i.Speed,
 		&i.VehicleID,
-		&i.RouteID,
+		&i.VariationID,
 		&i.Timestamp,
 	)
 	return i, err
 }
 
-const getLatestByRoute = `-- name: GetLatestByRoute :one
+const createOrGetVehicle = `-- name: CreateOrGetVehicle :one
+INSERT INTO
+    vehicles(license_plate)
+VALUES
+    ($1) ON CONFLICT (license_plate) DO NOTHING RETURNING id, license_plate
+`
+
+func (q *Queries) CreateOrGetVehicle(ctx context.Context, licensePlate string) (Vehicle, error) {
+	row := q.db.QueryRow(ctx, createOrGetVehicle, licensePlate)
+	var i Vehicle
+	err := row.Scan(&i.ID, &i.LicensePlate)
+	return i, err
+}
+
+const createOrUpdateRoute = `-- name: CreateOrUpdateRoute :one
+INSERT INTO
+    routes (
+        number,
+        name,
+        ebms_id
+    )
+VALUES
+    ($1, $2, $3) ON CONFLICT (ebms_id) DO
+UPDATE
+SET
+    number = EXCLUDED.number,
+    name = EXCLUDED.name RETURNING id, number, name, ebms_id, active
+`
+
+type CreateOrUpdateRouteParams struct {
+	Number string
+	Name   string
+	EbmsID pgtype.Int8
+}
+
+func (q *Queries) CreateOrUpdateRoute(ctx context.Context, arg CreateOrUpdateRouteParams) (Route, error) {
+	row := q.db.QueryRow(ctx, createOrUpdateRoute, arg.Number, arg.Name, arg.EbmsID)
+	var i Route
+	err := row.Scan(
+		&i.ID,
+		&i.Number,
+		&i.Name,
+		&i.EbmsID,
+		&i.Active,
+	)
+	return i, err
+}
+
+const createOrUpdateVariation = `-- name: CreateOrUpdateVariation :one
+INSERT INTO
+    variations (
+        name,
+        ebms_id,
+        is_outbound,
+        route_id
+    )
+VALUES
+    ($1, $2, $3, $4) ON CONFLICT (is_outbound, route_id) DO
+UPDATE
+SET
+    name = EXCLUDED.name RETURNING id, name, ebms_id, is_outbound, route_id
+`
+
+type CreateOrUpdateVariationParams struct {
+	Name       string
+	EbmsID     pgtype.Int8
+	IsOutbound bool
+	RouteID    int64
+}
+
+func (q *Queries) CreateOrUpdateVariation(ctx context.Context, arg CreateOrUpdateVariationParams) (Variation, error) {
+	row := q.db.QueryRow(ctx, createOrUpdateVariation,
+		arg.Name,
+		arg.EbmsID,
+		arg.IsOutbound,
+		arg.RouteID,
+	)
+	var i Variation
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.EbmsID,
+		&i.IsOutbound,
+		&i.RouteID,
+	)
+	return i, err
+}
+
+const getRouteByEbmsID = `-- name: GetRouteByEbmsID :one
 SELECT
-    degree, latitude, longitude, speed, vehicle_id, route_id, timestamp
+    id, number, name, ebms_id, active
 FROM
-    geolocations
+    routes
 WHERE
-    route_id = $1
+    ebms_id = $1
 LIMIT
     1
 `
 
-func (q *Queries) GetLatestByRoute(ctx context.Context, routeID int64) (Geolocation, error) {
-	row := q.db.QueryRow(ctx, getLatestByRoute, routeID)
+func (q *Queries) GetRouteByEbmsID(ctx context.Context, ebmsID pgtype.Int8) (Route, error) {
+	row := q.db.QueryRow(ctx, getRouteByEbmsID, ebmsID)
+	var i Route
+	err := row.Scan(
+		&i.ID,
+		&i.Number,
+		&i.Name,
+		&i.EbmsID,
+		&i.Active,
+	)
+	return i, err
+}
+
+const getRouteByVariationID = `-- name: GetRouteByVariationID :one
+SELECT
+    degree, latitude, longitude, speed, vehicle_id, variation_id, timestamp
+FROM
+    geolocations
+WHERE
+    variation_id = $1
+LIMIT
+    1
+`
+
+func (q *Queries) GetRouteByVariationID(ctx context.Context, variationID int64) (Geolocation, error) {
+	row := q.db.QueryRow(ctx, getRouteByVariationID, variationID)
 	var i Geolocation
 	err := row.Scan(
 		&i.Degree,
@@ -79,8 +191,38 @@ func (q *Queries) GetLatestByRoute(ctx context.Context, routeID int64) (Geolocat
 		&i.Longitude,
 		&i.Speed,
 		&i.VehicleID,
-		&i.RouteID,
+		&i.VariationID,
 		&i.Timestamp,
+	)
+	return i, err
+}
+
+const getVariationByRouteIDAndOutbound = `-- name: GetVariationByRouteIDAndOutbound :one
+SELECT
+    id, name, ebms_id, is_outbound, route_id
+FROM
+    variations
+WHERE
+    route_id = $1
+    AND is_outbound = $2
+LIMIT
+    1
+`
+
+type GetVariationByRouteIDAndOutboundParams struct {
+	RouteID    int64
+	IsOutbound bool
+}
+
+func (q *Queries) GetVariationByRouteIDAndOutbound(ctx context.Context, arg GetVariationByRouteIDAndOutboundParams) (Variation, error) {
+	row := q.db.QueryRow(ctx, getVariationByRouteIDAndOutbound, arg.RouteID, arg.IsOutbound)
+	var i Variation
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.EbmsID,
+		&i.IsOutbound,
+		&i.RouteID,
 	)
 	return i, err
 }
