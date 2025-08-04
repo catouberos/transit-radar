@@ -62,7 +62,7 @@
           buf
           protobuf
           protoc-gen-go
-          protoc-gen-go-grpc
+          protoc-gen-connect-go
 
           sqlc
           sleek

@@ -1,0 +1,17 @@
+syntax = "proto3";
+package api.v1;
+
+option go_package = "github.com/catouberos/transit-radar/gen/api/v1;transitradarv1";
+
+service RouteService {
+  rpc ListRoutes(ListRoutesRequest) returns (ListRoutesResponse) {}
+}
+
+message ListRoutesRequest {
+}
+
+message ListRoutesResponse {
+  repeated Route routes = 1;
+}
+
+message Route {}

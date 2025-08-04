@@ -1,0 +1,27 @@
+syntax = "proto3";
+package api.v1;
+
+option go_package = "github.com/catouberos/transit-radar/gen/api/v1;transitradarv1";
+
+service GeolocationService {
+  rpc GetVehiclesByRoute(GetVehiclesByRouteRequest) returns (GetVehiclesByRouteResponse) {}
+  rpc GetVehiclesByStation(GetVehiclesByStationRequest) returns (GetVehiclesByStationResponse) {}
+}
+
+message GetVehiclesByRouteRequest {
+  float route_id = 1;
+}
+
+message GetVehiclesByRouteResponse {
+  repeated Vehicle vehicles = 1;
+}
+
+message GetVehiclesByStationRequest {
+  float station_id = 1;
+}
+
+message GetVehiclesByStationResponse {
+  repeated Vehicle vehicles = 1;
+}
+
+message Vehicle {}

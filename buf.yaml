@@ -1,0 +1,14 @@
+# For details on buf.yaml configuration, visit https://buf.build/docs/configuration/v2/buf-yaml
+version: v2
+modules:
+  - path: .
+    excludes:
+      - .direnv/
+lint:
+  use:
+    - STANDARD
+  ignore:
+    - .direnv/flake-inputs
+breaking:
+  use:
+    - FILE
