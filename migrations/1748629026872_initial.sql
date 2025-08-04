@@ -1,10 +1,10 @@
 -- +goose Up
 CREATE TABLE vehicles (
     id bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    license_plate varchar(10) UNIQUE NOT NULL
+    license_plate varchar(25) UNIQUE NOT NULL
 );
 
-CREATE UNIQUE INDEX idx_vehicle_licenseplate ON vehicles USING HASH (license_plate);
+CREATE UNIQUE INDEX idx_vehicle_licenseplate ON vehicles(license_plate);
 
 CREATE TABLE variations (
     id bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
@@ -14,7 +14,7 @@ CREATE TABLE variations (
     route_id bigint NOT NULL REFERENCES routes(id)
 );
 
-CREATE INDEX idx_variation_ebmsid ON variations USING HASH (ebms_id);
+CREATE INDEX idx_variation_ebmsid ON variations(ebms_id);
 
 CREATE UNIQUE INDEX idx_variation_outbound_routeid ON variations(is_outbound, route_id);
 
@@ -26,7 +26,7 @@ CREATE TABLE routes (
     active boolean NOT NULL DEFAULT TRUE
 );
 
-CREATE INDEX idx_route_ebmsid ON routes USING HASH (ebms_id);
+CREATE INDEX idx_route_ebmsid ON routes(ebms_id);
 
 CREATE TABLE geolocations (
     degree real NOT NULL,
