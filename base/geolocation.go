@@ -9,17 +9,25 @@ import (
 )
 
 func (app *App) CreateGeolocationByRouteIDAndPlateAndBound(ctx context.Context, data *dto.GeolocationByRouteIDAndPlateAndBoundInsert) (*models.Geolocation, error) {
+	route, err := app.Query().GetRouteByEbmsID(ctx, pgtype.Int8{Int64: data.RouteID, Valid: true})
+	if err != nil {
+		return nil, err
+	}
+
 	variant, err := app.Query().GetVariantByRouteIDAndOutbound(ctx, models.GetVariantByRouteIDAndOutboundParams{
-		RouteID:    data.RouteID,
+		RouteID:    route.ID,
 		IsOutbound: data.IsOutbound,
 	})
 	if err != nil {
 		return nil, err
 	}
 
-	vehicle, err := app.Query().CreateOrGetVehicle(ctx, data.LicensePlate)
+	vehicle, err := app.Query().GetVehicleByLicensePlate(ctx, data.LicensePlate)
 	if err != nil {
-		return nil, err
+		vehicle, err = app.Query().CreateVehicle(ctx, data.LicensePlate)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	result, err := app.Query().CreateGeolocation(ctx, models.CreateGeolocationParams{

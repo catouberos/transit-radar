@@ -19,7 +19,7 @@ CREATE INDEX idx_route_ebmsid ON routes(ebms_id);
 CREATE TABLE variants (
     id bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     name text NOT NULL,
-    ebms_id bigint UNIQUE NULLS NOT DISTINCT,
+    ebms_id bigint,
     is_outbound boolean NOT NULL DEFAULT TRUE,
     route_id bigint NOT NULL
 );
