@@ -59,20 +59,6 @@ func (q *Queries) CreateGeolocation(ctx context.Context, arg CreateGeolocationPa
 	return i, err
 }
 
-const createOrGetVehicle = `-- name: CreateOrGetVehicle :one
-INSERT INTO
-    vehicles(license_plate)
-VALUES
-    ($1) ON CONFLICT (license_plate) DO NOTHING RETURNING id, license_plate
-`
-
-func (q *Queries) CreateOrGetVehicle(ctx context.Context, licensePlate string) (Vehicle, error) {
-	row := q.db.QueryRow(ctx, createOrGetVehicle, licensePlate)
-	var i Vehicle
-	err := row.Scan(&i.ID, &i.LicensePlate)
-	return i, err
-}
-
 const createOrUpdateRoute = `-- name: CreateOrUpdateRoute :one
 INSERT INTO
     routes (
@@ -144,6 +130,20 @@ func (q *Queries) CreateOrUpdateVariant(ctx context.Context, arg CreateOrUpdateV
 		&i.IsOutbound,
 		&i.RouteID,
 	)
+	return i, err
+}
+
+const createVehicle = `-- name: CreateVehicle :one
+INSERT INTO
+    vehicles(license_plate)
+VALUES
+    ($1) RETURNING id, license_plate
+`
+
+func (q *Queries) CreateVehicle(ctx context.Context, licensePlate string) (Vehicle, error) {
+	row := q.db.QueryRow(ctx, createVehicle, licensePlate)
+	var i Vehicle
+	err := row.Scan(&i.ID, &i.LicensePlate)
 	return i, err
 }
 
@@ -224,5 +224,23 @@ func (q *Queries) GetVariantByRouteIDAndOutbound(ctx context.Context, arg GetVar
 		&i.IsOutbound,
 		&i.RouteID,
 	)
+	return i, err
+}
+
+const getVehicleByLicensePlate = `-- name: GetVehicleByLicensePlate :one
+SELECT
+    id, license_plate
+FROM
+    vehicles
+WHERE
+    license_plate = $1
+LIMIT
+    1
+`
+
+func (q *Queries) GetVehicleByLicensePlate(ctx context.Context, licensePlate string) (Vehicle, error) {
+	row := q.db.QueryRow(ctx, getVehicleByLicensePlate, licensePlate)
+	var i Vehicle
+	err := row.Scan(&i.ID, &i.LicensePlate)
 	return i, err
 }

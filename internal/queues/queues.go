@@ -112,12 +112,12 @@ func declareVariantQueues(ch *amqp.Channel) error {
 	}
 
 	q, err := ch.QueueDeclare(
-		"variantUpdate", // name
-		false,           // durable
-		false,           // delete when unused
-		false,           // exclusive
-		false,           // no-wait
-		nil,             // arguments
+		"variantUpdated", // name
+		false,            // durable
+		false,            // delete when unused
+		false,            // exclusive
+		false,            // no-wait
+		nil,              // arguments
 	)
 	if err != nil {
 		return err

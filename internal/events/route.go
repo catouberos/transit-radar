@@ -9,9 +9,9 @@ import (
 	"github.com/catouberos/geoloc/dto"
 )
 
-func registerGeolocationInsertHandler(ctx context.Context, app *base.App) error {
+func registerRouteUpsertHandler(ctx context.Context, app *base.App) error {
 	deliveries, err := app.Queue().Consume(
-		"geolocationCreated", // queue
+		"routeUpdated", // queue
 	)
 	if err != nil {
 		slog.Error("Error creating consumer", "error", err)
@@ -24,17 +24,17 @@ func registerGeolocationInsertHandler(ctx context.Context, app *base.App) error 
 				return
 			case delivery := <-deliveries:
 				logger := slog.New(slog.Default().Handler())
-				logger.With("queue", "geolocationCreated")
+				logger.With("queue", "routeUpdated")
 
-				params := &dto.GeolocationByRouteIDAndPlateAndBoundInsert{}
+				params := &dto.RouteUpsert{}
 				err := json.Unmarshal(delivery.Body, params)
 				if err != nil {
 					logger.Error("Error unmarshal queue data", "error", err)
 				}
 
-				_, err = app.CreateGeolocationByRouteIDAndPlateAndBound(ctx, params)
+				_, err = app.CreateOrUpdateRoute(ctx, params)
 				if err != nil {
-					logger.Error("Error creating geolocation", "error", err)
+					logger.Error("Error creating route", "error", err)
 				}
 
 				if err := delivery.Ack(false); err != nil {

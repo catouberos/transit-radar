@@ -23,7 +23,9 @@ func RegisterConsumer(app *base.App) {
 		chCloseCh := make(chan *amqp.Error)
 		app.Queue().NotifyChannelClose(chCloseCh)
 
-		registerGeolocationInsertHandler(ctx, app.Queue())
+		registerGeolocationInsertHandler(ctx, app)
+		registerRouteUpsertHandler(ctx, app)
+		registerVariantUpsertHandler(ctx, app)
 
 		<-chCloseCh
 		cancel()
