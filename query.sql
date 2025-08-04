@@ -1,10 +1,10 @@
--- name: GetRouteByVariationID :one
+-- name: GetRouteByVariantID :one
 SELECT
     *
 FROM
     geolocations
 WHERE
-    variation_id = $1
+    variant_id = $1
 LIMIT
     1;
 
@@ -16,7 +16,7 @@ INSERT INTO
         longitude,
         speed,
         vehicle_id,
-        variation_id,
+        variant_id,
         "timestamp"
     )
 VALUES
@@ -36,9 +36,9 @@ SET
     number = EXCLUDED.number,
     name = EXCLUDED.name RETURNING *;
 
--- name: CreateOrUpdateVariation :one
+-- name: CreateOrUpdateVariant :one
 INSERT INTO
-    variations (
+    variants (
         name,
         ebms_id,
         is_outbound,
@@ -50,11 +50,11 @@ UPDATE
 SET
     name = EXCLUDED.name RETURNING *;
 
--- name: GetVariationByRouteIDAndOutbound :one
+-- name: GetVariantByRouteIDAndOutbound :one
 SELECT
     *
 FROM
-    variations
+    variants
 WHERE
     route_id = $1
     AND is_outbound = $2

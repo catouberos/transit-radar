@@ -8,13 +8,13 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-func (app *App) CreateOrUpdateVariationByRouteEbmsID(ctx context.Context, data *dto.VariationByRouteEbmsIDUpsert) (*models.Variation, error) {
+func (app *App) CreateOrUpdateVariantByRouteEbmsID(ctx context.Context, data *dto.VariantByRouteEbmsIDUpsert) (*models.Variant, error) {
 	routeId, err := app.GetRouteByEbmsID(ctx, data.RouteEbmsID)
 	if err != nil {
 		return nil, err
 	}
 
-	result, err := app.Query().CreateOrUpdateVariation(ctx, models.CreateOrUpdateVariationParams{
+	result, err := app.Query().CreateOrUpdateVariant(ctx, models.CreateOrUpdateVariantParams{
 		Name:       data.Name,
 		EbmsID:     pgtype.Int8{Int64: data.EbmsID, Valid: true},
 		IsOutbound: data.IsOutbound,

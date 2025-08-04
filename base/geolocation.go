@@ -9,7 +9,7 @@ import (
 )
 
 func (app *App) CreateGeolocationByRouteIDAndPlateAndBound(ctx context.Context, data *dto.GeolocationByRouteIDAndPlateAndBoundInsert) (*models.Geolocation, error) {
-	variation, err := app.Query().GetVariationByRouteIDAndOutbound(ctx, models.GetVariationByRouteIDAndOutboundParams{
+	variant, err := app.Query().GetVariantByRouteIDAndOutbound(ctx, models.GetVariantByRouteIDAndOutboundParams{
 		RouteID:    data.RouteID,
 		IsOutbound: data.IsOutbound,
 	})
@@ -23,13 +23,13 @@ func (app *App) CreateGeolocationByRouteIDAndPlateAndBound(ctx context.Context, 
 	}
 
 	result, err := app.Query().CreateGeolocation(ctx, models.CreateGeolocationParams{
-		Degree:      data.Degree,
-		Latitude:    data.Latitude,
-		Longitude:   data.Longitude,
-		Speed:       data.Speed,
-		VehicleID:   vehicle.ID,
-		VariationID: variation.ID,
-		Timestamp:   pgtype.Timestamptz{Time: data.Timestamp, Valid: true},
+		Degree:    data.Degree,
+		Latitude:  data.Latitude,
+		Longitude: data.Longitude,
+		Speed:     data.Speed,
+		VehicleID: vehicle.ID,
+		VariantID: variant.ID,
+		Timestamp: pgtype.Timestamptz{Time: data.Timestamp, Valid: true},
 	})
 
 	if err != nil {

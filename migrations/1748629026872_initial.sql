@@ -16,25 +16,25 @@ CREATE TABLE routes (
 
 CREATE INDEX idx_route_ebmsid ON routes(ebms_id);
 
-CREATE TABLE variations (
+CREATE TABLE variants (
     id bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     name text NOT NULL,
     ebms_id bigint UNIQUE NULLS NOT DISTINCT,
     is_outbound boolean NOT NULL DEFAULT TRUE,
-    route_id bigint NOT NULL REFERENCES routes(id)
+    route_id bigint NOT NULL
 );
 
-CREATE INDEX idx_variation_ebmsid ON variations(ebms_id);
+CREATE INDEX idx_variant_ebmsid ON variants(ebms_id);
 
-CREATE UNIQUE INDEX idx_variation_outbound_routeid ON variations(is_outbound, route_id);
+CREATE UNIQUE INDEX idx_variant_outbound_routeid ON variants(is_outbound, route_id);
 
 CREATE TABLE geolocations (
     degree real NOT NULL,
     latitude real NOT NULL,
     longitude real NOT NULL,
     speed real NOT NULL,
-    vehicle_id bigint NOT NULL REFERENCES vehicles(id),
-    variation_id bigint NOT NULL REFERENCES variations(id),
+    vehicle_id bigint NOT NULL,
+    variant_id bigint NOT NULL,
     "timestamp" timestamptz NOT NULL
 ) WITH (
     tsdb.hypertable,
@@ -45,12 +45,12 @@ CREATE TABLE geolocations (
 
 CREATE UNIQUE INDEX idx_geolocation_vehicleid_timestamp ON geolocations(vehicle_id, "timestamp");
 
-CREATE UNIQUE INDEX idx_geolocation_vehicleid_variationid_timestamp ON geolocations(vehicle_id, variation_id, "timestamp");
+CREATE UNIQUE INDEX idx_geolocation_vehicleid_variantid_timestamp ON geolocations(vehicle_id, variant_id, "timestamp");
 
 -- +goose Down
 DROP TABLE geolocations;
 
-DROP TABLE variations;
+DROP TABLE variants;
 
 DROP TABLE routes;
 
