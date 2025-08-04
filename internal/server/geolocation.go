@@ -19,3 +19,14 @@ func (s *RPCServer) GetVehiclesByRoute(
 	})
 	return res, nil
 }
+
+func (s *RPCServer) GetVehiclesByStation(
+	ctx context.Context,
+	req *connect.Request[apiv1.GetVehiclesByStationRequest],
+) (*connect.Response[apiv1.GetVehiclesByStationResponse], error) {
+	log.Println("Request headers: ", req.Header())
+	res := connect.NewResponse(&apiv1.GetVehiclesByStationResponse{
+		Vehicles: nil,
+	})
+	return res, nil
+}
