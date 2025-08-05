@@ -2,7 +2,7 @@ version: "2"
 sql:
   - engine: "postgresql"
     queries: "api/query.sql"
-    schema: "migrations"
+    schema: "cmd/transit-radar/migrations"
     gen:
       go:
         package: "models"

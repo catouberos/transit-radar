@@ -66,6 +66,8 @@
 
           sqlc
           sleek
+
+          rabbitmqadmin-ng
         ];
       };
     });

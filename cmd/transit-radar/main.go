@@ -9,17 +9,17 @@ import (
 	"syscall"
 
 	"github.com/catouberos/transit-radar/internal/base"
-	"github.com/catouberos/transit-radar/internal/events"
-	"github.com/catouberos/transit-radar/internal/queues"
+	"github.com/catouberos/transit-radar/internal/queue"
 	"github.com/catouberos/transit-radar/internal/server"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/wagslane/go-rabbitmq"
 )
 
 //go:embed migrations/*.sql
 var migrations embed.FS
 
 func main() {
-	done := make(chan bool)
+	ctx, cancel := context.WithCancel(context.Background())
 
 	// set up database
 	connection, exists := os.LookupEnv("DATABASE_CONNECTION")
@@ -28,21 +28,35 @@ func main() {
 	}
 
 	// setup main connection
-	pool, err := pgxpool.New(context.Background(), connection)
+	pool, err := pgxpool.New(ctx, connection)
 	if err != nil {
 		log.Panicln(err)
 	}
 	defer pool.Close()
 
-	// setup connectrpc
-	mux := server.NewRPCServer()
-
 	// setup rabbitmq
-	queue := queues.New("amqp://guest:guest@localhost:5672/")
-	defer queue.Close()
+	rmq, err := rabbitmq.NewConn(
+		"amqp://guest:guest@localhost:5672/",
+		rabbitmq.WithConnectionOptionsLogging,
+	)
+	if err != nil {
+		log.Panicln(err)
+	}
+	defer rmq.Close()
 
 	// initialise app
-	app := base.NewApp(pool, migrations, mux, queue)
+	app := base.NewApp(pool, migrations)
+	err = app.Init()
+	if err != nil {
+		log.Panicln(err)
+	}
+
+	// initialise grpc server
+	server := server.NewRPCServer(app, "[::]:5000")
+
+	// initialist rabbitmq
+	handler := queue.NewConsumerHandler(rmq, app)
+	defer handler.Stop()
 
 	// listen for interrupt signal to gracefully shutdown the application
 	go func() {
@@ -50,23 +64,23 @@ func main() {
 		signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
 		<-sigChan
 
-		done <- true
+		cancel()
 	}()
 
 	go func() {
-		events.RegisterConsumer(app)
+		handler.Start()
 
-		done <- true
+		cancel()
 	}()
 
 	// serve
 	go func() {
-		if err := app.Serve(); err != nil {
+		if err := server.Serve(); err != nil {
 			log.Fatalln(err)
 		}
 
-		done <- true
+		cancel()
 	}()
 
-	<-done
+	<-ctx.Done()
 }
