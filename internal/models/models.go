@@ -19,22 +19,38 @@ type Geolocation struct {
 }
 
 type Route struct {
-	ID     int64
-	Number string
-	Name   string
-	EbmsID pgtype.Int8
-	Active bool
+	ID            int64
+	Number        string
+	Name          string
+	EbmsID        pgtype.Int8
+	Active        bool
+	OperationTime pgtype.Text
+	Organization  pgtype.Text
+	Ticketing     pgtype.Text
+	RouteType     pgtype.Text
 }
 
 type Variant struct {
-	ID         int64
-	Name       string
-	EbmsID     pgtype.Int8
-	IsOutbound bool
-	RouteID    int64
+	ID            int64
+	Name          string
+	EbmsID        pgtype.Int8
+	IsOutbound    bool
+	RouteID       int64
+	Description   pgtype.Text
+	ShortName     pgtype.Text
+	Distance      pgtype.Float4
+	Duration      pgtype.Int4
+	StartStopName pgtype.Text
+	EndStopName   pgtype.Text
 }
 
 type Vehicle struct {
 	ID           int64
 	LicensePlate string
+	Type         pgtype.Int8
+}
+
+type VehicleType struct {
+	ID   int64
+	Name string
 }

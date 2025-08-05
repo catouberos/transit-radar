@@ -71,7 +71,7 @@ VALUES
 UPDATE
 SET
     number = EXCLUDED.number,
-    name = EXCLUDED.name RETURNING id, number, name, ebms_id, active
+    name = EXCLUDED.name RETURNING id, number, name, ebms_id, active, operation_time, organization, ticketing, route_type
 `
 
 type CreateOrUpdateRouteParams struct {
@@ -89,6 +89,10 @@ func (q *Queries) CreateOrUpdateRoute(ctx context.Context, arg CreateOrUpdateRou
 		&i.Name,
 		&i.EbmsID,
 		&i.Active,
+		&i.OperationTime,
+		&i.Organization,
+		&i.Ticketing,
+		&i.RouteType,
 	)
 	return i, err
 }
@@ -105,7 +109,7 @@ VALUES
     ($1, $2, $3, $4) ON CONFLICT (is_outbound, route_id) DO
 UPDATE
 SET
-    name = EXCLUDED.name RETURNING id, name, ebms_id, is_outbound, route_id
+    name = EXCLUDED.name RETURNING id, name, ebms_id, is_outbound, route_id, description, short_name, distance, duration, start_stop_name, end_stop_name
 `
 
 type CreateOrUpdateVariantParams struct {
@@ -129,6 +133,12 @@ func (q *Queries) CreateOrUpdateVariant(ctx context.Context, arg CreateOrUpdateV
 		&i.EbmsID,
 		&i.IsOutbound,
 		&i.RouteID,
+		&i.Description,
+		&i.ShortName,
+		&i.Distance,
+		&i.Duration,
+		&i.StartStopName,
+		&i.EndStopName,
 	)
 	return i, err
 }
@@ -137,19 +147,19 @@ const createVehicle = `-- name: CreateVehicle :one
 INSERT INTO
     vehicles(license_plate)
 VALUES
-    ($1) RETURNING id, license_plate
+    ($1) RETURNING id, license_plate, type
 `
 
 func (q *Queries) CreateVehicle(ctx context.Context, licensePlate string) (Vehicle, error) {
 	row := q.db.QueryRow(ctx, createVehicle, licensePlate)
 	var i Vehicle
-	err := row.Scan(&i.ID, &i.LicensePlate)
+	err := row.Scan(&i.ID, &i.LicensePlate, &i.Type)
 	return i, err
 }
 
 const getRouteByEbmsID = `-- name: GetRouteByEbmsID :one
 SELECT
-    id, number, name, ebms_id, active
+    id, number, name, ebms_id, active, operation_time, organization, ticketing, route_type
 FROM
     routes
 WHERE
@@ -167,6 +177,10 @@ func (q *Queries) GetRouteByEbmsID(ctx context.Context, ebmsID pgtype.Int8) (Rou
 		&i.Name,
 		&i.EbmsID,
 		&i.Active,
+		&i.OperationTime,
+		&i.Organization,
+		&i.Ticketing,
+		&i.RouteType,
 	)
 	return i, err
 }
@@ -199,7 +213,7 @@ func (q *Queries) GetRouteByVariantID(ctx context.Context, variantID int64) (Geo
 
 const getVariantByRouteIDAndOutbound = `-- name: GetVariantByRouteIDAndOutbound :one
 SELECT
-    id, name, ebms_id, is_outbound, route_id
+    id, name, ebms_id, is_outbound, route_id, description, short_name, distance, duration, start_stop_name, end_stop_name
 FROM
     variants
 WHERE
@@ -223,13 +237,19 @@ func (q *Queries) GetVariantByRouteIDAndOutbound(ctx context.Context, arg GetVar
 		&i.EbmsID,
 		&i.IsOutbound,
 		&i.RouteID,
+		&i.Description,
+		&i.ShortName,
+		&i.Distance,
+		&i.Duration,
+		&i.StartStopName,
+		&i.EndStopName,
 	)
 	return i, err
 }
 
 const getVehicleByLicensePlate = `-- name: GetVehicleByLicensePlate :one
 SELECT
-    id, license_plate
+    id, license_plate, type
 FROM
     vehicles
 WHERE
@@ -241,6 +261,6 @@ LIMIT
 func (q *Queries) GetVehicleByLicensePlate(ctx context.Context, licensePlate string) (Vehicle, error) {
 	row := q.db.QueryRow(ctx, getVehicleByLicensePlate, licensePlate)
 	var i Vehicle
-	err := row.Scan(&i.ID, &i.LicensePlate)
+	err := row.Scan(&i.ID, &i.LicensePlate, &i.Type)
 	return i, err
 }
