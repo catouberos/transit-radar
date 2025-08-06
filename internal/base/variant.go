@@ -15,12 +15,17 @@ func (app *App) CreateOrUpdateVariantByRouteEbmsID(ctx context.Context, data *dt
 	}
 
 	result, err := app.Query().CreateOrUpdateVariant(ctx, models.CreateOrUpdateVariantParams{
-		Name:       data.Name,
-		EbmsID:     pgtype.Int8{Int64: data.EbmsID, Valid: true},
-		IsOutbound: data.IsOutbound,
-		RouteID:    routeId.ID,
+		Name:          data.Name,
+		EbmsID:        pgtype.Int8{Int64: data.EbmsID, Valid: true},
+		IsOutbound:    data.IsOutbound,
+		RouteID:       routeId.ID,
+		Description:   pgtype.Text{String: data.Description, Valid: true},
+		ShortName:     pgtype.Text{String: data.ShortName, Valid: true},
+		Distance:      pgtype.Float4{Float32: data.Distance, Valid: true},
+		Duration:      pgtype.Int4{Int32: data.Duration, Valid: true},
+		StartStopName: pgtype.Text{String: data.StartStopName, Valid: true},
+		EndStopName:   pgtype.Text{String: data.EndStopName, Valid: true},
 	})
-
 	if err != nil {
 		return nil, err
 	}
