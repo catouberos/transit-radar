@@ -7,8 +7,7 @@ service RouteService {
   rpc ListRoutes(ListRoutesRequest) returns (ListRoutesResponse) {}
 }
 
-message ListRoutesRequest {
-}
+message ListRoutesRequest {}
 
 message ListRoutesResponse {
   repeated Route routes = 1;

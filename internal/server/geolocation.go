@@ -13,6 +13,7 @@ func (s *RPCServer) GetVehiclesByRoute(
 	ctx context.Context,
 	req *connect.Request[apiv1.GetVehiclesByRouteRequest],
 ) (*connect.Response[apiv1.GetVehiclesByRouteResponse], error) {
+
 	log.Println("Request headers: ", req.Header())
 	res := connect.NewResponse(&apiv1.GetVehiclesByRouteResponse{
 		Vehicles: nil,
@@ -28,5 +29,34 @@ func (s *RPCServer) GetVehiclesByStation(
 	res := connect.NewResponse(&apiv1.GetVehiclesByStationResponse{
 		Vehicles: nil,
 	})
+	return res, nil
+}
+
+func (s *RPCServer) ListGeolocationByBounding(
+	ctx context.Context,
+	req *connect.Request[apiv1.ListGeolocationByBoundingRequest],
+) (*connect.Response[apiv1.ListGeolocationByBoundingResponse], error) {
+	results, err := s.App.ListGeolocationByBounding(ctx, req.Msg.Latitude, req.Msg.Longitude, req.Msg.Width, req.Msg.Height)
+	if err != nil {
+		return nil, err
+	}
+
+	geolocations := []*apiv1.Geolocation{}
+
+	for _, result := range results {
+		geolocations = append(geolocations, &apiv1.Geolocation{
+			Degree:    result.Degree,
+			Latitude:  result.Latitude,
+			Longitude: result.Longitude,
+			Speed:     result.Speed,
+			VehicleId: result.VehicleID,
+			VariantId: result.VariantID,
+		})
+	}
+
+	res := connect.NewResponse(&apiv1.ListGeolocationByBoundingResponse{
+		Geolocations: geolocations,
+	})
+
 	return res, nil
 }

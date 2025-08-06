@@ -39,12 +39,16 @@ const (
 	// GeolocationServiceGetVehiclesByStationProcedure is the fully-qualified name of the
 	// GeolocationService's GetVehiclesByStation RPC.
 	GeolocationServiceGetVehiclesByStationProcedure = "/api.v1.GeolocationService/GetVehiclesByStation"
+	// GeolocationServiceListGeolocationByBoundingProcedure is the fully-qualified name of the
+	// GeolocationService's ListGeolocationByBounding RPC.
+	GeolocationServiceListGeolocationByBoundingProcedure = "/api.v1.GeolocationService/ListGeolocationByBounding"
 )
 
 // GeolocationServiceClient is a client for the api.v1.GeolocationService service.
 type GeolocationServiceClient interface {
 	GetVehiclesByRoute(context.Context, *connect.Request[v1.GetVehiclesByRouteRequest]) (*connect.Response[v1.GetVehiclesByRouteResponse], error)
 	GetVehiclesByStation(context.Context, *connect.Request[v1.GetVehiclesByStationRequest]) (*connect.Response[v1.GetVehiclesByStationResponse], error)
+	ListGeolocationByBounding(context.Context, *connect.Request[v1.ListGeolocationByBoundingRequest]) (*connect.Response[v1.ListGeolocationByBoundingResponse], error)
 }
 
 // NewGeolocationServiceClient constructs a client for the api.v1.GeolocationService service. By
@@ -70,13 +74,20 @@ func NewGeolocationServiceClient(httpClient connect.HTTPClient, baseURL string, 
 			connect.WithSchema(geolocationServiceMethods.ByName("GetVehiclesByStation")),
 			connect.WithClientOptions(opts...),
 		),
+		listGeolocationByBounding: connect.NewClient[v1.ListGeolocationByBoundingRequest, v1.ListGeolocationByBoundingResponse](
+			httpClient,
+			baseURL+GeolocationServiceListGeolocationByBoundingProcedure,
+			connect.WithSchema(geolocationServiceMethods.ByName("ListGeolocationByBounding")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
 // geolocationServiceClient implements GeolocationServiceClient.
 type geolocationServiceClient struct {
-	getVehiclesByRoute   *connect.Client[v1.GetVehiclesByRouteRequest, v1.GetVehiclesByRouteResponse]
-	getVehiclesByStation *connect.Client[v1.GetVehiclesByStationRequest, v1.GetVehiclesByStationResponse]
+	getVehiclesByRoute        *connect.Client[v1.GetVehiclesByRouteRequest, v1.GetVehiclesByRouteResponse]
+	getVehiclesByStation      *connect.Client[v1.GetVehiclesByStationRequest, v1.GetVehiclesByStationResponse]
+	listGeolocationByBounding *connect.Client[v1.ListGeolocationByBoundingRequest, v1.ListGeolocationByBoundingResponse]
 }
 
 // GetVehiclesByRoute calls api.v1.GeolocationService.GetVehiclesByRoute.
@@ -89,10 +100,16 @@ func (c *geolocationServiceClient) GetVehiclesByStation(ctx context.Context, req
 	return c.getVehiclesByStation.CallUnary(ctx, req)
 }
 
+// ListGeolocationByBounding calls api.v1.GeolocationService.ListGeolocationByBounding.
+func (c *geolocationServiceClient) ListGeolocationByBounding(ctx context.Context, req *connect.Request[v1.ListGeolocationByBoundingRequest]) (*connect.Response[v1.ListGeolocationByBoundingResponse], error) {
+	return c.listGeolocationByBounding.CallUnary(ctx, req)
+}
+
 // GeolocationServiceHandler is an implementation of the api.v1.GeolocationService service.
 type GeolocationServiceHandler interface {
 	GetVehiclesByRoute(context.Context, *connect.Request[v1.GetVehiclesByRouteRequest]) (*connect.Response[v1.GetVehiclesByRouteResponse], error)
 	GetVehiclesByStation(context.Context, *connect.Request[v1.GetVehiclesByStationRequest]) (*connect.Response[v1.GetVehiclesByStationResponse], error)
+	ListGeolocationByBounding(context.Context, *connect.Request[v1.ListGeolocationByBoundingRequest]) (*connect.Response[v1.ListGeolocationByBoundingResponse], error)
 }
 
 // NewGeolocationServiceHandler builds an HTTP handler from the service implementation. It returns
@@ -114,12 +131,20 @@ func NewGeolocationServiceHandler(svc GeolocationServiceHandler, opts ...connect
 		connect.WithSchema(geolocationServiceMethods.ByName("GetVehiclesByStation")),
 		connect.WithHandlerOptions(opts...),
 	)
+	geolocationServiceListGeolocationByBoundingHandler := connect.NewUnaryHandler(
+		GeolocationServiceListGeolocationByBoundingProcedure,
+		svc.ListGeolocationByBounding,
+		connect.WithSchema(geolocationServiceMethods.ByName("ListGeolocationByBounding")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/api.v1.GeolocationService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case GeolocationServiceGetVehiclesByRouteProcedure:
 			geolocationServiceGetVehiclesByRouteHandler.ServeHTTP(w, r)
 		case GeolocationServiceGetVehiclesByStationProcedure:
 			geolocationServiceGetVehiclesByStationHandler.ServeHTTP(w, r)
+		case GeolocationServiceListGeolocationByBoundingProcedure:
+			geolocationServiceListGeolocationByBoundingHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -135,4 +160,8 @@ func (UnimplementedGeolocationServiceHandler) GetVehiclesByRoute(context.Context
 
 func (UnimplementedGeolocationServiceHandler) GetVehiclesByStation(context.Context, *connect.Request[v1.GetVehiclesByStationRequest]) (*connect.Response[v1.GetVehiclesByStationResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("api.v1.GeolocationService.GetVehiclesByStation is not implemented"))
+}
+
+func (UnimplementedGeolocationServiceHandler) ListGeolocationByBounding(context.Context, *connect.Request[v1.ListGeolocationByBoundingRequest]) (*connect.Response[v1.ListGeolocationByBoundingResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("api.v1.GeolocationService.ListGeolocationByBounding is not implemented"))
 }
