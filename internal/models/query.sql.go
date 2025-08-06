@@ -64,24 +64,44 @@ INSERT INTO
     routes (
         number,
         name,
-        ebms_id
+        ebms_id,
+        operation_time,
+        organization,
+        ticketing,
+        route_type
     )
 VALUES
-    ($1, $2, $3) ON CONFLICT (ebms_id) DO
+    ($1, $2, $3, $4, $5, $6, $7) ON CONFLICT (ebms_id) DO
 UPDATE
 SET
     number = EXCLUDED.number,
-    name = EXCLUDED.name RETURNING id, number, name, ebms_id, active, operation_time, organization, ticketing, route_type
+    name = EXCLUDED.name,
+    operation_time = EXCLUDED.operation_time,
+    organization = EXCLUDED.organization,
+    ticketing = EXCLUDED.ticketing,
+    route_type = EXCLUDED.route_type RETURNING id, number, name, ebms_id, active, operation_time, organization, ticketing, route_type
 `
 
 type CreateOrUpdateRouteParams struct {
-	Number string
-	Name   string
-	EbmsID pgtype.Int8
+	Number        string
+	Name          string
+	EbmsID        pgtype.Int8
+	OperationTime pgtype.Text
+	Organization  pgtype.Text
+	Ticketing     pgtype.Text
+	RouteType     pgtype.Text
 }
 
 func (q *Queries) CreateOrUpdateRoute(ctx context.Context, arg CreateOrUpdateRouteParams) (Route, error) {
-	row := q.db.QueryRow(ctx, createOrUpdateRoute, arg.Number, arg.Name, arg.EbmsID)
+	row := q.db.QueryRow(ctx, createOrUpdateRoute,
+		arg.Number,
+		arg.Name,
+		arg.EbmsID,
+		arg.OperationTime,
+		arg.Organization,
+		arg.Ticketing,
+		arg.RouteType,
+	)
 	var i Route
 	err := row.Scan(
 		&i.ID,
@@ -103,20 +123,38 @@ INSERT INTO
         name,
         ebms_id,
         is_outbound,
-        route_id
+        route_id,
+        description,
+        short_name,
+        distance,
+        duration,
+        start_stop_name,
+        end_stop_name
     )
 VALUES
-    ($1, $2, $3, $4) ON CONFLICT (is_outbound, route_id) DO
+    ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) ON CONFLICT (is_outbound, route_id) DO
 UPDATE
 SET
-    name = EXCLUDED.name RETURNING id, name, ebms_id, is_outbound, route_id, description, short_name, distance, duration, start_stop_name, end_stop_name
+    name = EXCLUDED.name,
+    description = EXCLUDED.description,
+    short_name = EXCLUDED.short_name,
+    distance = EXCLUDED.distance,
+    duration = EXCLUDED.duration,
+    start_stop_name = EXCLUDED.start_stop_name,
+    end_stop_name = EXCLUDED.end_stop_name RETURNING id, name, ebms_id, is_outbound, route_id, description, short_name, distance, duration, start_stop_name, end_stop_name
 `
 
 type CreateOrUpdateVariantParams struct {
-	Name       string
-	EbmsID     pgtype.Int8
-	IsOutbound bool
-	RouteID    int64
+	Name          string
+	EbmsID        pgtype.Int8
+	IsOutbound    bool
+	RouteID       int64
+	Description   pgtype.Text
+	ShortName     pgtype.Text
+	Distance      pgtype.Float4
+	Duration      pgtype.Int4
+	StartStopName pgtype.Text
+	EndStopName   pgtype.Text
 }
 
 func (q *Queries) CreateOrUpdateVariant(ctx context.Context, arg CreateOrUpdateVariantParams) (Variant, error) {
@@ -125,6 +163,12 @@ func (q *Queries) CreateOrUpdateVariant(ctx context.Context, arg CreateOrUpdateV
 		arg.EbmsID,
 		arg.IsOutbound,
 		arg.RouteID,
+		arg.Description,
+		arg.ShortName,
+		arg.Distance,
+		arg.Duration,
+		arg.StartStopName,
+		arg.EndStopName,
 	)
 	var i Variant
 	err := row.Scan(

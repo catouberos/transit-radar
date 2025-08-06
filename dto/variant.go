@@ -8,8 +8,13 @@ type VariantUpsert struct {
 }
 
 type VariantByRouteEbmsIDUpsert struct {
-	Name        string `json:"name"`
-	EbmsID      int64  `json:"ebmsID"`
-	IsOutbound  bool   `json:"isOutbound"`
-	RouteEbmsID int64  `json:"routeEbmsID"`
+	Name          string  `json:"name"`
+	EbmsID        int64   `json:"ebmsID"`
+	IsOutbound    bool    `json:"isOutbound"`
+	RouteEbmsID   int64   `json:"routeEbmsID"`
+	ShortName     string  `json:"shortName"`
+	Distance      float32 `json:"distance"`
+	Duration      int32   `json:"duration"`
+	StartStopName string  `json:"startStopName"`
+	EndStopName   string  `json:"endStopName"`
 }

@@ -27,14 +27,22 @@ INSERT INTO
     routes (
         number,
         name,
-        ebms_id
+        ebms_id,
+        operation_time,
+        organization,
+        ticketing,
+        route_type
     )
 VALUES
-    ($1, $2, $3) ON CONFLICT (ebms_id) DO
+    ($1, $2, $3, $4, $5, $6, $7) ON CONFLICT (ebms_id) DO
 UPDATE
 SET
     number = EXCLUDED.number,
-    name = EXCLUDED.name RETURNING *;
+    name = EXCLUDED.name,
+    operation_time = EXCLUDED.operation_time,
+    organization = EXCLUDED.organization,
+    ticketing = EXCLUDED.ticketing,
+    route_type = EXCLUDED.route_type RETURNING *;
 
 -- name: CreateOrUpdateVariant :one
 INSERT INTO
@@ -42,13 +50,25 @@ INSERT INTO
         name,
         ebms_id,
         is_outbound,
-        route_id
+        route_id,
+        description,
+        short_name,
+        distance,
+        duration,
+        start_stop_name,
+        end_stop_name
     )
 VALUES
-    ($1, $2, $3, $4) ON CONFLICT (is_outbound, route_id) DO
+    ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) ON CONFLICT (is_outbound, route_id) DO
 UPDATE
 SET
-    name = EXCLUDED.name RETURNING *;
+    name = EXCLUDED.name,
+    description = EXCLUDED.description,
+    short_name = EXCLUDED.short_name,
+    distance = EXCLUDED.distance,
+    duration = EXCLUDED.duration,
+    start_stop_name = EXCLUDED.start_stop_name,
+    end_stop_name = EXCLUDED.end_stop_name RETURNING *;
 
 -- name: GetVariantByRouteIDAndOutbound :one
 SELECT
