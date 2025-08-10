@@ -21,26 +21,27 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type ListRoutesRequest struct {
+type GetRouteRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *ListRoutesRequest) Reset() {
-	*x = ListRoutesRequest{}
+func (x *GetRouteRequest) Reset() {
+	*x = GetRouteRequest{}
 	mi := &file_api_v1_route_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *ListRoutesRequest) String() string {
+func (x *GetRouteRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*ListRoutesRequest) ProtoMessage() {}
+func (*GetRouteRequest) ProtoMessage() {}
 
-func (x *ListRoutesRequest) ProtoReflect() protoreflect.Message {
+func (x *GetRouteRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_api_v1_route_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -52,33 +53,120 @@ func (x *ListRoutesRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ListRoutesRequest.ProtoReflect.Descriptor instead.
-func (*ListRoutesRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use GetRouteRequest.ProtoReflect.Descriptor instead.
+func (*GetRouteRequest) Descriptor() ([]byte, []int) {
 	return file_api_v1_route_proto_rawDescGZIP(), []int{0}
 }
 
-type ListRoutesResponse struct {
+func (x *GetRouteRequest) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+type GetRouteResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Route         *Route                 `protobuf:"bytes,1,opt,name=route,proto3" json:"route,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetRouteResponse) Reset() {
+	*x = GetRouteResponse{}
+	mi := &file_api_v1_route_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetRouteResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetRouteResponse) ProtoMessage() {}
+
+func (x *GetRouteResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_v1_route_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetRouteResponse.ProtoReflect.Descriptor instead.
+func (*GetRouteResponse) Descriptor() ([]byte, []int) {
+	return file_api_v1_route_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *GetRouteResponse) GetRoute() *Route {
+	if x != nil {
+		return x.Route
+	}
+	return nil
+}
+
+type ListRouteRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListRouteRequest) Reset() {
+	*x = ListRouteRequest{}
+	mi := &file_api_v1_route_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListRouteRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListRouteRequest) ProtoMessage() {}
+
+func (x *ListRouteRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_v1_route_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListRouteRequest.ProtoReflect.Descriptor instead.
+func (*ListRouteRequest) Descriptor() ([]byte, []int) {
+	return file_api_v1_route_proto_rawDescGZIP(), []int{2}
+}
+
+type ListRouteResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Routes        []*Route               `protobuf:"bytes,1,rep,name=routes,proto3" json:"routes,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *ListRoutesResponse) Reset() {
-	*x = ListRoutesResponse{}
-	mi := &file_api_v1_route_proto_msgTypes[1]
+func (x *ListRouteResponse) Reset() {
+	*x = ListRouteResponse{}
+	mi := &file_api_v1_route_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *ListRoutesResponse) String() string {
+func (x *ListRouteResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*ListRoutesResponse) ProtoMessage() {}
+func (*ListRouteResponse) ProtoMessage() {}
 
-func (x *ListRoutesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_route_proto_msgTypes[1]
+func (x *ListRouteResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_v1_route_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -89,12 +177,12 @@ func (x *ListRoutesResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ListRoutesResponse.ProtoReflect.Descriptor instead.
-func (*ListRoutesResponse) Descriptor() ([]byte, []int) {
-	return file_api_v1_route_proto_rawDescGZIP(), []int{1}
+// Deprecated: Use ListRouteResponse.ProtoReflect.Descriptor instead.
+func (*ListRouteResponse) Descriptor() ([]byte, []int) {
+	return file_api_v1_route_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *ListRoutesResponse) GetRoutes() []*Route {
+func (x *ListRouteResponse) GetRoutes() []*Route {
 	if x != nil {
 		return x.Routes
 	}
@@ -103,13 +191,22 @@ func (x *ListRoutesResponse) GetRoutes() []*Route {
 
 type Route struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Number        string                 `protobuf:"bytes,2,opt,name=number,proto3" json:"number,omitempty"`
+	Name          string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
+	Active        bool                   `protobuf:"varint,4,opt,name=active,proto3" json:"active,omitempty"`
+	OperationTime string                 `protobuf:"bytes,5,opt,name=operation_time,json=operationTime,proto3" json:"operation_time,omitempty"`
+	Organization  string                 `protobuf:"bytes,6,opt,name=organization,proto3" json:"organization,omitempty"`
+	Ticketing     string                 `protobuf:"bytes,7,opt,name=ticketing,proto3" json:"ticketing,omitempty"`
+	RouteType     string                 `protobuf:"bytes,8,opt,name=route_type,json=routeType,proto3" json:"route_type,omitempty"`
+	EbmsId        int64                  `protobuf:"varint,9,opt,name=ebms_id,json=ebmsId,proto3" json:"ebms_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *Route) Reset() {
 	*x = Route{}
-	mi := &file_api_v1_route_proto_msgTypes[2]
+	mi := &file_api_v1_route_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -121,7 +218,7 @@ func (x *Route) String() string {
 func (*Route) ProtoMessage() {}
 
 func (x *Route) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_route_proto_msgTypes[2]
+	mi := &file_api_v1_route_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -134,21 +231,98 @@ func (x *Route) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Route.ProtoReflect.Descriptor instead.
 func (*Route) Descriptor() ([]byte, []int) {
-	return file_api_v1_route_proto_rawDescGZIP(), []int{2}
+	return file_api_v1_route_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *Route) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *Route) GetNumber() string {
+	if x != nil {
+		return x.Number
+	}
+	return ""
+}
+
+func (x *Route) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *Route) GetActive() bool {
+	if x != nil {
+		return x.Active
+	}
+	return false
+}
+
+func (x *Route) GetOperationTime() string {
+	if x != nil {
+		return x.OperationTime
+	}
+	return ""
+}
+
+func (x *Route) GetOrganization() string {
+	if x != nil {
+		return x.Organization
+	}
+	return ""
+}
+
+func (x *Route) GetTicketing() string {
+	if x != nil {
+		return x.Ticketing
+	}
+	return ""
+}
+
+func (x *Route) GetRouteType() string {
+	if x != nil {
+		return x.RouteType
+	}
+	return ""
+}
+
+func (x *Route) GetEbmsId() int64 {
+	if x != nil {
+		return x.EbmsId
+	}
+	return 0
 }
 
 var File_api_v1_route_proto protoreflect.FileDescriptor
 
 const file_api_v1_route_proto_rawDesc = "" +
 	"\n" +
-	"\x12api/v1/route.proto\x12\x06api.v1\"\x13\n" +
-	"\x11ListRoutesRequest\";\n" +
-	"\x12ListRoutesResponse\x12%\n" +
-	"\x06routes\x18\x01 \x03(\v2\r.api.v1.RouteR\x06routes\"\a\n" +
-	"\x05Route2U\n" +
-	"\fRouteService\x12E\n" +
+	"\x12api/v1/route.proto\x12\x06api.v1\"!\n" +
+	"\x0fGetRouteRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\"7\n" +
+	"\x10GetRouteResponse\x12#\n" +
+	"\x05route\x18\x01 \x01(\v2\r.api.v1.RouteR\x05route\"\x12\n" +
+	"\x10ListRouteRequest\":\n" +
+	"\x11ListRouteResponse\x12%\n" +
+	"\x06routes\x18\x01 \x03(\v2\r.api.v1.RouteR\x06routes\"\xfc\x01\n" +
+	"\x05Route\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x16\n" +
+	"\x06number\x18\x02 \x01(\tR\x06number\x12\x12\n" +
+	"\x04name\x18\x03 \x01(\tR\x04name\x12\x16\n" +
+	"\x06active\x18\x04 \x01(\bR\x06active\x12%\n" +
+	"\x0eoperation_time\x18\x05 \x01(\tR\roperationTime\x12\"\n" +
+	"\forganization\x18\x06 \x01(\tR\forganization\x12\x1c\n" +
+	"\tticketing\x18\a \x01(\tR\tticketing\x12\x1d\n" +
 	"\n" +
-	"ListRoutes\x12\x19.api.v1.ListRoutesRequest\x1a\x1a.api.v1.ListRoutesResponse\"\x00B?Z=github.com/catouberos/transit-radar/gen/api/v1;transitradarv1b\x06proto3"
+	"route_type\x18\b \x01(\tR\trouteType\x12\x17\n" +
+	"\aebms_id\x18\t \x01(\x03R\x06ebmsId2\x93\x01\n" +
+	"\fRouteService\x12?\n" +
+	"\bGetRoute\x12\x17.api.v1.GetRouteRequest\x1a\x18.api.v1.GetRouteResponse\"\x00\x12B\n" +
+	"\tListRoute\x12\x18.api.v1.ListRouteRequest\x1a\x19.api.v1.ListRouteResponse\"\x00B?Z=github.com/catouberos/transit-radar/gen/api/v1;transitradarv1b\x06proto3"
 
 var (
 	file_api_v1_route_proto_rawDescOnce sync.Once
@@ -162,21 +336,26 @@ func file_api_v1_route_proto_rawDescGZIP() []byte {
 	return file_api_v1_route_proto_rawDescData
 }
 
-var file_api_v1_route_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_api_v1_route_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
 var file_api_v1_route_proto_goTypes = []any{
-	(*ListRoutesRequest)(nil),  // 0: api.v1.ListRoutesRequest
-	(*ListRoutesResponse)(nil), // 1: api.v1.ListRoutesResponse
-	(*Route)(nil),              // 2: api.v1.Route
+	(*GetRouteRequest)(nil),   // 0: api.v1.GetRouteRequest
+	(*GetRouteResponse)(nil),  // 1: api.v1.GetRouteResponse
+	(*ListRouteRequest)(nil),  // 2: api.v1.ListRouteRequest
+	(*ListRouteResponse)(nil), // 3: api.v1.ListRouteResponse
+	(*Route)(nil),             // 4: api.v1.Route
 }
 var file_api_v1_route_proto_depIdxs = []int32{
-	2, // 0: api.v1.ListRoutesResponse.routes:type_name -> api.v1.Route
-	0, // 1: api.v1.RouteService.ListRoutes:input_type -> api.v1.ListRoutesRequest
-	1, // 2: api.v1.RouteService.ListRoutes:output_type -> api.v1.ListRoutesResponse
-	2, // [2:3] is the sub-list for method output_type
-	1, // [1:2] is the sub-list for method input_type
-	1, // [1:1] is the sub-list for extension type_name
-	1, // [1:1] is the sub-list for extension extendee
-	0, // [0:1] is the sub-list for field type_name
+	4, // 0: api.v1.GetRouteResponse.route:type_name -> api.v1.Route
+	4, // 1: api.v1.ListRouteResponse.routes:type_name -> api.v1.Route
+	0, // 2: api.v1.RouteService.GetRoute:input_type -> api.v1.GetRouteRequest
+	2, // 3: api.v1.RouteService.ListRoute:input_type -> api.v1.ListRouteRequest
+	1, // 4: api.v1.RouteService.GetRoute:output_type -> api.v1.GetRouteResponse
+	3, // 5: api.v1.RouteService.ListRoute:output_type -> api.v1.ListRouteResponse
+	4, // [4:6] is the sub-list for method output_type
+	2, // [2:4] is the sub-list for method input_type
+	2, // [2:2] is the sub-list for extension type_name
+	2, // [2:2] is the sub-list for extension extendee
+	0, // [0:2] is the sub-list for field type_name
 }
 
 func init() { file_api_v1_route_proto_init() }
@@ -190,7 +369,7 @@ func file_api_v1_route_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_api_v1_route_proto_rawDesc), len(file_api_v1_route_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   3,
+			NumMessages:   5,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

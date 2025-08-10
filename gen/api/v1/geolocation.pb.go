@@ -9,6 +9,7 @@ package transitradarv1
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -353,6 +354,7 @@ type Geolocation struct {
 	Speed         float32                `protobuf:"fixed32,4,opt,name=speed,proto3" json:"speed,omitempty"`
 	VehicleId     int64                  `protobuf:"varint,5,opt,name=vehicle_id,json=vehicleId,proto3" json:"vehicle_id,omitempty"`
 	VariantId     int64                  `protobuf:"varint,6,opt,name=variant_id,json=variantId,proto3" json:"variant_id,omitempty"`
+	Timestamp     *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -429,11 +431,18 @@ func (x *Geolocation) GetVariantId() int64 {
 	return 0
 }
 
+func (x *Geolocation) GetTimestamp() *timestamppb.Timestamp {
+	if x != nil {
+		return x.Timestamp
+	}
+	return nil
+}
+
 var File_api_v1_geolocation_proto protoreflect.FileDescriptor
 
 const file_api_v1_geolocation_proto_rawDesc = "" +
 	"\n" +
-	"\x18api/v1/geolocation.proto\x12\x06api.v1\"6\n" +
+	"\x18api/v1/geolocation.proto\x12\x06api.v1\x1a\x1fgoogle/protobuf/timestamp.proto\"6\n" +
 	"\x19GetVehiclesByRouteRequest\x12\x19\n" +
 	"\broute_id\x18\x01 \x01(\x02R\arouteId\"I\n" +
 	"\x1aGetVehiclesByRouteResponse\x12+\n" +
@@ -450,7 +459,7 @@ const file_api_v1_geolocation_proto_rawDesc = "" +
 	"\x06height\x18\x04 \x01(\x02R\x06height\"\\\n" +
 	"!ListGeolocationByBoundingResponse\x127\n" +
 	"\fgeolocations\x18\x01 \x03(\v2\x13.api.v1.GeolocationR\fgeolocations\"\t\n" +
-	"\aVehicle\"\xb3\x01\n" +
+	"\aVehicle\"\xed\x01\n" +
 	"\vGeolocation\x12\x16\n" +
 	"\x06degree\x18\x01 \x01(\x02R\x06degree\x12\x1a\n" +
 	"\blatitude\x18\x02 \x01(\x02R\blatitude\x12\x1c\n" +
@@ -459,7 +468,8 @@ const file_api_v1_geolocation_proto_rawDesc = "" +
 	"\n" +
 	"vehicle_id\x18\x05 \x01(\x03R\tvehicleId\x12\x1d\n" +
 	"\n" +
-	"variant_id\x18\x06 \x01(\x03R\tvariantId2\xcc\x02\n" +
+	"variant_id\x18\x06 \x01(\x03R\tvariantId\x128\n" +
+	"\ttimestamp\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\ttimestamp2\xcc\x02\n" +
 	"\x12GeolocationService\x12]\n" +
 	"\x12GetVehiclesByRoute\x12!.api.v1.GetVehiclesByRouteRequest\x1a\".api.v1.GetVehiclesByRouteResponse\"\x00\x12c\n" +
 	"\x14GetVehiclesByStation\x12#.api.v1.GetVehiclesByStationRequest\x1a$.api.v1.GetVehiclesByStationResponse\"\x00\x12r\n" +
@@ -487,22 +497,24 @@ var file_api_v1_geolocation_proto_goTypes = []any{
 	(*ListGeolocationByBoundingResponse)(nil), // 5: api.v1.ListGeolocationByBoundingResponse
 	(*Vehicle)(nil),                           // 6: api.v1.Vehicle
 	(*Geolocation)(nil),                       // 7: api.v1.Geolocation
+	(*timestamppb.Timestamp)(nil),             // 8: google.protobuf.Timestamp
 }
 var file_api_v1_geolocation_proto_depIdxs = []int32{
 	6, // 0: api.v1.GetVehiclesByRouteResponse.vehicles:type_name -> api.v1.Vehicle
 	6, // 1: api.v1.GetVehiclesByStationResponse.vehicles:type_name -> api.v1.Vehicle
 	7, // 2: api.v1.ListGeolocationByBoundingResponse.geolocations:type_name -> api.v1.Geolocation
-	0, // 3: api.v1.GeolocationService.GetVehiclesByRoute:input_type -> api.v1.GetVehiclesByRouteRequest
-	2, // 4: api.v1.GeolocationService.GetVehiclesByStation:input_type -> api.v1.GetVehiclesByStationRequest
-	4, // 5: api.v1.GeolocationService.ListGeolocationByBounding:input_type -> api.v1.ListGeolocationByBoundingRequest
-	1, // 6: api.v1.GeolocationService.GetVehiclesByRoute:output_type -> api.v1.GetVehiclesByRouteResponse
-	3, // 7: api.v1.GeolocationService.GetVehiclesByStation:output_type -> api.v1.GetVehiclesByStationResponse
-	5, // 8: api.v1.GeolocationService.ListGeolocationByBounding:output_type -> api.v1.ListGeolocationByBoundingResponse
-	6, // [6:9] is the sub-list for method output_type
-	3, // [3:6] is the sub-list for method input_type
-	3, // [3:3] is the sub-list for extension type_name
-	3, // [3:3] is the sub-list for extension extendee
-	0, // [0:3] is the sub-list for field type_name
+	8, // 3: api.v1.Geolocation.timestamp:type_name -> google.protobuf.Timestamp
+	0, // 4: api.v1.GeolocationService.GetVehiclesByRoute:input_type -> api.v1.GetVehiclesByRouteRequest
+	2, // 5: api.v1.GeolocationService.GetVehiclesByStation:input_type -> api.v1.GetVehiclesByStationRequest
+	4, // 6: api.v1.GeolocationService.ListGeolocationByBounding:input_type -> api.v1.ListGeolocationByBoundingRequest
+	1, // 7: api.v1.GeolocationService.GetVehiclesByRoute:output_type -> api.v1.GetVehiclesByRouteResponse
+	3, // 8: api.v1.GeolocationService.GetVehiclesByStation:output_type -> api.v1.GetVehiclesByStationResponse
+	5, // 9: api.v1.GeolocationService.ListGeolocationByBounding:output_type -> api.v1.ListGeolocationByBoundingResponse
+	7, // [7:10] is the sub-list for method output_type
+	4, // [4:7] is the sub-list for method input_type
+	4, // [4:4] is the sub-list for extension type_name
+	4, // [4:4] is the sub-list for extension extendee
+	0, // [0:4] is the sub-list for field type_name
 }
 
 func init() { file_api_v1_geolocation_proto_init() }

@@ -1,0 +1,36 @@
+syntax = "proto3";
+package api.v1;
+
+option go_package = "github.com/catouberos/transit-radar/gen/api/v1;transitradarv1";
+
+service VariantService {
+  rpc GetVariant(GetVariantRequest) returns (GetVariantResponse) {}
+  rpc ListVariant(ListVariantRequest) returns (ListVariantResponse) {}
+}
+
+message GetVariantRequest {
+  int64 id = 1;
+}
+
+message GetVariantResponse {
+  Variant variant = 1;
+}
+
+message ListVariantRequest {}
+
+message ListVariantResponse {
+  repeated Variant variants = 1;
+}
+
+message Variant {
+  int64 id = 1;
+  string name = 2;
+  bool is_outbound = 3;
+  int64 route_id = 4;
+  string description = 5;
+  string short_name = 6;
+  float distance = 7;
+  int32 duration = 8;
+  string start_stop_name = 9;
+  string end_stop_name = 10;
+}

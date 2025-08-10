@@ -4,13 +4,32 @@ package api.v1;
 option go_package = "github.com/catouberos/transit-radar/gen/api/v1;transitradarv1";
 
 service RouteService {
-  rpc ListRoutes(ListRoutesRequest) returns (ListRoutesResponse) {}
+  rpc GetRoute(GetRouteRequest) returns (GetRouteResponse) {}
+  rpc ListRoute(ListRouteRequest) returns (ListRouteResponse) {}
 }
 
-message ListRoutesRequest {}
+message GetRouteRequest {
+  int64 id = 1;
+}
 
-message ListRoutesResponse {
+message GetRouteResponse {
+  Route route = 1;
+}
+
+message ListRouteRequest {}
+
+message ListRouteResponse {
   repeated Route routes = 1;
 }
 
-message Route {}
+message Route {
+  int64 id = 1;
+  string number = 2;
+  string name = 3;
+  bool active = 4;
+  string operation_time = 5;
+  string organization = 6;
+  string ticketing = 7;
+  string route_type = 8;
+  int64 ebms_id = 9;
+}
