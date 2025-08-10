@@ -459,20 +459,50 @@ func (q *Queries) GetVariant(ctx context.Context, id int64) (Variant, error) {
 	return i, err
 }
 
-const getVariantByEbmsID = `-- name: GetVariantByEbmsID :one
+const getVariantByRouteEbmsID = `-- name: GetVariantByRouteEbmsID :one
 SELECT
-    id, name, ebms_id, is_outbound, route_id, description, short_name, distance, duration, start_stop_name, end_stop_name
+    variants.id, variants.name, variants.ebms_id, is_outbound, route_id, description, short_name, distance, duration, start_stop_name, end_stop_name, routes.id, number, routes.name, routes.ebms_id, active, operation_time, organization, ticketing, route_type
 FROM
-    variants
+    public.variants
+    LEFT OUTER JOIN routes ON routes.id = variants.route_id
 WHERE
-    ebms_id = $1
+    variants.ebms_id = $1
+    AND routes.ebms_id = $2
 LIMIT
     1
 `
 
-func (q *Queries) GetVariantByEbmsID(ctx context.Context, ebmsID pgtype.Int8) (Variant, error) {
-	row := q.db.QueryRow(ctx, getVariantByEbmsID, ebmsID)
-	var i Variant
+type GetVariantByRouteEbmsIDParams struct {
+	EbmsID   pgtype.Int8
+	EbmsID_2 pgtype.Int8
+}
+
+type GetVariantByRouteEbmsIDRow struct {
+	ID            int64
+	Name          string
+	EbmsID        pgtype.Int8
+	IsOutbound    bool
+	RouteID       int64
+	Description   pgtype.Text
+	ShortName     pgtype.Text
+	Distance      pgtype.Float4
+	Duration      pgtype.Int4
+	StartStopName pgtype.Text
+	EndStopName   pgtype.Text
+	ID_2          pgtype.Int8
+	Number        pgtype.Text
+	Name_2        pgtype.Text
+	EbmsID_2      pgtype.Int8
+	Active        pgtype.Bool
+	OperationTime pgtype.Text
+	Organization  pgtype.Text
+	Ticketing     pgtype.Text
+	RouteType     pgtype.Text
+}
+
+func (q *Queries) GetVariantByRouteEbmsID(ctx context.Context, arg GetVariantByRouteEbmsIDParams) (GetVariantByRouteEbmsIDRow, error) {
+	row := q.db.QueryRow(ctx, getVariantByRouteEbmsID, arg.EbmsID, arg.EbmsID_2)
+	var i GetVariantByRouteEbmsIDRow
 	err := row.Scan(
 		&i.ID,
 		&i.Name,
@@ -485,6 +515,15 @@ func (q *Queries) GetVariantByEbmsID(ctx context.Context, ebmsID pgtype.Int8) (V
 		&i.Duration,
 		&i.StartStopName,
 		&i.EndStopName,
+		&i.ID_2,
+		&i.Number,
+		&i.Name_2,
+		&i.EbmsID_2,
+		&i.Active,
+		&i.OperationTime,
+		&i.Organization,
+		&i.Ticketing,
+		&i.RouteType,
 	)
 	return i, err
 }

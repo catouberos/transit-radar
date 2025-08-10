@@ -19,7 +19,12 @@ func (app *App) ImportVariantStops(ctx context.Context, data *[]dto.VariantStopB
 	qtx := app.Query().WithTx(tx)
 
 	for _, record := range *data {
-		variant, err := qtx.GetVariantByEbmsID(ctx, pgtype.Int8{Int64: record.VariantEbmsID, Valid: true})
+		variant, err := qtx.GetVariantByRouteEbmsID(ctx,
+			models.GetVariantByRouteEbmsIDParams{
+				EbmsID:   pgtype.Int8{Int64: record.VariantEbmsID, Valid: true},
+				EbmsID_2: pgtype.Int8{Int64: record.RouteEbmsID, Valid: true},
+			},
+		)
 		if err != nil {
 			return err
 		}

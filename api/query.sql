@@ -167,13 +167,15 @@ WHERE
 LIMIT
     1;
 
--- name: GetVariantByEbmsID :one
+-- name: GetVariantByRouteEbmsID :one
 SELECT
     *
 FROM
-    variants
+    public.variants
+    LEFT OUTER JOIN routes ON routes.id = variants.route_id
 WHERE
-    ebms_id = $1
+    variants.ebms_id = $1
+    AND routes.ebms_id = $2
 LIMIT
     1;
 
