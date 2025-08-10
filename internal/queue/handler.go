@@ -76,3 +76,25 @@ func variantUpsertHandler(app *base.App) rabbitmq.Handler {
 		return rabbitmq.Ack
 	}
 }
+
+func stopImportHandler(app *base.App) rabbitmq.Handler {
+	return func(delivery rabbitmq.Delivery) rabbitmq.Action {
+		ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+		defer cancel()
+
+		params := &dto.StopImport{}
+		err := json.Unmarshal(delivery.Body, params)
+		if err != nil {
+			slog.Error("Error unmarshal stop data", "error", err)
+			return rabbitmq.NackDiscard
+		}
+
+		err = app.ImportStop(ctx, params)
+		if err != nil {
+			slog.Error("Error importing stop", "error", err)
+			return rabbitmq.NackDiscard
+		}
+
+		return rabbitmq.Ack
+	}
+}

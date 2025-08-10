@@ -34,3 +34,30 @@ func (app *App) CreateOrUpdateVariantByRouteEbmsID(ctx context.Context, data *dt
 
 	return &result, nil
 }
+
+func (app *App) ListVariant(ctx context.Context) ([]models.Variant, error) {
+	result, err := app.Query().ListVariant(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+func (app *App) GetVariant(ctx context.Context, id int64) (models.Variant, error) {
+	result, err := app.Query().GetVariant(ctx, id)
+	if err != nil {
+		return models.Variant{}, err
+	}
+
+	return result, nil
+}
+
+func (app *App) ListVariantByRouteId(ctx context.Context, routeID int64) ([]models.Variant, error) {
+	result, err := app.Query().ListVariantByRouteId(ctx, routeID)
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}

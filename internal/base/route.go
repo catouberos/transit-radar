@@ -27,15 +27,32 @@ func (app *App) CreateOrUpdateRoute(ctx context.Context, data *dto.RouteUpsert) 
 	return &result, nil
 }
 
-func (app *App) GetRouteByEbmsID(ctx context.Context, ebmsID int64) (*models.Route, error) {
-	result, err := app.Query().GetRouteByEbmsID(ctx, pgtype.Int8{Int64: ebmsID, Valid: true})
-
+func (app *App) GetRoute(ctx context.Context, id int64) (models.Route, error) {
+	result, err := app.Query().GetRoute(ctx, id)
 	if err != nil {
-		return nil, err
+		return models.Route{}, nil
+	}
+
+	return result, nil
+}
+
+func (app *App) GetRouteByEbmsID(ctx context.Context, ebmsID int64) (models.Route, error) {
+	result, err := app.Query().GetRouteByEbmsID(ctx, pgtype.Int8{Int64: ebmsID, Valid: true})
+	if err != nil {
+		return models.Route{}, err
 	}
 
 	// todo: replace in redis
 
-	return &result, nil
+	return result, nil
 
+}
+
+func (app *App) ListRoute(ctx context.Context) ([]models.Route, error) {
+	result, err := app.Query().ListRoute(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return result, err
 }

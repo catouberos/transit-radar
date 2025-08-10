@@ -30,6 +30,26 @@ type Route struct {
 	RouteType     pgtype.Text
 }
 
+type Stop struct {
+	ID              int64
+	Code            string
+	Name            string
+	TypeID          int64
+	EbmsID          pgtype.Int8
+	Active          bool
+	Latitude        float32
+	Longitude       float32
+	AddressNumber   pgtype.Text
+	AddressStreet   pgtype.Text
+	AddressWard     pgtype.Text
+	AddressDistrict pgtype.Text
+}
+
+type StopType struct {
+	ID   int64
+	Name string
+}
+
 type Variant struct {
 	ID            int64
 	Name          string
@@ -42,6 +62,11 @@ type Variant struct {
 	Duration      pgtype.Int4
 	StartStopName pgtype.Text
 	EndStopName   pgtype.Text
+}
+
+type VariantsStop struct {
+	VariantID int64
+	StopID    int64
 }
 
 type Vehicle struct {

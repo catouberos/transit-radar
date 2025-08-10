@@ -117,6 +117,69 @@ func (q *Queries) CreateOrUpdateRoute(ctx context.Context, arg CreateOrUpdateRou
 	return i, err
 }
 
+const createOrUpdateStop = `-- name: CreateOrUpdateStop :exec
+INSERT INTO
+    stops(
+        code,
+        name,
+        type_id,
+        ebms_id,
+        active,
+        latitude,
+        longitude,
+        -- address
+        address_number,
+        address_street,
+        address_ward,
+        address_district
+    )
+VALUES
+    ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) ON CONFLICT(ebms_id) DO
+UPDATE
+SET
+    code = EXCLUDED.code,
+    name = EXCLUDED.name,
+    type_id = EXCLUDED.type_id,
+    active = EXCLUDED.active,
+    latitude = EXCLUDED.latitude,
+    longitude = EXCLUDED.longitude,
+    address_number = EXCLUDED.address_number,
+    address_street = EXCLUDED.address_street,
+    address_ward = EXCLUDED.address_ward,
+    address_district = EXCLUDED.address_district
+`
+
+type CreateOrUpdateStopParams struct {
+	Code            string
+	Name            string
+	TypeID          int64
+	EbmsID          pgtype.Int8
+	Active          bool
+	Latitude        float32
+	Longitude       float32
+	AddressNumber   pgtype.Text
+	AddressStreet   pgtype.Text
+	AddressWard     pgtype.Text
+	AddressDistrict pgtype.Text
+}
+
+func (q *Queries) CreateOrUpdateStop(ctx context.Context, arg CreateOrUpdateStopParams) error {
+	_, err := q.db.Exec(ctx, createOrUpdateStop,
+		arg.Code,
+		arg.Name,
+		arg.TypeID,
+		arg.EbmsID,
+		arg.Active,
+		arg.Latitude,
+		arg.Longitude,
+		arg.AddressNumber,
+		arg.AddressStreet,
+		arg.AddressWard,
+		arg.AddressDistrict,
+	)
+	return err
+}
+
 const createOrUpdateVariant = `-- name: CreateOrUpdateVariant :one
 INSERT INTO
     variants (
@@ -187,6 +250,20 @@ func (q *Queries) CreateOrUpdateVariant(ctx context.Context, arg CreateOrUpdateV
 	return i, err
 }
 
+const createStopType = `-- name: CreateStopType :one
+INSERT INTO
+    stop_types (name)
+VALUES
+    ($1) RETURNING id, name
+`
+
+func (q *Queries) CreateStopType(ctx context.Context, name string) (StopType, error) {
+	row := q.db.QueryRow(ctx, createStopType, name)
+	var i StopType
+	err := row.Scan(&i.ID, &i.Name)
+	return i, err
+}
+
 const createVehicle = `-- name: CreateVehicle :one
 INSERT INTO
     vehicles(license_plate)
@@ -198,6 +275,34 @@ func (q *Queries) CreateVehicle(ctx context.Context, licensePlate string) (Vehic
 	row := q.db.QueryRow(ctx, createVehicle, licensePlate)
 	var i Vehicle
 	err := row.Scan(&i.ID, &i.LicensePlate, &i.Type)
+	return i, err
+}
+
+const getRoute = `-- name: GetRoute :one
+SELECT
+    id, number, name, ebms_id, active, operation_time, organization, ticketing, route_type
+FROM
+    routes
+WHERE
+    id = $1
+LIMIT
+    1
+`
+
+func (q *Queries) GetRoute(ctx context.Context, id int64) (Route, error) {
+	row := q.db.QueryRow(ctx, getRoute, id)
+	var i Route
+	err := row.Scan(
+		&i.ID,
+		&i.Number,
+		&i.Name,
+		&i.EbmsID,
+		&i.Active,
+		&i.OperationTime,
+		&i.Organization,
+		&i.Ticketing,
+		&i.RouteType,
+	)
 	return i, err
 }
 
@@ -255,6 +360,85 @@ func (q *Queries) GetRouteByVariantID(ctx context.Context, variantID int64) (Geo
 	return i, err
 }
 
+const getStopByEbmsID = `-- name: GetStopByEbmsID :one
+SELECT
+    id, code, name, type_id, ebms_id, active, latitude, longitude, address_number, address_street, address_ward, address_district
+FROM
+    stops
+WHERE
+    ebms_id = $1
+LIMIT
+    1
+`
+
+func (q *Queries) GetStopByEbmsID(ctx context.Context, ebmsID pgtype.Int8) (Stop, error) {
+	row := q.db.QueryRow(ctx, getStopByEbmsID, ebmsID)
+	var i Stop
+	err := row.Scan(
+		&i.ID,
+		&i.Code,
+		&i.Name,
+		&i.TypeID,
+		&i.EbmsID,
+		&i.Active,
+		&i.Latitude,
+		&i.Longitude,
+		&i.AddressNumber,
+		&i.AddressStreet,
+		&i.AddressWard,
+		&i.AddressDistrict,
+	)
+	return i, err
+}
+
+const getStopTypeByName = `-- name: GetStopTypeByName :one
+SELECT
+    id, name
+FROM
+    stop_types
+WHERE
+    name = $1
+LIMIT
+    1
+`
+
+func (q *Queries) GetStopTypeByName(ctx context.Context, name string) (StopType, error) {
+	row := q.db.QueryRow(ctx, getStopTypeByName, name)
+	var i StopType
+	err := row.Scan(&i.ID, &i.Name)
+	return i, err
+}
+
+const getVariant = `-- name: GetVariant :one
+SELECT
+    id, name, ebms_id, is_outbound, route_id, description, short_name, distance, duration, start_stop_name, end_stop_name
+FROM
+    variants
+WHERE
+    id = $1
+LIMIT
+    1
+`
+
+func (q *Queries) GetVariant(ctx context.Context, id int64) (Variant, error) {
+	row := q.db.QueryRow(ctx, getVariant, id)
+	var i Variant
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.EbmsID,
+		&i.IsOutbound,
+		&i.RouteID,
+		&i.Description,
+		&i.ShortName,
+		&i.Distance,
+		&i.Duration,
+		&i.StartStopName,
+		&i.EndStopName,
+	)
+	return i, err
+}
+
 const getVariantByRouteIDAndOutbound = `-- name: GetVariantByRouteIDAndOutbound :one
 SELECT
     id, name, ebms_id, is_outbound, route_id, description, short_name, distance, duration, start_stop_name, end_stop_name
@@ -307,4 +491,167 @@ func (q *Queries) GetVehicleByLicensePlate(ctx context.Context, licensePlate str
 	var i Vehicle
 	err := row.Scan(&i.ID, &i.LicensePlate, &i.Type)
 	return i, err
+}
+
+const listRoute = `-- name: ListRoute :many
+SELECT
+    id, number, name, ebms_id, active, operation_time, organization, ticketing, route_type
+FROM
+    routes
+ORDER BY
+    id
+`
+
+func (q *Queries) ListRoute(ctx context.Context) ([]Route, error) {
+	rows, err := q.db.Query(ctx, listRoute)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Route
+	for rows.Next() {
+		var i Route
+		if err := rows.Scan(
+			&i.ID,
+			&i.Number,
+			&i.Name,
+			&i.EbmsID,
+			&i.Active,
+			&i.OperationTime,
+			&i.Organization,
+			&i.Ticketing,
+			&i.RouteType,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listStop = `-- name: ListStop :many
+SELECT
+    id, code, name, type_id, ebms_id, active, latitude, longitude, address_number, address_street, address_ward, address_district
+FROM
+    stops
+ORDER BY
+    id
+`
+
+func (q *Queries) ListStop(ctx context.Context) ([]Stop, error) {
+	rows, err := q.db.Query(ctx, listStop)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Stop
+	for rows.Next() {
+		var i Stop
+		if err := rows.Scan(
+			&i.ID,
+			&i.Code,
+			&i.Name,
+			&i.TypeID,
+			&i.EbmsID,
+			&i.Active,
+			&i.Latitude,
+			&i.Longitude,
+			&i.AddressNumber,
+			&i.AddressStreet,
+			&i.AddressWard,
+			&i.AddressDistrict,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listVariant = `-- name: ListVariant :many
+SELECT
+    id, name, ebms_id, is_outbound, route_id, description, short_name, distance, duration, start_stop_name, end_stop_name
+FROM
+    variants
+ORDER BY
+    id
+`
+
+func (q *Queries) ListVariant(ctx context.Context) ([]Variant, error) {
+	rows, err := q.db.Query(ctx, listVariant)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Variant
+	for rows.Next() {
+		var i Variant
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.EbmsID,
+			&i.IsOutbound,
+			&i.RouteID,
+			&i.Description,
+			&i.ShortName,
+			&i.Distance,
+			&i.Duration,
+			&i.StartStopName,
+			&i.EndStopName,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listVariantByRouteId = `-- name: ListVariantByRouteId :many
+SELECT
+    id, name, ebms_id, is_outbound, route_id, description, short_name, distance, duration, start_stop_name, end_stop_name
+FROM
+    variants
+WHERE
+    route_id = $1
+`
+
+func (q *Queries) ListVariantByRouteId(ctx context.Context, routeID int64) ([]Variant, error) {
+	rows, err := q.db.Query(ctx, listVariantByRouteId, routeID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Variant
+	for rows.Next() {
+		var i Variant
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.EbmsID,
+			&i.IsOutbound,
+			&i.RouteID,
+			&i.Description,
+			&i.ShortName,
+			&i.Distance,
+			&i.Duration,
+			&i.StartStopName,
+			&i.EndStopName,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }

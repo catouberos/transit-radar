@@ -29,6 +29,7 @@ func NewConsumerHandler(conn *rabbitmq.Conn, app *base.App) *consumerHandler {
 	handler.AddConsumer("geolocationCreated", "geolocation.event.created", "geolocation", geolocationInsertHandler(app))
 	handler.AddConsumer("routeUpdated", "route.event.updated", "route", routeUpsertHandler(app))
 	handler.AddConsumer("variantUpdated", "variant.event.updated", "variant", variantUpsertHandler(app))
+	handler.AddConsumer("stopImport", "stop.action.import", "stop", stopImportHandler(app))
 
 	return handler
 }

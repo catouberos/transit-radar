@@ -4,9 +4,11 @@ go 1.24.3
 
 require (
 	connectrpc.com/connect v1.18.1
+	connectrpc.com/cors v0.1.0
 	github.com/jackc/pgx/v5 v5.7.5
 	github.com/pressly/goose/v3 v3.24.3
 	github.com/redis/go-redis/v9 v9.12.0
+	github.com/rs/cors v1.11.1
 	github.com/wagslane/go-rabbitmq v0.15.0
 	google.golang.org/protobuf v1.36.6
 )

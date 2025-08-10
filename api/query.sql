@@ -44,6 +44,115 @@ SET
     ticketing = EXCLUDED.ticketing,
     route_type = EXCLUDED.route_type RETURNING *;
 
+-- name: GetRoute :one
+SELECT
+    *
+FROM
+    routes
+WHERE
+    id = $1
+LIMIT
+    1;
+
+-- name: ListRoute :many
+SELECT
+    *
+FROM
+    routes
+ORDER BY
+    id;
+
+-- name: CreateStopType :one
+INSERT INTO
+    stop_types (name)
+VALUES
+    ($1) RETURNING *;
+
+-- name: GetStopTypeByName :one
+SELECT
+    *
+FROM
+    stop_types
+WHERE
+    name = $1
+LIMIT
+    1;
+
+-- name: CreateOrUpdateStop :exec
+INSERT INTO
+    stops(
+        code,
+        name,
+        type_id,
+        ebms_id,
+        active,
+        latitude,
+        longitude,
+        -- address
+        address_number,
+        address_street,
+        address_ward,
+        address_district
+    )
+VALUES
+    ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) ON CONFLICT(ebms_id) DO
+UPDATE
+SET
+    code = EXCLUDED.code,
+    name = EXCLUDED.name,
+    type_id = EXCLUDED.type_id,
+    active = EXCLUDED.active,
+    latitude = EXCLUDED.latitude,
+    longitude = EXCLUDED.longitude,
+    address_number = EXCLUDED.address_number,
+    address_street = EXCLUDED.address_street,
+    address_ward = EXCLUDED.address_ward,
+    address_district = EXCLUDED.address_district;
+
+-- name: GetStopByEbmsID :one
+SELECT
+    *
+FROM
+    stops
+WHERE
+    ebms_id = $1
+LIMIT
+    1;
+
+-- name: ListStop :many
+SELECT
+    *
+FROM
+    stops
+ORDER BY
+    id;
+
+-- name: ListVariant :many
+SELECT
+    *
+FROM
+    variants
+ORDER BY
+    id;
+
+-- name: GetVariant :one
+SELECT
+    *
+FROM
+    variants
+WHERE
+    id = $1
+LIMIT
+    1;
+
+-- name: ListVariantByRouteId :many
+SELECT
+    *
+FROM
+    variants
+WHERE
+    route_id = $1;
+
 -- name: CreateOrUpdateVariant :one
 INSERT INTO
     variants (
