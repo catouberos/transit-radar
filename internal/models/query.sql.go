@@ -264,6 +264,26 @@ func (q *Queries) CreateStopType(ctx context.Context, name string) (StopType, er
 	return i, err
 }
 
+const createVariantStop = `-- name: CreateVariantStop :one
+INSERT INTO
+    variants_stops(variant_id, stop_id, order_score)
+VALUES
+    ($1, $2, $3) RETURNING variant_id, stop_id, order_score
+`
+
+type CreateVariantStopParams struct {
+	VariantID  int64
+	StopID     int64
+	OrderScore pgtype.Int4
+}
+
+func (q *Queries) CreateVariantStop(ctx context.Context, arg CreateVariantStopParams) (VariantsStop, error) {
+	row := q.db.QueryRow(ctx, createVariantStop, arg.VariantID, arg.StopID, arg.OrderScore)
+	var i VariantsStop
+	err := row.Scan(&i.VariantID, &i.StopID, &i.OrderScore)
+	return i, err
+}
+
 const createVehicle = `-- name: CreateVehicle :one
 INSERT INTO
     vehicles(license_plate)
@@ -439,6 +459,36 @@ func (q *Queries) GetVariant(ctx context.Context, id int64) (Variant, error) {
 	return i, err
 }
 
+const getVariantByEbmsID = `-- name: GetVariantByEbmsID :one
+SELECT
+    id, name, ebms_id, is_outbound, route_id, description, short_name, distance, duration, start_stop_name, end_stop_name
+FROM
+    variants
+WHERE
+    ebms_id = $1
+LIMIT
+    1
+`
+
+func (q *Queries) GetVariantByEbmsID(ctx context.Context, ebmsID pgtype.Int8) (Variant, error) {
+	row := q.db.QueryRow(ctx, getVariantByEbmsID, ebmsID)
+	var i Variant
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.EbmsID,
+		&i.IsOutbound,
+		&i.RouteID,
+		&i.Description,
+		&i.ShortName,
+		&i.Distance,
+		&i.Duration,
+		&i.StartStopName,
+		&i.EndStopName,
+	)
+	return i, err
+}
+
 const getVariantByRouteIDAndOutbound = `-- name: GetVariantByRouteIDAndOutbound :one
 SELECT
     id, name, ebms_id, is_outbound, route_id, description, short_name, distance, duration, start_stop_name, end_stop_name
@@ -473,6 +523,64 @@ func (q *Queries) GetVariantByRouteIDAndOutbound(ctx context.Context, arg GetVar
 		&i.EndStopName,
 	)
 	return i, err
+}
+
+const getVariantStopByStopID = `-- name: GetVariantStopByStopID :many
+SELECT
+    variant_id, stop_id, order_score
+FROM
+    variants_stops
+WHERE
+    stop_id = $1
+`
+
+func (q *Queries) GetVariantStopByStopID(ctx context.Context, stopID int64) ([]VariantsStop, error) {
+	rows, err := q.db.Query(ctx, getVariantStopByStopID, stopID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []VariantsStop
+	for rows.Next() {
+		var i VariantsStop
+		if err := rows.Scan(&i.VariantID, &i.StopID, &i.OrderScore); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getVariantStopByVariantID = `-- name: GetVariantStopByVariantID :many
+SELECT
+    variant_id, stop_id, order_score
+FROM
+    variants_stops
+WHERE
+    variant_id = $1
+`
+
+func (q *Queries) GetVariantStopByVariantID(ctx context.Context, variantID int64) ([]VariantsStop, error) {
+	rows, err := q.db.Query(ctx, getVariantStopByVariantID, variantID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []VariantsStop
+	for rows.Next() {
+		var i VariantsStop
+		if err := rows.Scan(&i.VariantID, &i.StopID, &i.OrderScore); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const getVehicleByLicensePlate = `-- name: GetVehicleByLicensePlate :one

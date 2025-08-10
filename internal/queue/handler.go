@@ -98,3 +98,26 @@ func stopImportHandler(app *base.App) rabbitmq.Handler {
 		return rabbitmq.Ack
 	}
 }
+
+func variantStopImportHandler(app *base.App) rabbitmq.Handler {
+	return func(delivery rabbitmq.Delivery) rabbitmq.Action {
+		ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+		defer cancel()
+
+		params := &[]dto.VariantStopByEbmsIDImport{}
+		err := json.Unmarshal(delivery.Body, params)
+		if err != nil {
+			slog.Error("Error unmarshal variant and stop data", "error", err)
+			return rabbitmq.NackDiscard
+		}
+
+		// TODO: delete all stops by variant first, then insert in-place (transaction)
+		err = app.ImportVariantStops(ctx, params)
+		if err != nil {
+			slog.Error("Error importing variant and stop data", "error", err)
+			return rabbitmq.NackDiscard
+		}
+
+		return rabbitmq.Ack
+	}
+}

@@ -127,6 +127,28 @@ FROM
 ORDER BY
     id;
 
+-- name: GetVariantStopByStopID :many
+SELECT
+    *
+FROM
+    variants_stops
+WHERE
+    stop_id = $1;
+
+-- name: GetVariantStopByVariantID :many
+SELECT
+    *
+FROM
+    variants_stops
+WHERE
+    variant_id = $1;
+
+-- name: CreateVariantStop :one
+INSERT INTO
+    variants_stops(variant_id, stop_id, order_score)
+VALUES
+    ($1, $2, $3) RETURNING *;
+
 -- name: ListVariant :many
 SELECT
     *
@@ -142,6 +164,16 @@ FROM
     variants
 WHERE
     id = $1
+LIMIT
+    1;
+
+-- name: GetVariantByEbmsID :one
+SELECT
+    *
+FROM
+    variants
+WHERE
+    ebms_id = $1
 LIMIT
     1;
 

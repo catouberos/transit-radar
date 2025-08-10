@@ -30,6 +30,7 @@ func NewConsumerHandler(conn *rabbitmq.Conn, app *base.App) *consumerHandler {
 	handler.AddConsumer("routeUpdated", "route.event.updated", "route", routeUpsertHandler(app))
 	handler.AddConsumer("variantUpdated", "variant.event.updated", "variant", variantUpsertHandler(app))
 	handler.AddConsumer("stopImport", "stop.action.import", "stop", stopImportHandler(app))
+	handler.AddConsumer("variantStopImport", "variantstop.action.import", "variantstop", variantStopImportHandler(app))
 
 	return handler
 }

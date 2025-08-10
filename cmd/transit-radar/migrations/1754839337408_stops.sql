@@ -27,6 +27,7 @@ CREATE INDEX idx_stoptype_name ON stop_types(name);
 CREATE TABLE variants_stops (
     variant_id bigint,
     stop_id bigint,
+    order_score int,
     PRIMARY KEY (variant_id, stop_id)
 );
 
