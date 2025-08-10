@@ -18,17 +18,13 @@ func (app *App) ImportStop(ctx context.Context, data *dto.StopImport) error {
 	}
 
 	err = app.Query().CreateOrUpdateStop(ctx, models.CreateOrUpdateStopParams{
-		Code:            data.Code,
-		Name:            data.Name,
-		TypeID:          stopType.ID,
-		EbmsID:          pgtype.Int8{Int64: data.EbmsID, Valid: true},
-		Active:          data.Active,
-		Latitude:        data.Latitude,
-		Longitude:       data.Longitude,
-		AddressNumber:   pgtype.Text{String: data.AddressNumber, Valid: true},
-		AddressStreet:   pgtype.Text{String: data.AddressStreet, Valid: true},
-		AddressWard:     pgtype.Text{String: data.AddressWard, Valid: true},
-		AddressDistrict: pgtype.Text{String: data.AddressDistrict, Valid: true},
+		Code:      data.Code,
+		Name:      data.Name,
+		TypeID:    stopType.ID,
+		EbmsID:    pgtype.Int8{Int64: data.EbmsID, Valid: true},
+		Active:    data.Active,
+		Latitude:  data.Latitude,
+		Longitude: data.Longitude,
 	})
 	if err != nil {
 		return err

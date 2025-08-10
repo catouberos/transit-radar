@@ -31,18 +31,14 @@ type Route struct {
 }
 
 type Stop struct {
-	ID              int64
-	Code            string
-	Name            string
-	TypeID          int64
-	EbmsID          pgtype.Int8
-	Active          bool
-	Latitude        float32
-	Longitude       float32
-	AddressNumber   pgtype.Text
-	AddressStreet   pgtype.Text
-	AddressWard     pgtype.Text
-	AddressDistrict pgtype.Text
+	ID        int64
+	Code      string
+	Name      string
+	TypeID    int64
+	EbmsID    pgtype.Int8
+	Active    bool
+	Latitude  float32
+	Longitude float32
 }
 
 type StopType struct {

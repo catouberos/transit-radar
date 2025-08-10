@@ -7,12 +7,7 @@ CREATE TABLE stops (
     ebms_id bigint UNIQUE NULLS NOT DISTINCT,
     active boolean NOT NULL DEFAULT TRUE,
     latitude real NOT NULL,
-    longitude real NOT NULL,
-    -- address
-    address_number text,
-    address_street text,
-    address_ward text,
-    address_district text
+    longitude real NOT NULL
 );
 
 CREATE INDEX idx_stop_name ON stops(name);

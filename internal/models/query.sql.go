@@ -126,15 +126,10 @@ INSERT INTO
         ebms_id,
         active,
         latitude,
-        longitude,
-        -- address
-        address_number,
-        address_street,
-        address_ward,
-        address_district
+        longitude
     )
 VALUES
-    ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) ON CONFLICT(ebms_id) DO
+    ($1, $2, $3, $4, $5, $6, $7) ON CONFLICT(ebms_id) DO
 UPDATE
 SET
     code = EXCLUDED.code,
@@ -142,25 +137,17 @@ SET
     type_id = EXCLUDED.type_id,
     active = EXCLUDED.active,
     latitude = EXCLUDED.latitude,
-    longitude = EXCLUDED.longitude,
-    address_number = EXCLUDED.address_number,
-    address_street = EXCLUDED.address_street,
-    address_ward = EXCLUDED.address_ward,
-    address_district = EXCLUDED.address_district
+    longitude = EXCLUDED.longitude
 `
 
 type CreateOrUpdateStopParams struct {
-	Code            string
-	Name            string
-	TypeID          int64
-	EbmsID          pgtype.Int8
-	Active          bool
-	Latitude        float32
-	Longitude       float32
-	AddressNumber   pgtype.Text
-	AddressStreet   pgtype.Text
-	AddressWard     pgtype.Text
-	AddressDistrict pgtype.Text
+	Code      string
+	Name      string
+	TypeID    int64
+	EbmsID    pgtype.Int8
+	Active    bool
+	Latitude  float32
+	Longitude float32
 }
 
 func (q *Queries) CreateOrUpdateStop(ctx context.Context, arg CreateOrUpdateStopParams) error {
@@ -172,10 +159,6 @@ func (q *Queries) CreateOrUpdateStop(ctx context.Context, arg CreateOrUpdateStop
 		arg.Active,
 		arg.Latitude,
 		arg.Longitude,
-		arg.AddressNumber,
-		arg.AddressStreet,
-		arg.AddressWard,
-		arg.AddressDistrict,
 	)
 	return err
 }
@@ -382,7 +365,7 @@ func (q *Queries) GetRouteByVariantID(ctx context.Context, variantID int64) (Geo
 
 const getStopByEbmsID = `-- name: GetStopByEbmsID :one
 SELECT
-    id, code, name, type_id, ebms_id, active, latitude, longitude, address_number, address_street, address_ward, address_district
+    id, code, name, type_id, ebms_id, active, latitude, longitude
 FROM
     stops
 WHERE
@@ -403,10 +386,6 @@ func (q *Queries) GetStopByEbmsID(ctx context.Context, ebmsID pgtype.Int8) (Stop
 		&i.Active,
 		&i.Latitude,
 		&i.Longitude,
-		&i.AddressNumber,
-		&i.AddressStreet,
-		&i.AddressWard,
-		&i.AddressDistrict,
 	)
 	return i, err
 }
@@ -681,7 +660,7 @@ func (q *Queries) ListRoute(ctx context.Context) ([]Route, error) {
 
 const listStop = `-- name: ListStop :many
 SELECT
-    id, code, name, type_id, ebms_id, active, latitude, longitude, address_number, address_street, address_ward, address_district
+    id, code, name, type_id, ebms_id, active, latitude, longitude
 FROM
     stops
 ORDER BY
@@ -706,10 +685,6 @@ func (q *Queries) ListStop(ctx context.Context) ([]Stop, error) {
 			&i.Active,
 			&i.Latitude,
 			&i.Longitude,
-			&i.AddressNumber,
-			&i.AddressStreet,
-			&i.AddressWard,
-			&i.AddressDistrict,
 		); err != nil {
 			return nil, err
 		}

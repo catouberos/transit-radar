@@ -87,15 +87,10 @@ INSERT INTO
         ebms_id,
         active,
         latitude,
-        longitude,
-        -- address
-        address_number,
-        address_street,
-        address_ward,
-        address_district
+        longitude
     )
 VALUES
-    ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) ON CONFLICT(ebms_id) DO
+    ($1, $2, $3, $4, $5, $6, $7) ON CONFLICT(ebms_id) DO
 UPDATE
 SET
     code = EXCLUDED.code,
@@ -103,11 +98,7 @@ SET
     type_id = EXCLUDED.type_id,
     active = EXCLUDED.active,
     latitude = EXCLUDED.latitude,
-    longitude = EXCLUDED.longitude,
-    address_number = EXCLUDED.address_number,
-    address_street = EXCLUDED.address_street,
-    address_ward = EXCLUDED.address_ward,
-    address_district = EXCLUDED.address_district;
+    longitude = EXCLUDED.longitude;
 
 -- name: GetStopByEbmsID :one
 SELECT
