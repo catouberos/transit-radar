@@ -2,6 +2,7 @@ package base
 
 import (
 	"context"
+	"log/slog"
 
 	"github.com/catouberos/transit-radar/dto"
 	"github.com/catouberos/transit-radar/internal/models"
@@ -26,20 +27,24 @@ func (app *App) ImportVariantStops(ctx context.Context, data *[]dto.VariantStopB
 			},
 		)
 		if err != nil {
+			slog.Error("Variant not found", "record", record)
 			return err
 		}
 
 		stop, err := qtx.GetStopByEbmsID(ctx, pgtype.Int8{Int64: record.StopEbmsID, Valid: true})
 		if err != nil {
+			slog.Error("Stop not found", "record", record)
 			return err
 		}
 
 		if _, err = qtx.CreateVariantStop(ctx, models.CreateVariantStopParams{
 			VariantID:  variant.ID,
 			StopID:     stop.ID,
-			OrderScore: pgtype.Int4{Int32: int32(record.OrderScore), Valid: true},
+			OrderScore: int32(record.OrderScore),
 		}); err != nil {
-			return err
+			// ignore duplicate
+			slog.Error("Error creating variant stop", "record", record)
+			continue
 		}
 	}
 

@@ -1,7 +1,7 @@
 -- +goose Up
 CREATE TABLE stops (
     id bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    code varchar(10) UNIQUE NOT NULL,
+    code text NOT NULL,
     name text NOT NULL,
     type_id bigint NOT NULL,
     ebms_id bigint UNIQUE NULLS NOT DISTINCT,
@@ -23,7 +23,7 @@ CREATE TABLE variants_stops (
     variant_id bigint,
     stop_id bigint,
     order_score int,
-    PRIMARY KEY (variant_id, stop_id)
+    PRIMARY KEY (variant_id, stop_id, order_score)
 );
 
 -- +goose Down

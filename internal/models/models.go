@@ -63,7 +63,7 @@ type Variant struct {
 type VariantsStop struct {
 	VariantID  int64
 	StopID     int64
-	OrderScore pgtype.Int4
+	OrderScore int32
 }
 
 type Vehicle struct {

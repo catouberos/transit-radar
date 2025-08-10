@@ -257,7 +257,7 @@ VALUES
 type CreateVariantStopParams struct {
 	VariantID  int64
 	StopID     int64
-	OrderScore pgtype.Int4
+	OrderScore int32
 }
 
 func (q *Queries) CreateVariantStop(ctx context.Context, arg CreateVariantStopParams) (VariantsStop, error) {
