@@ -1,11 +1,47 @@
 syntax = "proto3";
 package api.v1;
 
-option go_package = "github.com/catouberos/transit-radar/gen/api/v1;transitradarv1";
-
 service VariantService {
+  rpc CreateVariant(CreateVariantRequest) returns (CreateVariantResponse) {}
+  rpc UpdateVariant(UpdateVariantRequest) returns (UpdateVariantResponse) {}
   rpc GetVariant(GetVariantRequest) returns (GetVariantResponse) {}
+  rpc GetVariantByEbmsID(GetVariantByEbmsIDRequest) returns (GetVariantByEbmsIDResponse) {}
   rpc ListVariant(ListVariantRequest) returns (ListVariantResponse) {}
+}
+
+message CreateVariantRequest {
+  string name = 1;
+  bool is_outbound = 2;
+  int64 route_id = 3;
+  string description = 4;
+  string short_name = 5;
+  float distance = 6;
+  int32 duration = 7;
+  string start_stop_name = 8;
+  string end_stop_name = 9;
+  int64 ebms_id = 10;
+}
+
+message CreateVariantResponse {
+  Variant variant = 1;
+}
+
+message UpdateVariantRequest {
+  int64 id = 1;
+  string name = 2;
+  bool is_outbound = 3;
+  int64 route_id = 4;
+  string description = 5;
+  string short_name = 6;
+  float distance = 7;
+  int32 duration = 8;
+  string start_stop_name = 9;
+  string end_stop_name = 10;
+  int64 ebms_id = 11;
+}
+
+message UpdateVariantResponse {
+  Variant variant = 1;
 }
 
 message GetVariantRequest {
@@ -13,6 +49,14 @@ message GetVariantRequest {
 }
 
 message GetVariantResponse {
+  Variant variant = 1;
+}
+
+message GetVariantByEbmsIDRequest {
+  int64 ebms_id = 1;
+}
+
+message GetVariantByEbmsIDResponse {
   Variant variant = 1;
 }
 
@@ -33,4 +77,5 @@ message Variant {
   int32 duration = 8;
   string start_stop_name = 9;
   string end_stop_name = 10;
+  int64 ebms_id = 11;
 }

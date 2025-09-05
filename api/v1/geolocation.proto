@@ -3,13 +3,27 @@ package api.v1;
 
 import "google/protobuf/timestamp.proto";
 
-option go_package = "github.com/catouberos/transit-radar/gen/api/v1;transitradarv1";
-
 service GeolocationService {
+  rpc CreateGeolocation(CreateGeolocationRequest) returns (CreateGeolocationResponse) {}
+
   rpc GetVehiclesByRoute(GetVehiclesByRouteRequest) returns (GetVehiclesByRouteResponse) {}
   rpc GetVehiclesByStation(GetVehiclesByStationRequest) returns (GetVehiclesByStationResponse) {}
 
   rpc ListGeolocationByBounding(ListGeolocationByBoundingRequest) returns (ListGeolocationByBoundingResponse) {}
+}
+
+message CreateGeolocationRequest {
+  float degree = 1;
+  float latitude = 2;
+  float longitude = 3;
+  float speed = 4;
+  int64 vehicle_id = 5;
+  int64 variant_id = 6;
+  google.protobuf.Timestamp timestamp = 7;
+}
+
+message CreateGeolocationResponse {
+  Geolocation geolocation = 1;
 }
 
 message GetVehiclesByRouteRequest {
