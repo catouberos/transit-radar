@@ -16,7 +16,7 @@ message CreateRouteRequest {
   string operation_time = 4;
   string organization = 5;
   string ticketing = 6;
-  string route_typ = 7;
+  string route_type = 7;
   int64 ebms_id = 8;
 }
 

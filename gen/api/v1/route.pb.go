@@ -29,7 +29,7 @@ type CreateRouteRequest struct {
 	OperationTime string                 `protobuf:"bytes,4,opt,name=operation_time,json=operationTime,proto3" json:"operation_time,omitempty"`
 	Organization  string                 `protobuf:"bytes,5,opt,name=organization,proto3" json:"organization,omitempty"`
 	Ticketing     string                 `protobuf:"bytes,6,opt,name=ticketing,proto3" json:"ticketing,omitempty"`
-	RouteTyp      string                 `protobuf:"bytes,7,opt,name=route_typ,json=routeTyp,proto3" json:"route_typ,omitempty"`
+	RouteType     string                 `protobuf:"bytes,7,opt,name=route_type,json=routeType,proto3" json:"route_type,omitempty"`
 	EbmsId        int64                  `protobuf:"varint,8,opt,name=ebms_id,json=ebmsId,proto3" json:"ebms_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -107,9 +107,9 @@ func (x *CreateRouteRequest) GetTicketing() string {
 	return ""
 }
 
-func (x *CreateRouteRequest) GetRouteTyp() string {
+func (x *CreateRouteRequest) GetRouteType() string {
 	if x != nil {
-		return x.RouteTyp
+		return x.RouteType
 	}
 	return ""
 }
@@ -685,15 +685,16 @@ var File_api_v1_route_proto protoreflect.FileDescriptor
 
 const file_api_v1_route_proto_rawDesc = "" +
 	"\n" +
-	"\x12api/v1/route.proto\x12\x06api.v1\"\xf7\x01\n" +
+	"\x12api/v1/route.proto\x12\x06api.v1\"\xf9\x01\n" +
 	"\x12CreateRouteRequest\x12\x16\n" +
 	"\x06number\x18\x01 \x01(\tR\x06number\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x16\n" +
 	"\x06active\x18\x03 \x01(\bR\x06active\x12%\n" +
 	"\x0eoperation_time\x18\x04 \x01(\tR\roperationTime\x12\"\n" +
 	"\forganization\x18\x05 \x01(\tR\forganization\x12\x1c\n" +
-	"\tticketing\x18\x06 \x01(\tR\tticketing\x12\x1b\n" +
-	"\troute_typ\x18\a \x01(\tR\brouteTyp\x12\x17\n" +
+	"\tticketing\x18\x06 \x01(\tR\tticketing\x12\x1d\n" +
+	"\n" +
+	"route_type\x18\a \x01(\tR\trouteType\x12\x17\n" +
 	"\aebms_id\x18\b \x01(\x03R\x06ebmsId\":\n" +
 	"\x13CreateRouteResponse\x12#\n" +
 	"\x05route\x18\x01 \x01(\v2\r.api.v1.RouteR\x05route\"\xa9\x03\n" +
