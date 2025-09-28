@@ -7,8 +7,6 @@ package models
 
 import (
 	"context"
-
-	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const createVariant = `-- name: CreateVariant :one
@@ -31,15 +29,15 @@ VALUES
 
 type CreateVariantParams struct {
 	Name          string
-	EbmsID        pgtype.Int8
+	EbmsID        *int64
 	IsOutbound    bool
 	RouteID       int64
-	Description   pgtype.Text
-	ShortName     pgtype.Text
-	Distance      pgtype.Float4
-	Duration      pgtype.Int4
-	StartStopName pgtype.Text
-	EndStopName   pgtype.Text
+	Description   *string
+	ShortName     *string
+	Distance      *float32
+	Duration      *int32
+	StartStopName *string
+	EndStopName   *string
 }
 
 func (q *Queries) CreateVariant(ctx context.Context, arg CreateVariantParams) (Variant, error) {
@@ -78,13 +76,19 @@ SELECT
 FROM
     variants
 WHERE
-    id = $1
+    id = coalesce($1, id)
+    AND ebms_id = coalesce($2, ebms_id)
 LIMIT
     1
 `
 
-func (q *Queries) GetVariant(ctx context.Context, id int64) (Variant, error) {
-	row := q.db.QueryRow(ctx, getVariant, id)
+type GetVariantParams struct {
+	ID     *int64
+	EbmsID *int64
+}
+
+func (q *Queries) GetVariant(ctx context.Context, arg GetVariantParams) (Variant, error) {
+	row := q.db.QueryRow(ctx, getVariant, arg.ID, arg.EbmsID)
 	var i Variant
 	err := row.Scan(
 		&i.ID,
@@ -102,75 +106,6 @@ func (q *Queries) GetVariant(ctx context.Context, id int64) (Variant, error) {
 	return i, err
 }
 
-const getVariantByEbmsIDAndRouteEbmsID = `-- name: GetVariantByEbmsIDAndRouteEbmsID :one
-SELECT
-    variants.id, variants.name, variants.ebms_id, is_outbound, route_id, description, short_name, distance, duration, start_stop_name, end_stop_name, routes.id, number, routes.name, routes.ebms_id, active, operation_time, organization, ticketing, route_type
-FROM
-    variants
-    LEFT OUTER JOIN routes ON routes.id = variants.route_id
-WHERE
-    variants.ebms_id = $1
-    AND routes.ebms_id = $2
-LIMIT
-    1
-`
-
-type GetVariantByEbmsIDAndRouteEbmsIDParams struct {
-	EbmsID   pgtype.Int8
-	EbmsID_2 pgtype.Int8
-}
-
-type GetVariantByEbmsIDAndRouteEbmsIDRow struct {
-	ID            int64
-	Name          string
-	EbmsID        pgtype.Int8
-	IsOutbound    bool
-	RouteID       int64
-	Description   pgtype.Text
-	ShortName     pgtype.Text
-	Distance      pgtype.Float4
-	Duration      pgtype.Int4
-	StartStopName pgtype.Text
-	EndStopName   pgtype.Text
-	ID_2          pgtype.Int8
-	Number        pgtype.Text
-	Name_2        pgtype.Text
-	EbmsID_2      pgtype.Int8
-	Active        pgtype.Bool
-	OperationTime pgtype.Text
-	Organization  pgtype.Text
-	Ticketing     pgtype.Text
-	RouteType     pgtype.Text
-}
-
-func (q *Queries) GetVariantByEbmsIDAndRouteEbmsID(ctx context.Context, arg GetVariantByEbmsIDAndRouteEbmsIDParams) (GetVariantByEbmsIDAndRouteEbmsIDRow, error) {
-	row := q.db.QueryRow(ctx, getVariantByEbmsIDAndRouteEbmsID, arg.EbmsID, arg.EbmsID_2)
-	var i GetVariantByEbmsIDAndRouteEbmsIDRow
-	err := row.Scan(
-		&i.ID,
-		&i.Name,
-		&i.EbmsID,
-		&i.IsOutbound,
-		&i.RouteID,
-		&i.Description,
-		&i.ShortName,
-		&i.Distance,
-		&i.Duration,
-		&i.StartStopName,
-		&i.EndStopName,
-		&i.ID_2,
-		&i.Number,
-		&i.Name_2,
-		&i.EbmsID_2,
-		&i.Active,
-		&i.OperationTime,
-		&i.Organization,
-		&i.Ticketing,
-		&i.RouteType,
-	)
-	return i, err
-}
-
 const listVariant = `-- name: ListVariant :many
 SELECT
     id, name, ebms_id, is_outbound, route_id, description, short_name, distance, duration, start_stop_name, end_stop_name
@@ -184,7 +119,7 @@ ORDER BY
 `
 
 type ListVariantParams struct {
-	RouteID    pgtype.Int8
+	RouteID    *int64
 	IsOutbound interface{}
 }
 
@@ -239,16 +174,16 @@ WHERE
 `
 
 type UpdateVariantParams struct {
-	Name          pgtype.Text
-	EbmsID        pgtype.Int8
-	IsOutbound    pgtype.Bool
-	RouteID       pgtype.Int8
-	Description   pgtype.Text
-	ShortName     pgtype.Text
-	Distance      pgtype.Float4
-	Duration      pgtype.Int4
-	StartStopName pgtype.Text
-	EndStopName   pgtype.Text
+	Name          *string
+	EbmsID        *int64
+	IsOutbound    *bool
+	RouteID       *int64
+	Description   *string
+	ShortName     *string
+	Distance      *float32
+	Duration      *int32
+	StartStopName *string
+	EndStopName   *string
 	ID            int64
 }
 

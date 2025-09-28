@@ -7,8 +7,6 @@ package models
 
 import (
 	"context"
-
-	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const createStop = `-- name: CreateStop :one
@@ -30,7 +28,7 @@ type CreateStopParams struct {
 	Code      string
 	Name      string
 	TypeID    int64
-	EbmsID    pgtype.Int8
+	EbmsID    *int64
 	Active    bool
 	Latitude  float32
 	Longitude float32
@@ -73,8 +71,8 @@ LIMIT
 `
 
 type GetStopParams struct {
-	ID     pgtype.Int8
-	EbmsID pgtype.Int8
+	ID     *int64
+	EbmsID *int64
 }
 
 func (q *Queries) GetStop(ctx context.Context, arg GetStopParams) (Stop, error) {
@@ -147,13 +145,13 @@ WHERE
 `
 
 type UpdateStopParams struct {
-	Code      pgtype.Text
-	Name      pgtype.Text
-	TypeID    pgtype.Int8
-	EbmsID    pgtype.Int8
-	Active    pgtype.Bool
-	Latitude  pgtype.Float4
-	Longitude pgtype.Float4
+	Code      *string
+	Name      *string
+	TypeID    *int64
+	EbmsID    *int64
+	Active    *bool
+	Latitude  *float32
+	Longitude *float32
 	ID        int64
 }
 

@@ -7,8 +7,6 @@ package models
 
 import (
 	"context"
-
-	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const createRoute = `-- name: CreateRoute :one
@@ -29,11 +27,11 @@ VALUES
 type CreateRouteParams struct {
 	Number        string
 	Name          string
-	EbmsID        pgtype.Int8
-	OperationTime pgtype.Text
-	Organization  pgtype.Text
-	Ticketing     pgtype.Text
-	RouteType     pgtype.Text
+	EbmsID        *int64
+	OperationTime *string
+	Organization  *string
+	Ticketing     *string
+	RouteType     *string
 }
 
 func (q *Queries) CreateRoute(ctx context.Context, arg CreateRouteParams) (Route, error) {
@@ -74,8 +72,8 @@ LIMIT
 `
 
 type GetRouteParams struct {
-	ID     pgtype.Int8
-	EbmsID pgtype.Int8
+	ID     *int64
+	EbmsID *int64
 }
 
 func (q *Queries) GetRoute(ctx context.Context, arg GetRouteParams) (Route, error) {
@@ -150,13 +148,13 @@ WHERE
 `
 
 type UpdateRouteParams struct {
-	Number        pgtype.Text
-	Name          pgtype.Text
-	EbmsID        pgtype.Int8
-	OperationTime pgtype.Text
-	Organization  pgtype.Text
-	Ticketing     pgtype.Text
-	RouteType     pgtype.Text
+	Number        *string
+	Name          *string
+	EbmsID        *int64
+	OperationTime *string
+	Organization  *string
+	Ticketing     *string
+	RouteType     *string
 	ID            int64
 }
 

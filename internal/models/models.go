@@ -22,12 +22,12 @@ type Route struct {
 	ID            int64
 	Number        string
 	Name          string
-	EbmsID        pgtype.Int8
+	EbmsID        *int64
 	Active        bool
-	OperationTime pgtype.Text
-	Organization  pgtype.Text
-	Ticketing     pgtype.Text
-	RouteType     pgtype.Text
+	OperationTime *string
+	Organization  *string
+	Ticketing     *string
+	RouteType     *string
 }
 
 type Stop struct {
@@ -35,7 +35,7 @@ type Stop struct {
 	Code      string
 	Name      string
 	TypeID    int64
-	EbmsID    pgtype.Int8
+	EbmsID    *int64
 	Active    bool
 	Latitude  float32
 	Longitude float32
@@ -49,15 +49,15 @@ type StopType struct {
 type Variant struct {
 	ID            int64
 	Name          string
-	EbmsID        pgtype.Int8
+	EbmsID        *int64
 	IsOutbound    bool
 	RouteID       int64
-	Description   pgtype.Text
-	ShortName     pgtype.Text
-	Distance      pgtype.Float4
-	Duration      pgtype.Int4
-	StartStopName pgtype.Text
-	EndStopName   pgtype.Text
+	Description   *string
+	ShortName     *string
+	Distance      *float32
+	Duration      *int32
+	StartStopName *string
+	EndStopName   *string
 }
 
 type VariantsStop struct {
@@ -69,7 +69,7 @@ type VariantsStop struct {
 type Vehicle struct {
 	ID           int64
 	LicensePlate string
-	Type         pgtype.Int8
+	Type         *int64
 }
 
 type VehicleType struct {
