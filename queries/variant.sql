@@ -38,19 +38,8 @@ SELECT
 FROM
     variants
 WHERE
-    id = $1
-LIMIT
-    1;
-
--- name: GetVariantByEbmsIDAndRouteEbmsID :one
-SELECT
-    *
-FROM
-    variants
-    LEFT OUTER JOIN routes ON routes.id = variants.route_id
-WHERE
-    variants.ebms_id = $1
-    AND routes.ebms_id = $2
+    id = coalesce(sqlc.narg('id'), id)
+    AND ebms_id = coalesce(sqlc.narg('ebms_id'), ebms_id)
 LIMIT
     1;
 
