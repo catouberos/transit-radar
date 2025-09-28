@@ -1,4 +1,4 @@
-package base
+package app
 
 import (
 	"context"
@@ -11,13 +11,13 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
-func (app *App) CreateGeolocationByRouteIDAndPlateAndBound(ctx context.Context, data *dto.GeolocationByRouteIDAndPlateAndBoundInsert) (*models.Geolocation, error) {
-	route, err := app.Query().GetRouteByEbmsID(ctx, pgtype.Int8{Int64: data.RouteID, Valid: true})
+func (a *App) CreateGeolocationByRouteIDAndPlateAndBound(ctx context.Context, data *dto.GeolocationByRouteIDAndPlateAndBoundInsert) (*models.Geolocation, error) {
+	route, err := a.Query().GetRouteByEbmsID(ctx, pgtype.Int8{Int64: data.RouteID, Valid: true})
 	if err != nil {
 		return nil, err
 	}
 
-	variant, err := app.Query().GetVariantByRouteIDAndOutbound(ctx, models.GetVariantByRouteIDAndOutboundParams{
+	variant, err := a.Query().GetVariantByRouteIDAndOutbound(ctx, models.GetVariantByRouteIDAndOutboundParams{
 		RouteID:    route.ID,
 		IsOutbound: data.IsOutbound,
 	})
@@ -25,15 +25,15 @@ func (app *App) CreateGeolocationByRouteIDAndPlateAndBound(ctx context.Context, 
 		return nil, err
 	}
 
-	vehicle, err := app.Query().GetVehicleByLicensePlate(ctx, data.LicensePlate)
+	vehicle, err := a.Query().GetVehicleByLicensePlate(ctx, data.LicensePlate)
 	if err != nil {
-		vehicle, err = app.Query().CreateVehicle(ctx, data.LicensePlate)
+		vehicle, err = a.Query().CreateVehicle(ctx, data.LicensePlate)
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	result, err := app.Query().CreateGeolocation(ctx, models.CreateGeolocationParams{
+	result, err := a.Query().CreateGeolocation(ctx, models.CreateGeolocationParams{
 		Degree:    data.Degree,
 		Latitude:  data.Latitude,
 		Longitude: data.Longitude,
@@ -47,7 +47,7 @@ func (app *App) CreateGeolocationByRouteIDAndPlateAndBound(ctx context.Context, 
 		return nil, err
 	}
 
-	cmd := app.Redis().GeoAdd(ctx, "geolocations", &redis.GeoLocation{
+	cmd := a.Redis().GeoAdd(ctx, "geolocations", &redis.GeoLocation{
 		Name:      fmt.Sprintf("geolocation:%d", vehicle.ID),
 		Latitude:  float64(result.Latitude),
 		Longitude: float64(result.Longitude),
@@ -56,7 +56,7 @@ func (app *App) CreateGeolocationByRouteIDAndPlateAndBound(ctx context.Context, 
 		slog.Warn("Cannot add geolocation to Redis", "error", err)
 	}
 
-	cmd = app.Redis().HSet(ctx, fmt.Sprintf("geolocation:%d", vehicle.ID), &dto.Geolocation{
+	cmd = a.Redis().HSet(ctx, fmt.Sprintf("geolocation:%d", vehicle.ID), &dto.Geolocation{
 		Degree:    result.Degree,
 		Latitude:  result.Latitude,
 		Longitude: result.Longitude,
@@ -72,10 +72,10 @@ func (app *App) CreateGeolocationByRouteIDAndPlateAndBound(ctx context.Context, 
 	return &result, nil
 }
 
-func (app *App) ListGeolocationByBounding(ctx context.Context, lat, lng float32, width, height float32) ([]*dto.Geolocation, error) {
+func (a *App) ListGeolocationByBounding(ctx context.Context, lat, lng float32, width, height float32) ([]*dto.Geolocation, error) {
 	results := []*dto.Geolocation{}
 
-	cmd := app.Redis().GeoSearchLocation(ctx, "geolocations", &redis.GeoSearchLocationQuery{
+	cmd := a.Redis().GeoSearchLocation(ctx, "geolocations", &redis.GeoSearchLocationQuery{
 		GeoSearchQuery: redis.GeoSearchQuery{
 			Latitude:  float64(lat),
 			Longitude: float64(lng),
@@ -93,7 +93,7 @@ func (app *App) ListGeolocationByBounding(ctx context.Context, lat, lng float32,
 	}
 
 	for _, location := range locations {
-		cmd := app.Redis().HGetAll(ctx, location.Name)
+		cmd := a.Redis().HGetAll(ctx, location.Name)
 		if err := cmd.Err(); err != nil {
 			slog.Warn("Location not in cache, getting from database...")
 			// TODO: get location from database
@@ -107,7 +107,7 @@ func (app *App) ListGeolocationByBounding(ctx context.Context, lat, lng float32,
 			continue
 		}
 
-		results = append(results, result)
+		results = aend(results, result)
 	}
 
 	return results, nil
