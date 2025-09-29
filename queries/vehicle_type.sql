@@ -1,32 +1,32 @@
--- name: CreateStopType :one
+-- name: CreateVehicleType :one
 INSERT INTO
-    stop_types(name)
+    vehicle_types(name)
 VALUES
     ($1) RETURNING *;
 
--- name: UpdateStopType :one
+-- name: UpdateVehicleType :one
 UPDATE
-    stop_types
+    vehicle_types
 SET
     name = coalesce(sqlc.narg('name'), name)
 WHERE
     id = sqlc.arg('id') RETURNING *;
 
--- name: GetStopType :one
+-- name: GetVehicleType :one
 SELECT
     *
 FROM
-    stop_types
+    vehicle_types
 WHERE
     id = coalesce(sqlc.narg('id'), id)
     AND name = coalesce(sqlc.narg('name'), name)
 LIMIT
     1;
 
--- name: ListStopType :many
+-- name: ListVehicleType :many
 SELECT
     *
 FROM
-    stop_types
+    vehicle_types
 ORDER BY
     id;

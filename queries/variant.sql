@@ -50,6 +50,6 @@ FROM
     variants
 WHERE
     route_id = coalesce(sqlc.narg('route_id'), route_id)
-    AND coalesce(sqlc.narg('is_outbound'), is_outbound)
+    AND is_outbound = coalesce(sqlc.narg('is_outbound'), is_outbound)
 ORDER BY
     id;

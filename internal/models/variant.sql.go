@@ -113,14 +113,14 @@ FROM
     variants
 WHERE
     route_id = coalesce($1, route_id)
-    AND coalesce($2, is_outbound)
+    AND is_outbound = coalesce($2, is_outbound)
 ORDER BY
     id
 `
 
 type ListVariantParams struct {
 	RouteID    *int64
-	IsOutbound interface{}
+	IsOutbound *bool
 }
 
 func (q *Queries) ListVariant(ctx context.Context, arg ListVariantParams) ([]Variant, error) {

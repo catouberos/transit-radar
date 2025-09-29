@@ -5,17 +5,17 @@
 package models
 
 import (
-	"github.com/jackc/pgx/v5/pgtype"
+	"time"
 )
 
 type Geolocation struct {
 	Degree    float32
-	Latitude  float32
-	Longitude float32
+	Latitude  float64
+	Longitude float64
 	Speed     float32
 	VehicleID int64
 	VariantID int64
-	Timestamp pgtype.Timestamptz
+	Timestamp time.Time
 }
 
 type Route struct {
