@@ -1,88 +1,136 @@
-package app
+package geolocation
 
 import (
 	"context"
 	"fmt"
-	"log/slog"
+	"strconv"
+	"strings"
+	"time"
 
-	"github.com/catouberos/transit-radar/dto"
 	"github.com/catouberos/transit-radar/internal/models"
-	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/redis/go-redis/v9"
 )
 
-func (a *App) CreateGeolocationByRouteIDAndPlateAndBound(ctx context.Context, data *dto.GeolocationByRouteIDAndPlateAndBoundInsert) (*models.Geolocation, error) {
-	route, err := a.Query().GetRouteByEbmsID(ctx, pgtype.Int8{Int64: data.RouteID, Valid: true})
-	if err != nil {
-		return nil, err
-	}
+const (
+	cacheKey = "geolocation:vehicle:%d"
+)
 
-	variant, err := a.Query().GetVariantByRouteIDAndOutbound(ctx, models.GetVariantByRouteIDAndOutboundParams{
-		RouteID:    route.ID,
-		IsOutbound: data.IsOutbound,
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	vehicle, err := a.Query().GetVehicleByLicensePlate(ctx, data.LicensePlate)
-	if err != nil {
-		vehicle, err = a.Query().CreateVehicle(ctx, data.LicensePlate)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	result, err := a.Query().CreateGeolocation(ctx, models.CreateGeolocationParams{
-		Degree:    data.Degree,
-		Latitude:  data.Latitude,
-		Longitude: data.Longitude,
-		Speed:     data.Speed,
-		VehicleID: vehicle.ID,
-		VariantID: variant.ID,
-		Timestamp: pgtype.Timestamptz{Time: data.Timestamp, Valid: true},
-	})
-
-	if err != nil {
-		return nil, err
-	}
-
-	cmd := a.Redis().GeoAdd(ctx, "geolocations", &redis.GeoLocation{
-		Name:      fmt.Sprintf("geolocation:%d", vehicle.ID),
-		Latitude:  float64(result.Latitude),
-		Longitude: float64(result.Longitude),
-	})
-	if err := cmd.Err(); err != nil {
-		slog.Warn("Cannot add geolocation to Redis", "error", err)
-	}
-
-	cmd = a.Redis().HSet(ctx, fmt.Sprintf("geolocation:%d", vehicle.ID), &dto.Geolocation{
-		Degree:    result.Degree,
-		Latitude:  result.Latitude,
-		Longitude: result.Longitude,
-		Speed:     result.Speed,
-		VehicleID: result.VehicleID,
-		VariantID: result.VariantID,
-		Timestamp: result.Timestamp.Time,
-	})
-	if err := cmd.Err(); err != nil {
-		slog.Warn("Cannot add geolocation details to Redis", "error", err)
-	}
-
-	return &result, nil
+type GeolocationService interface {
+	Create(context.Context, CreateParams) (Geolocation, error)
+	Get(context.Context, GetParams) (Geolocation, error)
+	List(context.Context, ListParams) ([]Geolocation, error)
+	ListByBounding(context.Context, ListByBoundingParams) ([]Geolocation, error)
 }
 
-func (a *App) ListGeolocationByBounding(ctx context.Context, lat, lng float32, width, height float32) ([]*dto.Geolocation, error) {
-	results := []*dto.Geolocation{}
+type Geolocation struct {
+	Degree    float32   `redis:"degree"`
+	Latitude  float64   `redis:"latitude"`
+	Longitude float64   `redis:"longitude"`
+	Speed     float32   `redis:"speed"`
+	VehicleID int64     `redis:"vehicle_id"`
+	VariantID int64     `redis:"variant_id"`
+	Timestamp time.Time `redis:"timestamp"`
+}
 
-	cmd := a.Redis().GeoSearchLocation(ctx, "geolocations", &redis.GeoSearchLocationQuery{
+type CreateParams struct {
+	Degree    float32
+	Latitude  float64
+	Longitude float64
+	Speed     float32
+	VehicleID int64
+	VariantID int64
+	Timestamp time.Time
+}
+
+type GetParams struct {
+	VehicleID int64
+}
+
+type ListParams struct {
+	Limit int32
+}
+
+type ListByBoundingParams struct {
+	Latitude, Longitude, Width, Height float64
+	Unit                               string
+}
+
+var _ GeolocationService = (*GeolocationServiceImpl)(nil)
+
+func NewGeolocationService(query *models.Queries, redis *redis.Client) *GeolocationServiceImpl {
+	return &GeolocationServiceImpl{
+		query: query,
+		redis: redis,
+	}
+}
+
+type GeolocationServiceImpl struct {
+	query *models.Queries
+	redis *redis.Client
+}
+
+func (s *GeolocationServiceImpl) Create(ctx context.Context, params CreateParams) (Geolocation, error) {
+	result, err := s.query.CreateGeolocation(ctx, models.CreateGeolocationParams{
+		Degree:    params.Degree,
+		Latitude:  params.Latitude,
+		Longitude: params.Longitude,
+		Speed:     params.Speed,
+		VehicleID: params.VehicleID,
+		VariantID: params.VariantID,
+		Timestamp: params.Timestamp,
+	})
+	if err != nil {
+		return Geolocation{}, err
+	}
+	geolocation := buildGeolocation(result)
+
+	// TODO: error handling
+	s.cachePut(ctx, geolocation)
+	s.geoPut(ctx, geolocation)
+
+	return geolocation, nil
+}
+
+func (s *GeolocationServiceImpl) Get(ctx context.Context, params GetParams) (Geolocation, error) {
+	cached, err := s.cacheGet(ctx, params.VehicleID)
+	if err == nil {
+		return cached, nil
+	}
+
+	result, err := s.query.GetGeolocation(ctx, &params.VehicleID)
+	if err != nil {
+		return Geolocation{}, err
+	}
+	geolocation := buildGeolocation(result)
+
+	return geolocation, nil
+}
+
+func (s *GeolocationServiceImpl) List(ctx context.Context, params ListParams) ([]Geolocation, error) {
+	result, err := s.query.ListGeolocation(ctx, models.ListGeolocationParams{
+		Limit: params.Limit,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	geolocations := make([]Geolocation, len(result))
+	for i, geolocation := range result {
+		geolocations[i] = buildGeolocation(geolocation)
+	}
+
+	return geolocations, nil
+}
+
+func (s *GeolocationServiceImpl) ListByBounding(ctx context.Context, params ListByBoundingParams) ([]Geolocation, error) {
+	cmd := s.redis.GeoSearchLocation(ctx, "geolocations", &redis.GeoSearchLocationQuery{
 		GeoSearchQuery: redis.GeoSearchQuery{
-			Latitude:  float64(lat),
-			Longitude: float64(lng),
+			Latitude:  params.Latitude,
+			Longitude: params.Longitude,
 
-			BoxWidth:  float64(width),
-			BoxHeight: float64(height),
-			BoxUnit:   "m",
+			BoxWidth:  params.Width,
+			BoxHeight: params.Height,
+			BoxUnit:   params.Unit,
 		},
 		WithCoord: true,
 	})
@@ -92,23 +140,79 @@ func (a *App) ListGeolocationByBounding(ctx context.Context, lat, lng float32, w
 		return nil, err
 	}
 
-	for _, location := range locations {
-		cmd := a.Redis().HGetAll(ctx, location.Name)
-		if err := cmd.Err(); err != nil {
-			slog.Warn("Location not in cache, getting from database...")
-			// TODO: get location from database
+	geolocations := make([]Geolocation, len(locations))
+
+	for i, location := range locations {
+		values := strings.Split(location.Name, ":")
+		rawVehicleID := values[len(values)-1]
+		vehicleID, err := strconv.ParseInt(rawVehicleID, 10, 64)
+		if err != nil {
+			// TODO: log
 			continue
 		}
 
-		result := &dto.Geolocation{}
-		if err := cmd.Scan(result); err != nil {
-			slog.Error("Cannot parse from Redis")
-			// TODO: get from database also
+		geolocation, err := s.Get(ctx, GetParams{
+			VehicleID: vehicleID,
+		})
+		if err != nil {
+			// TODO: log
 			continue
 		}
 
-		results = aend(results, result)
+		geolocations[i] = geolocation
 	}
 
-	return results, nil
+	return geolocations, nil
+}
+
+func (s *GeolocationServiceImpl) geoPut(ctx context.Context, geolocation Geolocation) error {
+	cmd := s.redis.GeoAdd(ctx, "geolocations", &redis.GeoLocation{
+		Name:      fmt.Sprintf(cacheKey, geolocation.VehicleID),
+		Latitude:  geolocation.Latitude,
+		Longitude: geolocation.Longitude,
+	})
+	if err := cmd.Err(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *GeolocationServiceImpl) cachePut(ctx context.Context, geolocation Geolocation) error {
+	cmd := s.redis.HSet(ctx, fmt.Sprintf(cacheKey, geolocation.VehicleID), geolocation)
+	if err := cmd.Err(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *GeolocationServiceImpl) cacheGet(ctx context.Context, vehicleID int64) (Geolocation, error) {
+	return s.cacheGetRaw(ctx, fmt.Sprintf(cacheKey, vehicleID))
+}
+
+func (s *GeolocationServiceImpl) cacheGetRaw(ctx context.Context, key string) (Geolocation, error) {
+	cmd := s.redis.HGetAll(ctx, key)
+	if err := cmd.Err(); err != nil {
+		return Geolocation{}, err
+	}
+
+	var geolocation Geolocation
+	if err := cmd.Scan(&geolocation); err != nil {
+		return Geolocation{}, err
+	}
+
+	return geolocation, nil
+}
+
+func buildGeolocation(model models.Geolocation) Geolocation {
+	return Geolocation{
+		Degree:    model.Degree,
+		Latitude:  model.Latitude,
+		Longitude: model.Longitude,
+		Speed:     model.Speed,
+		VehicleID: model.VehicleID,
+		VariantID: model.VariantID,
+		Timestamp: model.Timestamp,
+	}
 }
