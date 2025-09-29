@@ -2,22 +2,17 @@ package main
 
 import (
 	"context"
-	"embed"
 	"log"
 	"os"
 	"os/signal"
 	"syscall"
 
-	"github.com/catouberos/transit-radar/internal/base"
-	"github.com/catouberos/transit-radar/internal/queue"
+	"github.com/catouberos/transit-radar/internal/app"
 	"github.com/catouberos/transit-radar/internal/server"
+	"github.com/catouberos/transit-radar/migrations"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/redis/go-redis/v9"
-	"github.com/wagslane/go-rabbitmq"
 )
-
-//go:embed migrations/*.sql
-var migrations embed.FS
 
 func main() {
 	ctx, cancel := context.WithCancel(context.Background())
@@ -43,18 +38,8 @@ func main() {
 	client := redis.NewClient(opt)
 	defer client.Close()
 
-	// setup rabbitmq
-	rmq, err := rabbitmq.NewConn(
-		"amqp://guest:guest@localhost:5672/",
-		rabbitmq.WithConnectionOptionsLogging,
-	)
-	if err != nil {
-		log.Panicln(err)
-	}
-	defer rmq.Close()
-
 	// initialise app
-	app := base.NewApp(pool, migrations, client)
+	app := app.NewApp(pool, migrations.Migrations, client)
 	err = app.Init()
 	if err != nil {
 		log.Panicln(err)
@@ -63,21 +48,11 @@ func main() {
 	// initialise grpc server
 	server := server.NewRPCServer(app, "[::]:5000")
 
-	// initialist rabbitmq
-	handler := queue.NewConsumerHandler(rmq, app)
-	defer handler.Stop()
-
 	// listen for interrupt signal to gracefully shutdown the application
 	go func() {
 		sigChan := make(chan os.Signal, 1)
 		signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
 		<-sigChan
-
-		cancel()
-	}()
-
-	go func() {
-		handler.Start()
 
 		cancel()
 	}()

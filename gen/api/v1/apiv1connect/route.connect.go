@@ -2,7 +2,7 @@
 //
 // Source: api/v1/route.proto
 
-package transitradarv1connect
+package apiv1connect
 
 import (
 	connect "connectrpc.com/connect"
@@ -33,15 +33,27 @@ const (
 // reflection-formatted method names, remove the leading slash and convert the remaining slash to a
 // period.
 const (
+	// RouteServiceCreateRouteProcedure is the fully-qualified name of the RouteService's CreateRoute
+	// RPC.
+	RouteServiceCreateRouteProcedure = "/api.v1.RouteService/CreateRoute"
+	// RouteServiceUpdateRouteProcedure is the fully-qualified name of the RouteService's UpdateRoute
+	// RPC.
+	RouteServiceUpdateRouteProcedure = "/api.v1.RouteService/UpdateRoute"
 	// RouteServiceGetRouteProcedure is the fully-qualified name of the RouteService's GetRoute RPC.
 	RouteServiceGetRouteProcedure = "/api.v1.RouteService/GetRoute"
+	// RouteServiceGetRouteByEbmsIDProcedure is the fully-qualified name of the RouteService's
+	// GetRouteByEbmsID RPC.
+	RouteServiceGetRouteByEbmsIDProcedure = "/api.v1.RouteService/GetRouteByEbmsID"
 	// RouteServiceListRouteProcedure is the fully-qualified name of the RouteService's ListRoute RPC.
 	RouteServiceListRouteProcedure = "/api.v1.RouteService/ListRoute"
 )
 
 // RouteServiceClient is a client for the api.v1.RouteService service.
 type RouteServiceClient interface {
+	CreateRoute(context.Context, *connect.Request[v1.CreateRouteRequest]) (*connect.Response[v1.CreateRouteResponse], error)
+	UpdateRoute(context.Context, *connect.Request[v1.UpdateRouteRequest]) (*connect.Response[v1.UpdateRouteResponse], error)
 	GetRoute(context.Context, *connect.Request[v1.GetRouteRequest]) (*connect.Response[v1.GetRouteResponse], error)
+	GetRouteByEbmsID(context.Context, *connect.Request[v1.GetRouteByEbmsIDRequest]) (*connect.Response[v1.GetRouteByEbmsIDResponse], error)
 	ListRoute(context.Context, *connect.Request[v1.ListRouteRequest]) (*connect.Response[v1.ListRouteResponse], error)
 }
 
@@ -56,10 +68,28 @@ func NewRouteServiceClient(httpClient connect.HTTPClient, baseURL string, opts .
 	baseURL = strings.TrimRight(baseURL, "/")
 	routeServiceMethods := v1.File_api_v1_route_proto.Services().ByName("RouteService").Methods()
 	return &routeServiceClient{
+		createRoute: connect.NewClient[v1.CreateRouteRequest, v1.CreateRouteResponse](
+			httpClient,
+			baseURL+RouteServiceCreateRouteProcedure,
+			connect.WithSchema(routeServiceMethods.ByName("CreateRoute")),
+			connect.WithClientOptions(opts...),
+		),
+		updateRoute: connect.NewClient[v1.UpdateRouteRequest, v1.UpdateRouteResponse](
+			httpClient,
+			baseURL+RouteServiceUpdateRouteProcedure,
+			connect.WithSchema(routeServiceMethods.ByName("UpdateRoute")),
+			connect.WithClientOptions(opts...),
+		),
 		getRoute: connect.NewClient[v1.GetRouteRequest, v1.GetRouteResponse](
 			httpClient,
 			baseURL+RouteServiceGetRouteProcedure,
 			connect.WithSchema(routeServiceMethods.ByName("GetRoute")),
+			connect.WithClientOptions(opts...),
+		),
+		getRouteByEbmsID: connect.NewClient[v1.GetRouteByEbmsIDRequest, v1.GetRouteByEbmsIDResponse](
+			httpClient,
+			baseURL+RouteServiceGetRouteByEbmsIDProcedure,
+			connect.WithSchema(routeServiceMethods.ByName("GetRouteByEbmsID")),
 			connect.WithClientOptions(opts...),
 		),
 		listRoute: connect.NewClient[v1.ListRouteRequest, v1.ListRouteResponse](
@@ -73,13 +103,31 @@ func NewRouteServiceClient(httpClient connect.HTTPClient, baseURL string, opts .
 
 // routeServiceClient implements RouteServiceClient.
 type routeServiceClient struct {
-	getRoute  *connect.Client[v1.GetRouteRequest, v1.GetRouteResponse]
-	listRoute *connect.Client[v1.ListRouteRequest, v1.ListRouteResponse]
+	createRoute      *connect.Client[v1.CreateRouteRequest, v1.CreateRouteResponse]
+	updateRoute      *connect.Client[v1.UpdateRouteRequest, v1.UpdateRouteResponse]
+	getRoute         *connect.Client[v1.GetRouteRequest, v1.GetRouteResponse]
+	getRouteByEbmsID *connect.Client[v1.GetRouteByEbmsIDRequest, v1.GetRouteByEbmsIDResponse]
+	listRoute        *connect.Client[v1.ListRouteRequest, v1.ListRouteResponse]
+}
+
+// CreateRoute calls api.v1.RouteService.CreateRoute.
+func (c *routeServiceClient) CreateRoute(ctx context.Context, req *connect.Request[v1.CreateRouteRequest]) (*connect.Response[v1.CreateRouteResponse], error) {
+	return c.createRoute.CallUnary(ctx, req)
+}
+
+// UpdateRoute calls api.v1.RouteService.UpdateRoute.
+func (c *routeServiceClient) UpdateRoute(ctx context.Context, req *connect.Request[v1.UpdateRouteRequest]) (*connect.Response[v1.UpdateRouteResponse], error) {
+	return c.updateRoute.CallUnary(ctx, req)
 }
 
 // GetRoute calls api.v1.RouteService.GetRoute.
 func (c *routeServiceClient) GetRoute(ctx context.Context, req *connect.Request[v1.GetRouteRequest]) (*connect.Response[v1.GetRouteResponse], error) {
 	return c.getRoute.CallUnary(ctx, req)
+}
+
+// GetRouteByEbmsID calls api.v1.RouteService.GetRouteByEbmsID.
+func (c *routeServiceClient) GetRouteByEbmsID(ctx context.Context, req *connect.Request[v1.GetRouteByEbmsIDRequest]) (*connect.Response[v1.GetRouteByEbmsIDResponse], error) {
+	return c.getRouteByEbmsID.CallUnary(ctx, req)
 }
 
 // ListRoute calls api.v1.RouteService.ListRoute.
@@ -89,7 +137,10 @@ func (c *routeServiceClient) ListRoute(ctx context.Context, req *connect.Request
 
 // RouteServiceHandler is an implementation of the api.v1.RouteService service.
 type RouteServiceHandler interface {
+	CreateRoute(context.Context, *connect.Request[v1.CreateRouteRequest]) (*connect.Response[v1.CreateRouteResponse], error)
+	UpdateRoute(context.Context, *connect.Request[v1.UpdateRouteRequest]) (*connect.Response[v1.UpdateRouteResponse], error)
 	GetRoute(context.Context, *connect.Request[v1.GetRouteRequest]) (*connect.Response[v1.GetRouteResponse], error)
+	GetRouteByEbmsID(context.Context, *connect.Request[v1.GetRouteByEbmsIDRequest]) (*connect.Response[v1.GetRouteByEbmsIDResponse], error)
 	ListRoute(context.Context, *connect.Request[v1.ListRouteRequest]) (*connect.Response[v1.ListRouteResponse], error)
 }
 
@@ -100,10 +151,28 @@ type RouteServiceHandler interface {
 // and JSON codecs. They also support gzip compression.
 func NewRouteServiceHandler(svc RouteServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
 	routeServiceMethods := v1.File_api_v1_route_proto.Services().ByName("RouteService").Methods()
+	routeServiceCreateRouteHandler := connect.NewUnaryHandler(
+		RouteServiceCreateRouteProcedure,
+		svc.CreateRoute,
+		connect.WithSchema(routeServiceMethods.ByName("CreateRoute")),
+		connect.WithHandlerOptions(opts...),
+	)
+	routeServiceUpdateRouteHandler := connect.NewUnaryHandler(
+		RouteServiceUpdateRouteProcedure,
+		svc.UpdateRoute,
+		connect.WithSchema(routeServiceMethods.ByName("UpdateRoute")),
+		connect.WithHandlerOptions(opts...),
+	)
 	routeServiceGetRouteHandler := connect.NewUnaryHandler(
 		RouteServiceGetRouteProcedure,
 		svc.GetRoute,
 		connect.WithSchema(routeServiceMethods.ByName("GetRoute")),
+		connect.WithHandlerOptions(opts...),
+	)
+	routeServiceGetRouteByEbmsIDHandler := connect.NewUnaryHandler(
+		RouteServiceGetRouteByEbmsIDProcedure,
+		svc.GetRouteByEbmsID,
+		connect.WithSchema(routeServiceMethods.ByName("GetRouteByEbmsID")),
 		connect.WithHandlerOptions(opts...),
 	)
 	routeServiceListRouteHandler := connect.NewUnaryHandler(
@@ -114,8 +183,14 @@ func NewRouteServiceHandler(svc RouteServiceHandler, opts ...connect.HandlerOpti
 	)
 	return "/api.v1.RouteService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
+		case RouteServiceCreateRouteProcedure:
+			routeServiceCreateRouteHandler.ServeHTTP(w, r)
+		case RouteServiceUpdateRouteProcedure:
+			routeServiceUpdateRouteHandler.ServeHTTP(w, r)
 		case RouteServiceGetRouteProcedure:
 			routeServiceGetRouteHandler.ServeHTTP(w, r)
+		case RouteServiceGetRouteByEbmsIDProcedure:
+			routeServiceGetRouteByEbmsIDHandler.ServeHTTP(w, r)
 		case RouteServiceListRouteProcedure:
 			routeServiceListRouteHandler.ServeHTTP(w, r)
 		default:
@@ -127,8 +202,20 @@ func NewRouteServiceHandler(svc RouteServiceHandler, opts ...connect.HandlerOpti
 // UnimplementedRouteServiceHandler returns CodeUnimplemented from all methods.
 type UnimplementedRouteServiceHandler struct{}
 
+func (UnimplementedRouteServiceHandler) CreateRoute(context.Context, *connect.Request[v1.CreateRouteRequest]) (*connect.Response[v1.CreateRouteResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("api.v1.RouteService.CreateRoute is not implemented"))
+}
+
+func (UnimplementedRouteServiceHandler) UpdateRoute(context.Context, *connect.Request[v1.UpdateRouteRequest]) (*connect.Response[v1.UpdateRouteResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("api.v1.RouteService.UpdateRoute is not implemented"))
+}
+
 func (UnimplementedRouteServiceHandler) GetRoute(context.Context, *connect.Request[v1.GetRouteRequest]) (*connect.Response[v1.GetRouteResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("api.v1.RouteService.GetRoute is not implemented"))
+}
+
+func (UnimplementedRouteServiceHandler) GetRouteByEbmsID(context.Context, *connect.Request[v1.GetRouteByEbmsIDRequest]) (*connect.Response[v1.GetRouteByEbmsIDResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("api.v1.RouteService.GetRouteByEbmsID is not implemented"))
 }
 
 func (UnimplementedRouteServiceHandler) ListRoute(context.Context, *connect.Request[v1.ListRouteRequest]) (*connect.Response[v1.ListRouteResponse], error) {

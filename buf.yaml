@@ -4,6 +4,7 @@ modules:
   - path: .
     excludes:
       - .direnv/
+    name: buf.build/catou/transit-radar
 lint:
   use:
     - STANDARD

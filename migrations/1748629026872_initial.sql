@@ -30,8 +30,8 @@ CREATE UNIQUE INDEX idx_variant_outbound_routeid ON variants(is_outbound, route_
 
 CREATE TABLE geolocations (
     degree real NOT NULL,
-    latitude real NOT NULL,
-    longitude real NOT NULL,
+    latitude double precision NOT NULL,
+    longitude double precision NOT NULL,
     speed real NOT NULL,
     vehicle_id bigint NOT NULL,
     variant_id bigint NOT NULL,

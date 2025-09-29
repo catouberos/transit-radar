@@ -2,7 +2,7 @@
 //
 // Source: api/v1/variant.proto
 
-package transitradarv1connect
+package apiv1connect
 
 import (
 	connect "connectrpc.com/connect"
@@ -33,9 +33,18 @@ const (
 // reflection-formatted method names, remove the leading slash and convert the remaining slash to a
 // period.
 const (
+	// VariantServiceCreateVariantProcedure is the fully-qualified name of the VariantService's
+	// CreateVariant RPC.
+	VariantServiceCreateVariantProcedure = "/api.v1.VariantService/CreateVariant"
+	// VariantServiceUpdateVariantProcedure is the fully-qualified name of the VariantService's
+	// UpdateVariant RPC.
+	VariantServiceUpdateVariantProcedure = "/api.v1.VariantService/UpdateVariant"
 	// VariantServiceGetVariantProcedure is the fully-qualified name of the VariantService's GetVariant
 	// RPC.
 	VariantServiceGetVariantProcedure = "/api.v1.VariantService/GetVariant"
+	// VariantServiceGetVariantByEbmsIDProcedure is the fully-qualified name of the VariantService's
+	// GetVariantByEbmsID RPC.
+	VariantServiceGetVariantByEbmsIDProcedure = "/api.v1.VariantService/GetVariantByEbmsID"
 	// VariantServiceListVariantProcedure is the fully-qualified name of the VariantService's
 	// ListVariant RPC.
 	VariantServiceListVariantProcedure = "/api.v1.VariantService/ListVariant"
@@ -43,7 +52,10 @@ const (
 
 // VariantServiceClient is a client for the api.v1.VariantService service.
 type VariantServiceClient interface {
+	CreateVariant(context.Context, *connect.Request[v1.CreateVariantRequest]) (*connect.Response[v1.CreateVariantResponse], error)
+	UpdateVariant(context.Context, *connect.Request[v1.UpdateVariantRequest]) (*connect.Response[v1.UpdateVariantResponse], error)
 	GetVariant(context.Context, *connect.Request[v1.GetVariantRequest]) (*connect.Response[v1.GetVariantResponse], error)
+	GetVariantByEbmsID(context.Context, *connect.Request[v1.GetVariantByEbmsIDRequest]) (*connect.Response[v1.GetVariantByEbmsIDResponse], error)
 	ListVariant(context.Context, *connect.Request[v1.ListVariantRequest]) (*connect.Response[v1.ListVariantResponse], error)
 }
 
@@ -58,10 +70,28 @@ func NewVariantServiceClient(httpClient connect.HTTPClient, baseURL string, opts
 	baseURL = strings.TrimRight(baseURL, "/")
 	variantServiceMethods := v1.File_api_v1_variant_proto.Services().ByName("VariantService").Methods()
 	return &variantServiceClient{
+		createVariant: connect.NewClient[v1.CreateVariantRequest, v1.CreateVariantResponse](
+			httpClient,
+			baseURL+VariantServiceCreateVariantProcedure,
+			connect.WithSchema(variantServiceMethods.ByName("CreateVariant")),
+			connect.WithClientOptions(opts...),
+		),
+		updateVariant: connect.NewClient[v1.UpdateVariantRequest, v1.UpdateVariantResponse](
+			httpClient,
+			baseURL+VariantServiceUpdateVariantProcedure,
+			connect.WithSchema(variantServiceMethods.ByName("UpdateVariant")),
+			connect.WithClientOptions(opts...),
+		),
 		getVariant: connect.NewClient[v1.GetVariantRequest, v1.GetVariantResponse](
 			httpClient,
 			baseURL+VariantServiceGetVariantProcedure,
 			connect.WithSchema(variantServiceMethods.ByName("GetVariant")),
+			connect.WithClientOptions(opts...),
+		),
+		getVariantByEbmsID: connect.NewClient[v1.GetVariantByEbmsIDRequest, v1.GetVariantByEbmsIDResponse](
+			httpClient,
+			baseURL+VariantServiceGetVariantByEbmsIDProcedure,
+			connect.WithSchema(variantServiceMethods.ByName("GetVariantByEbmsID")),
 			connect.WithClientOptions(opts...),
 		),
 		listVariant: connect.NewClient[v1.ListVariantRequest, v1.ListVariantResponse](
@@ -75,13 +105,31 @@ func NewVariantServiceClient(httpClient connect.HTTPClient, baseURL string, opts
 
 // variantServiceClient implements VariantServiceClient.
 type variantServiceClient struct {
-	getVariant  *connect.Client[v1.GetVariantRequest, v1.GetVariantResponse]
-	listVariant *connect.Client[v1.ListVariantRequest, v1.ListVariantResponse]
+	createVariant      *connect.Client[v1.CreateVariantRequest, v1.CreateVariantResponse]
+	updateVariant      *connect.Client[v1.UpdateVariantRequest, v1.UpdateVariantResponse]
+	getVariant         *connect.Client[v1.GetVariantRequest, v1.GetVariantResponse]
+	getVariantByEbmsID *connect.Client[v1.GetVariantByEbmsIDRequest, v1.GetVariantByEbmsIDResponse]
+	listVariant        *connect.Client[v1.ListVariantRequest, v1.ListVariantResponse]
+}
+
+// CreateVariant calls api.v1.VariantService.CreateVariant.
+func (c *variantServiceClient) CreateVariant(ctx context.Context, req *connect.Request[v1.CreateVariantRequest]) (*connect.Response[v1.CreateVariantResponse], error) {
+	return c.createVariant.CallUnary(ctx, req)
+}
+
+// UpdateVariant calls api.v1.VariantService.UpdateVariant.
+func (c *variantServiceClient) UpdateVariant(ctx context.Context, req *connect.Request[v1.UpdateVariantRequest]) (*connect.Response[v1.UpdateVariantResponse], error) {
+	return c.updateVariant.CallUnary(ctx, req)
 }
 
 // GetVariant calls api.v1.VariantService.GetVariant.
 func (c *variantServiceClient) GetVariant(ctx context.Context, req *connect.Request[v1.GetVariantRequest]) (*connect.Response[v1.GetVariantResponse], error) {
 	return c.getVariant.CallUnary(ctx, req)
+}
+
+// GetVariantByEbmsID calls api.v1.VariantService.GetVariantByEbmsID.
+func (c *variantServiceClient) GetVariantByEbmsID(ctx context.Context, req *connect.Request[v1.GetVariantByEbmsIDRequest]) (*connect.Response[v1.GetVariantByEbmsIDResponse], error) {
+	return c.getVariantByEbmsID.CallUnary(ctx, req)
 }
 
 // ListVariant calls api.v1.VariantService.ListVariant.
@@ -91,7 +139,10 @@ func (c *variantServiceClient) ListVariant(ctx context.Context, req *connect.Req
 
 // VariantServiceHandler is an implementation of the api.v1.VariantService service.
 type VariantServiceHandler interface {
+	CreateVariant(context.Context, *connect.Request[v1.CreateVariantRequest]) (*connect.Response[v1.CreateVariantResponse], error)
+	UpdateVariant(context.Context, *connect.Request[v1.UpdateVariantRequest]) (*connect.Response[v1.UpdateVariantResponse], error)
 	GetVariant(context.Context, *connect.Request[v1.GetVariantRequest]) (*connect.Response[v1.GetVariantResponse], error)
+	GetVariantByEbmsID(context.Context, *connect.Request[v1.GetVariantByEbmsIDRequest]) (*connect.Response[v1.GetVariantByEbmsIDResponse], error)
 	ListVariant(context.Context, *connect.Request[v1.ListVariantRequest]) (*connect.Response[v1.ListVariantResponse], error)
 }
 
@@ -102,10 +153,28 @@ type VariantServiceHandler interface {
 // and JSON codecs. They also support gzip compression.
 func NewVariantServiceHandler(svc VariantServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
 	variantServiceMethods := v1.File_api_v1_variant_proto.Services().ByName("VariantService").Methods()
+	variantServiceCreateVariantHandler := connect.NewUnaryHandler(
+		VariantServiceCreateVariantProcedure,
+		svc.CreateVariant,
+		connect.WithSchema(variantServiceMethods.ByName("CreateVariant")),
+		connect.WithHandlerOptions(opts...),
+	)
+	variantServiceUpdateVariantHandler := connect.NewUnaryHandler(
+		VariantServiceUpdateVariantProcedure,
+		svc.UpdateVariant,
+		connect.WithSchema(variantServiceMethods.ByName("UpdateVariant")),
+		connect.WithHandlerOptions(opts...),
+	)
 	variantServiceGetVariantHandler := connect.NewUnaryHandler(
 		VariantServiceGetVariantProcedure,
 		svc.GetVariant,
 		connect.WithSchema(variantServiceMethods.ByName("GetVariant")),
+		connect.WithHandlerOptions(opts...),
+	)
+	variantServiceGetVariantByEbmsIDHandler := connect.NewUnaryHandler(
+		VariantServiceGetVariantByEbmsIDProcedure,
+		svc.GetVariantByEbmsID,
+		connect.WithSchema(variantServiceMethods.ByName("GetVariantByEbmsID")),
 		connect.WithHandlerOptions(opts...),
 	)
 	variantServiceListVariantHandler := connect.NewUnaryHandler(
@@ -116,8 +185,14 @@ func NewVariantServiceHandler(svc VariantServiceHandler, opts ...connect.Handler
 	)
 	return "/api.v1.VariantService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
+		case VariantServiceCreateVariantProcedure:
+			variantServiceCreateVariantHandler.ServeHTTP(w, r)
+		case VariantServiceUpdateVariantProcedure:
+			variantServiceUpdateVariantHandler.ServeHTTP(w, r)
 		case VariantServiceGetVariantProcedure:
 			variantServiceGetVariantHandler.ServeHTTP(w, r)
+		case VariantServiceGetVariantByEbmsIDProcedure:
+			variantServiceGetVariantByEbmsIDHandler.ServeHTTP(w, r)
 		case VariantServiceListVariantProcedure:
 			variantServiceListVariantHandler.ServeHTTP(w, r)
 		default:
@@ -129,8 +204,20 @@ func NewVariantServiceHandler(svc VariantServiceHandler, opts ...connect.Handler
 // UnimplementedVariantServiceHandler returns CodeUnimplemented from all methods.
 type UnimplementedVariantServiceHandler struct{}
 
+func (UnimplementedVariantServiceHandler) CreateVariant(context.Context, *connect.Request[v1.CreateVariantRequest]) (*connect.Response[v1.CreateVariantResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("api.v1.VariantService.CreateVariant is not implemented"))
+}
+
+func (UnimplementedVariantServiceHandler) UpdateVariant(context.Context, *connect.Request[v1.UpdateVariantRequest]) (*connect.Response[v1.UpdateVariantResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("api.v1.VariantService.UpdateVariant is not implemented"))
+}
+
 func (UnimplementedVariantServiceHandler) GetVariant(context.Context, *connect.Request[v1.GetVariantRequest]) (*connect.Response[v1.GetVariantResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("api.v1.VariantService.GetVariant is not implemented"))
+}
+
+func (UnimplementedVariantServiceHandler) GetVariantByEbmsID(context.Context, *connect.Request[v1.GetVariantByEbmsIDRequest]) (*connect.Response[v1.GetVariantByEbmsIDResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("api.v1.VariantService.GetVariantByEbmsID is not implemented"))
 }
 
 func (UnimplementedVariantServiceHandler) ListVariant(context.Context, *connect.Request[v1.ListVariantRequest]) (*connect.Response[v1.ListVariantResponse], error) {
