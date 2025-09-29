@@ -16,7 +16,6 @@ type RouteService interface {
 	Create(context.Context, CreateParams) (Route, error)
 	Update(context.Context, UpdateParams) (Route, error)
 	Get(context.Context, GetParams) (Route, error)
-	GetByEbmsID(context.Context, GetByEbmsIDParams) (Route, error)
 	List(context.Context, ListParams) ([]Route, error)
 }
 
@@ -56,11 +55,8 @@ type UpdateParams struct {
 }
 
 type GetParams struct {
-	ID int64
-}
-
-type GetByEbmsIDParams struct {
-	EbmsID int64
+	ID     *int64
+	EbmsID *int64
 }
 
 type ListParams struct {
@@ -129,32 +125,23 @@ func (s RouteServiceImpl) Update(ctx context.Context, params UpdateParams) (Rout
 }
 
 func (s RouteServiceImpl) Get(ctx context.Context, params GetParams) (Route, error) {
-	route, err := s.cacheGet(ctx, params.ID)
-	if err == nil {
-		return route, err
+	if params.ID != nil {
+		route, err := s.cacheGet(ctx, *params.ID)
+		if err == nil {
+			return route, err
+		}
 	}
 
 	result, err := s.query.GetRoute(ctx, models.GetRouteParams{
-		ID: &params.ID,
+		ID:     params.ID,
+		EbmsID: params.EbmsID,
 	})
 	if err != nil {
 		return Route{}, err
 	}
-	route = buildRoute(result)
+	route := buildRoute(result)
 
 	return route, nil
-}
-
-func (s RouteServiceImpl) GetByEbmsID(ctx context.Context, params GetByEbmsIDParams) (Route, error) {
-	result, err := s.query.GetRoute(ctx, models.GetRouteParams{
-		EbmsID: &params.EbmsID,
-	})
-	if err != nil {
-		return Route{}, err
-	}
-
-	return buildRoute(result), nil
-
 }
 
 func (s RouteServiceImpl) List(ctx context.Context, params ListParams) ([]Route, error) {

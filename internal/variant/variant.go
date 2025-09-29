@@ -11,7 +11,6 @@ type VariantService interface {
 	Create(context.Context, CreateParams) (Variant, error)
 	Update(context.Context, UpdateParams) (Variant, error)
 	Get(context.Context, GetParams) (Variant, error)
-	GetByEbmsID(context.Context, GetByEbmsIDParams) (Variant, error)
 	List(context.Context, ListParams) ([]Variant, error)
 }
 
@@ -57,11 +56,8 @@ type UpdateParams struct {
 }
 
 type GetParams struct {
-	ID int64
-}
-
-type GetByEbmsIDParams struct {
-	EbmsID int64
+	ID     *int64
+	EbmsID *int64
 }
 
 type ListParams struct {
@@ -123,19 +119,8 @@ func (s VariantServiceImpl) Update(ctx context.Context, params UpdateParams) (Va
 
 func (s VariantServiceImpl) Get(ctx context.Context, params GetParams) (Variant, error) {
 	result, err := s.query.GetVariant(ctx, models.GetVariantParams{
-		ID: &params.ID,
-	})
-	if err != nil {
-		return Variant{}, err
-	}
-	stop := buildVariant(result)
-
-	return stop, nil
-}
-
-func (s VariantServiceImpl) GetByEbmsID(ctx context.Context, params GetByEbmsIDParams) (Variant, error) {
-	result, err := s.query.GetVariant(ctx, models.GetVariantParams{
-		EbmsID: &params.EbmsID,
+		ID:     params.ID,
+		EbmsID: params.EbmsID,
 	})
 	if err != nil {
 		return Variant{}, err

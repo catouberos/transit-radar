@@ -25,8 +25,8 @@ const (
 type CreateGeolocationRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Degree        float32                `protobuf:"fixed32,1,opt,name=degree,proto3" json:"degree,omitempty"`
-	Latitude      float32                `protobuf:"fixed32,2,opt,name=latitude,proto3" json:"latitude,omitempty"`
-	Longitude     float32                `protobuf:"fixed32,3,opt,name=longitude,proto3" json:"longitude,omitempty"`
+	Latitude      float64                `protobuf:"fixed64,2,opt,name=latitude,proto3" json:"latitude,omitempty"`
+	Longitude     float64                `protobuf:"fixed64,3,opt,name=longitude,proto3" json:"longitude,omitempty"`
 	Speed         float32                `protobuf:"fixed32,4,opt,name=speed,proto3" json:"speed,omitempty"`
 	VehicleId     int64                  `protobuf:"varint,5,opt,name=vehicle_id,json=vehicleId,proto3" json:"vehicle_id,omitempty"`
 	VariantId     int64                  `protobuf:"varint,6,opt,name=variant_id,json=variantId,proto3" json:"variant_id,omitempty"`
@@ -72,14 +72,14 @@ func (x *CreateGeolocationRequest) GetDegree() float32 {
 	return 0
 }
 
-func (x *CreateGeolocationRequest) GetLatitude() float32 {
+func (x *CreateGeolocationRequest) GetLatitude() float64 {
 	if x != nil {
 		return x.Latitude
 	}
 	return 0
 }
 
-func (x *CreateGeolocationRequest) GetLongitude() float32 {
+func (x *CreateGeolocationRequest) GetLongitude() float64 {
 	if x != nil {
 		return x.Longitude
 	}
@@ -336,10 +336,10 @@ func (x *GetVehiclesByStationResponse) GetVehicles() []*Vehicle {
 
 type ListGeolocationByBoundingRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Latitude      float32                `protobuf:"fixed32,1,opt,name=latitude,proto3" json:"latitude,omitempty"`
-	Longitude     float32                `protobuf:"fixed32,2,opt,name=longitude,proto3" json:"longitude,omitempty"`
-	Width         float32                `protobuf:"fixed32,3,opt,name=width,proto3" json:"width,omitempty"`
-	Height        float32                `protobuf:"fixed32,4,opt,name=height,proto3" json:"height,omitempty"`
+	Latitude      float64                `protobuf:"fixed64,1,opt,name=latitude,proto3" json:"latitude,omitempty"`
+	Longitude     float64                `protobuf:"fixed64,2,opt,name=longitude,proto3" json:"longitude,omitempty"`
+	Width         float64                `protobuf:"fixed64,3,opt,name=width,proto3" json:"width,omitempty"`
+	Height        float64                `protobuf:"fixed64,4,opt,name=height,proto3" json:"height,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -374,28 +374,28 @@ func (*ListGeolocationByBoundingRequest) Descriptor() ([]byte, []int) {
 	return file_api_v1_geolocation_proto_rawDescGZIP(), []int{6}
 }
 
-func (x *ListGeolocationByBoundingRequest) GetLatitude() float32 {
+func (x *ListGeolocationByBoundingRequest) GetLatitude() float64 {
 	if x != nil {
 		return x.Latitude
 	}
 	return 0
 }
 
-func (x *ListGeolocationByBoundingRequest) GetLongitude() float32 {
+func (x *ListGeolocationByBoundingRequest) GetLongitude() float64 {
 	if x != nil {
 		return x.Longitude
 	}
 	return 0
 }
 
-func (x *ListGeolocationByBoundingRequest) GetWidth() float32 {
+func (x *ListGeolocationByBoundingRequest) GetWidth() float64 {
 	if x != nil {
 		return x.Width
 	}
 	return 0
 }
 
-func (x *ListGeolocationByBoundingRequest) GetHeight() float32 {
+func (x *ListGeolocationByBoundingRequest) GetHeight() float64 {
 	if x != nil {
 		return x.Height
 	}
@@ -485,8 +485,8 @@ func (*Vehicle) Descriptor() ([]byte, []int) {
 type Geolocation struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Degree        float32                `protobuf:"fixed32,1,opt,name=degree,proto3" json:"degree,omitempty"`
-	Latitude      float32                `protobuf:"fixed32,2,opt,name=latitude,proto3" json:"latitude,omitempty"`
-	Longitude     float32                `protobuf:"fixed32,3,opt,name=longitude,proto3" json:"longitude,omitempty"`
+	Latitude      float64                `protobuf:"fixed64,2,opt,name=latitude,proto3" json:"latitude,omitempty"`
+	Longitude     float64                `protobuf:"fixed64,3,opt,name=longitude,proto3" json:"longitude,omitempty"`
 	Speed         float32                `protobuf:"fixed32,4,opt,name=speed,proto3" json:"speed,omitempty"`
 	VehicleId     int64                  `protobuf:"varint,5,opt,name=vehicle_id,json=vehicleId,proto3" json:"vehicle_id,omitempty"`
 	VariantId     int64                  `protobuf:"varint,6,opt,name=variant_id,json=variantId,proto3" json:"variant_id,omitempty"`
@@ -532,14 +532,14 @@ func (x *Geolocation) GetDegree() float32 {
 	return 0
 }
 
-func (x *Geolocation) GetLatitude() float32 {
+func (x *Geolocation) GetLatitude() float64 {
 	if x != nil {
 		return x.Latitude
 	}
 	return 0
 }
 
-func (x *Geolocation) GetLongitude() float32 {
+func (x *Geolocation) GetLongitude() float64 {
 	if x != nil {
 		return x.Longitude
 	}
@@ -581,8 +581,8 @@ const file_api_v1_geolocation_proto_rawDesc = "" +
 	"\x18api/v1/geolocation.proto\x12\x06api.v1\x1a\x1fgoogle/protobuf/timestamp.proto\"\xfa\x01\n" +
 	"\x18CreateGeolocationRequest\x12\x16\n" +
 	"\x06degree\x18\x01 \x01(\x02R\x06degree\x12\x1a\n" +
-	"\blatitude\x18\x02 \x01(\x02R\blatitude\x12\x1c\n" +
-	"\tlongitude\x18\x03 \x01(\x02R\tlongitude\x12\x14\n" +
+	"\blatitude\x18\x02 \x01(\x01R\blatitude\x12\x1c\n" +
+	"\tlongitude\x18\x03 \x01(\x01R\tlongitude\x12\x14\n" +
 	"\x05speed\x18\x04 \x01(\x02R\x05speed\x12\x1d\n" +
 	"\n" +
 	"vehicle_id\x18\x05 \x01(\x03R\tvehicleId\x12\x1d\n" +
@@ -601,17 +601,17 @@ const file_api_v1_geolocation_proto_rawDesc = "" +
 	"\x1cGetVehiclesByStationResponse\x12+\n" +
 	"\bvehicles\x18\x01 \x03(\v2\x0f.api.v1.VehicleR\bvehicles\"\x8a\x01\n" +
 	" ListGeolocationByBoundingRequest\x12\x1a\n" +
-	"\blatitude\x18\x01 \x01(\x02R\blatitude\x12\x1c\n" +
-	"\tlongitude\x18\x02 \x01(\x02R\tlongitude\x12\x14\n" +
-	"\x05width\x18\x03 \x01(\x02R\x05width\x12\x16\n" +
-	"\x06height\x18\x04 \x01(\x02R\x06height\"\\\n" +
+	"\blatitude\x18\x01 \x01(\x01R\blatitude\x12\x1c\n" +
+	"\tlongitude\x18\x02 \x01(\x01R\tlongitude\x12\x14\n" +
+	"\x05width\x18\x03 \x01(\x01R\x05width\x12\x16\n" +
+	"\x06height\x18\x04 \x01(\x01R\x06height\"\\\n" +
 	"!ListGeolocationByBoundingResponse\x127\n" +
 	"\fgeolocations\x18\x01 \x03(\v2\x13.api.v1.GeolocationR\fgeolocations\"\t\n" +
 	"\aVehicle\"\xed\x01\n" +
 	"\vGeolocation\x12\x16\n" +
 	"\x06degree\x18\x01 \x01(\x02R\x06degree\x12\x1a\n" +
-	"\blatitude\x18\x02 \x01(\x02R\blatitude\x12\x1c\n" +
-	"\tlongitude\x18\x03 \x01(\x02R\tlongitude\x12\x14\n" +
+	"\blatitude\x18\x02 \x01(\x01R\blatitude\x12\x1c\n" +
+	"\tlongitude\x18\x03 \x01(\x01R\tlongitude\x12\x14\n" +
 	"\x05speed\x18\x04 \x01(\x02R\x05speed\x12\x1d\n" +
 	"\n" +
 	"vehicle_id\x18\x05 \x01(\x03R\tvehicleId\x12\x1d\n" +

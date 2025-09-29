@@ -24,15 +24,15 @@ const (
 type CreateVariantRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	IsOutbound    bool                   `protobuf:"varint,2,opt,name=is_outbound,json=isOutbound,proto3" json:"is_outbound,omitempty"`
-	RouteId       int64                  `protobuf:"varint,3,opt,name=route_id,json=routeId,proto3" json:"route_id,omitempty"`
-	Description   string                 `protobuf:"bytes,4,opt,name=description,proto3" json:"description,omitempty"`
-	ShortName     string                 `protobuf:"bytes,5,opt,name=short_name,json=shortName,proto3" json:"short_name,omitempty"`
-	Distance      float32                `protobuf:"fixed32,6,opt,name=distance,proto3" json:"distance,omitempty"`
-	Duration      int32                  `protobuf:"varint,7,opt,name=duration,proto3" json:"duration,omitempty"`
-	StartStopName string                 `protobuf:"bytes,8,opt,name=start_stop_name,json=startStopName,proto3" json:"start_stop_name,omitempty"`
-	EndStopName   string                 `protobuf:"bytes,9,opt,name=end_stop_name,json=endStopName,proto3" json:"end_stop_name,omitempty"`
-	EbmsId        int64                  `protobuf:"varint,10,opt,name=ebms_id,json=ebmsId,proto3" json:"ebms_id,omitempty"`
+	EbmsId        *int64                 `protobuf:"varint,2,opt,name=ebms_id,json=ebmsId,proto3,oneof" json:"ebms_id,omitempty"`
+	IsOutbound    bool                   `protobuf:"varint,3,opt,name=is_outbound,json=isOutbound,proto3" json:"is_outbound,omitempty"`
+	RouteId       int64                  `protobuf:"varint,4,opt,name=route_id,json=routeId,proto3" json:"route_id,omitempty"`
+	Description   *string                `protobuf:"bytes,5,opt,name=description,proto3,oneof" json:"description,omitempty"`
+	ShortName     *string                `protobuf:"bytes,6,opt,name=short_name,json=shortName,proto3,oneof" json:"short_name,omitempty"`
+	Distance      *float32               `protobuf:"fixed32,7,opt,name=distance,proto3,oneof" json:"distance,omitempty"`
+	Duration      *int32                 `protobuf:"varint,8,opt,name=duration,proto3,oneof" json:"duration,omitempty"`
+	StartStopName *string                `protobuf:"bytes,9,opt,name=start_stop_name,json=startStopName,proto3,oneof" json:"start_stop_name,omitempty"`
+	EndStopName   *string                `protobuf:"bytes,10,opt,name=end_stop_name,json=endStopName,proto3,oneof" json:"end_stop_name,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -74,6 +74,13 @@ func (x *CreateVariantRequest) GetName() string {
 	return ""
 }
 
+func (x *CreateVariantRequest) GetEbmsId() int64 {
+	if x != nil && x.EbmsId != nil {
+		return *x.EbmsId
+	}
+	return 0
+}
+
 func (x *CreateVariantRequest) GetIsOutbound() bool {
 	if x != nil {
 		return x.IsOutbound
@@ -89,52 +96,45 @@ func (x *CreateVariantRequest) GetRouteId() int64 {
 }
 
 func (x *CreateVariantRequest) GetDescription() string {
-	if x != nil {
-		return x.Description
+	if x != nil && x.Description != nil {
+		return *x.Description
 	}
 	return ""
 }
 
 func (x *CreateVariantRequest) GetShortName() string {
-	if x != nil {
-		return x.ShortName
+	if x != nil && x.ShortName != nil {
+		return *x.ShortName
 	}
 	return ""
 }
 
 func (x *CreateVariantRequest) GetDistance() float32 {
-	if x != nil {
-		return x.Distance
+	if x != nil && x.Distance != nil {
+		return *x.Distance
 	}
 	return 0
 }
 
 func (x *CreateVariantRequest) GetDuration() int32 {
-	if x != nil {
-		return x.Duration
+	if x != nil && x.Duration != nil {
+		return *x.Duration
 	}
 	return 0
 }
 
 func (x *CreateVariantRequest) GetStartStopName() string {
-	if x != nil {
-		return x.StartStopName
+	if x != nil && x.StartStopName != nil {
+		return *x.StartStopName
 	}
 	return ""
 }
 
 func (x *CreateVariantRequest) GetEndStopName() string {
-	if x != nil {
-		return x.EndStopName
+	if x != nil && x.EndStopName != nil {
+		return *x.EndStopName
 	}
 	return ""
-}
-
-func (x *CreateVariantRequest) GetEbmsId() int64 {
-	if x != nil {
-		return x.EbmsId
-	}
-	return 0
 }
 
 type CreateVariantResponse struct {
@@ -184,16 +184,16 @@ func (x *CreateVariantResponse) GetVariant() *Variant {
 type UpdateVariantRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	IsOutbound    bool                   `protobuf:"varint,3,opt,name=is_outbound,json=isOutbound,proto3" json:"is_outbound,omitempty"`
-	RouteId       int64                  `protobuf:"varint,4,opt,name=route_id,json=routeId,proto3" json:"route_id,omitempty"`
-	Description   string                 `protobuf:"bytes,5,opt,name=description,proto3" json:"description,omitempty"`
-	ShortName     string                 `protobuf:"bytes,6,opt,name=short_name,json=shortName,proto3" json:"short_name,omitempty"`
-	Distance      float32                `protobuf:"fixed32,7,opt,name=distance,proto3" json:"distance,omitempty"`
-	Duration      int32                  `protobuf:"varint,8,opt,name=duration,proto3" json:"duration,omitempty"`
-	StartStopName string                 `protobuf:"bytes,9,opt,name=start_stop_name,json=startStopName,proto3" json:"start_stop_name,omitempty"`
-	EndStopName   string                 `protobuf:"bytes,10,opt,name=end_stop_name,json=endStopName,proto3" json:"end_stop_name,omitempty"`
-	EbmsId        int64                  `protobuf:"varint,11,opt,name=ebms_id,json=ebmsId,proto3" json:"ebms_id,omitempty"`
+	Name          *string                `protobuf:"bytes,2,opt,name=name,proto3,oneof" json:"name,omitempty"`
+	EbmsId        *int64                 `protobuf:"varint,3,opt,name=ebms_id,json=ebmsId,proto3,oneof" json:"ebms_id,omitempty"`
+	IsOutbound    *bool                  `protobuf:"varint,4,opt,name=is_outbound,json=isOutbound,proto3,oneof" json:"is_outbound,omitempty"`
+	RouteId       *int64                 `protobuf:"varint,5,opt,name=route_id,json=routeId,proto3,oneof" json:"route_id,omitempty"`
+	Description   *string                `protobuf:"bytes,6,opt,name=description,proto3,oneof" json:"description,omitempty"`
+	ShortName     *string                `protobuf:"bytes,7,opt,name=short_name,json=shortName,proto3,oneof" json:"short_name,omitempty"`
+	Distance      *float32               `protobuf:"fixed32,8,opt,name=distance,proto3,oneof" json:"distance,omitempty"`
+	Duration      *int32                 `protobuf:"varint,9,opt,name=duration,proto3,oneof" json:"duration,omitempty"`
+	StartStopName *string                `protobuf:"bytes,10,opt,name=start_stop_name,json=startStopName,proto3,oneof" json:"start_stop_name,omitempty"`
+	EndStopName   *string                `protobuf:"bytes,11,opt,name=end_stop_name,json=endStopName,proto3,oneof" json:"end_stop_name,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -236,73 +236,73 @@ func (x *UpdateVariantRequest) GetId() int64 {
 }
 
 func (x *UpdateVariantRequest) GetName() string {
-	if x != nil {
-		return x.Name
-	}
-	return ""
-}
-
-func (x *UpdateVariantRequest) GetIsOutbound() bool {
-	if x != nil {
-		return x.IsOutbound
-	}
-	return false
-}
-
-func (x *UpdateVariantRequest) GetRouteId() int64 {
-	if x != nil {
-		return x.RouteId
-	}
-	return 0
-}
-
-func (x *UpdateVariantRequest) GetDescription() string {
-	if x != nil {
-		return x.Description
-	}
-	return ""
-}
-
-func (x *UpdateVariantRequest) GetShortName() string {
-	if x != nil {
-		return x.ShortName
-	}
-	return ""
-}
-
-func (x *UpdateVariantRequest) GetDistance() float32 {
-	if x != nil {
-		return x.Distance
-	}
-	return 0
-}
-
-func (x *UpdateVariantRequest) GetDuration() int32 {
-	if x != nil {
-		return x.Duration
-	}
-	return 0
-}
-
-func (x *UpdateVariantRequest) GetStartStopName() string {
-	if x != nil {
-		return x.StartStopName
-	}
-	return ""
-}
-
-func (x *UpdateVariantRequest) GetEndStopName() string {
-	if x != nil {
-		return x.EndStopName
+	if x != nil && x.Name != nil {
+		return *x.Name
 	}
 	return ""
 }
 
 func (x *UpdateVariantRequest) GetEbmsId() int64 {
-	if x != nil {
-		return x.EbmsId
+	if x != nil && x.EbmsId != nil {
+		return *x.EbmsId
 	}
 	return 0
+}
+
+func (x *UpdateVariantRequest) GetIsOutbound() bool {
+	if x != nil && x.IsOutbound != nil {
+		return *x.IsOutbound
+	}
+	return false
+}
+
+func (x *UpdateVariantRequest) GetRouteId() int64 {
+	if x != nil && x.RouteId != nil {
+		return *x.RouteId
+	}
+	return 0
+}
+
+func (x *UpdateVariantRequest) GetDescription() string {
+	if x != nil && x.Description != nil {
+		return *x.Description
+	}
+	return ""
+}
+
+func (x *UpdateVariantRequest) GetShortName() string {
+	if x != nil && x.ShortName != nil {
+		return *x.ShortName
+	}
+	return ""
+}
+
+func (x *UpdateVariantRequest) GetDistance() float32 {
+	if x != nil && x.Distance != nil {
+		return *x.Distance
+	}
+	return 0
+}
+
+func (x *UpdateVariantRequest) GetDuration() int32 {
+	if x != nil && x.Duration != nil {
+		return *x.Duration
+	}
+	return 0
+}
+
+func (x *UpdateVariantRequest) GetStartStopName() string {
+	if x != nil && x.StartStopName != nil {
+		return *x.StartStopName
+	}
+	return ""
+}
+
+func (x *UpdateVariantRequest) GetEndStopName() string {
+	if x != nil && x.EndStopName != nil {
+		return *x.EndStopName
+	}
+	return ""
 }
 
 type UpdateVariantResponse struct {
@@ -609,15 +609,15 @@ type Variant struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	IsOutbound    bool                   `protobuf:"varint,3,opt,name=is_outbound,json=isOutbound,proto3" json:"is_outbound,omitempty"`
-	RouteId       int64                  `protobuf:"varint,4,opt,name=route_id,json=routeId,proto3" json:"route_id,omitempty"`
-	Description   string                 `protobuf:"bytes,5,opt,name=description,proto3" json:"description,omitempty"`
-	ShortName     string                 `protobuf:"bytes,6,opt,name=short_name,json=shortName,proto3" json:"short_name,omitempty"`
-	Distance      float32                `protobuf:"fixed32,7,opt,name=distance,proto3" json:"distance,omitempty"`
-	Duration      int32                  `protobuf:"varint,8,opt,name=duration,proto3" json:"duration,omitempty"`
-	StartStopName string                 `protobuf:"bytes,9,opt,name=start_stop_name,json=startStopName,proto3" json:"start_stop_name,omitempty"`
-	EndStopName   string                 `protobuf:"bytes,10,opt,name=end_stop_name,json=endStopName,proto3" json:"end_stop_name,omitempty"`
-	EbmsId        int64                  `protobuf:"varint,11,opt,name=ebms_id,json=ebmsId,proto3" json:"ebms_id,omitempty"`
+	EbmsId        *int64                 `protobuf:"varint,3,opt,name=ebms_id,json=ebmsId,proto3,oneof" json:"ebms_id,omitempty"`
+	IsOutbound    bool                   `protobuf:"varint,4,opt,name=is_outbound,json=isOutbound,proto3" json:"is_outbound,omitempty"`
+	RouteId       int64                  `protobuf:"varint,5,opt,name=route_id,json=routeId,proto3" json:"route_id,omitempty"`
+	Description   *string                `protobuf:"bytes,6,opt,name=description,proto3,oneof" json:"description,omitempty"`
+	ShortName     *string                `protobuf:"bytes,7,opt,name=short_name,json=shortName,proto3,oneof" json:"short_name,omitempty"`
+	Distance      *float32               `protobuf:"fixed32,8,opt,name=distance,proto3,oneof" json:"distance,omitempty"`
+	Duration      *int32                 `protobuf:"varint,9,opt,name=duration,proto3,oneof" json:"duration,omitempty"`
+	StartStopName *string                `protobuf:"bytes,10,opt,name=start_stop_name,json=startStopName,proto3,oneof" json:"start_stop_name,omitempty"`
+	EndStopName   *string                `protobuf:"bytes,11,opt,name=end_stop_name,json=endStopName,proto3,oneof" json:"end_stop_name,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -666,6 +666,13 @@ func (x *Variant) GetName() string {
 	return ""
 }
 
+func (x *Variant) GetEbmsId() int64 {
+	if x != nil && x.EbmsId != nil {
+		return *x.EbmsId
+	}
+	return 0
+}
+
 func (x *Variant) GetIsOutbound() bool {
 	if x != nil {
 		return x.IsOutbound
@@ -681,90 +688,102 @@ func (x *Variant) GetRouteId() int64 {
 }
 
 func (x *Variant) GetDescription() string {
-	if x != nil {
-		return x.Description
+	if x != nil && x.Description != nil {
+		return *x.Description
 	}
 	return ""
 }
 
 func (x *Variant) GetShortName() string {
-	if x != nil {
-		return x.ShortName
+	if x != nil && x.ShortName != nil {
+		return *x.ShortName
 	}
 	return ""
 }
 
 func (x *Variant) GetDistance() float32 {
-	if x != nil {
-		return x.Distance
+	if x != nil && x.Distance != nil {
+		return *x.Distance
 	}
 	return 0
 }
 
 func (x *Variant) GetDuration() int32 {
-	if x != nil {
-		return x.Duration
+	if x != nil && x.Duration != nil {
+		return *x.Duration
 	}
 	return 0
 }
 
 func (x *Variant) GetStartStopName() string {
-	if x != nil {
-		return x.StartStopName
+	if x != nil && x.StartStopName != nil {
+		return *x.StartStopName
 	}
 	return ""
 }
 
 func (x *Variant) GetEndStopName() string {
-	if x != nil {
-		return x.EndStopName
+	if x != nil && x.EndStopName != nil {
+		return *x.EndStopName
 	}
 	return ""
-}
-
-func (x *Variant) GetEbmsId() int64 {
-	if x != nil {
-		return x.EbmsId
-	}
-	return 0
 }
 
 var File_api_v1_variant_proto protoreflect.FileDescriptor
 
 const file_api_v1_variant_proto_rawDesc = "" +
 	"\n" +
-	"\x14api/v1/variant.proto\x12\x06api.v1\"\xc4\x02\n" +
+	"\x14api/v1/variant.proto\x12\x06api.v1\"\xd2\x03\n" +
 	"\x14CreateVariantRequest\x12\x12\n" +
-	"\x04name\x18\x01 \x01(\tR\x04name\x12\x1f\n" +
-	"\vis_outbound\x18\x02 \x01(\bR\n" +
-	"isOutbound\x12\x19\n" +
-	"\broute_id\x18\x03 \x01(\x03R\arouteId\x12 \n" +
-	"\vdescription\x18\x04 \x01(\tR\vdescription\x12\x1d\n" +
-	"\n" +
-	"short_name\x18\x05 \x01(\tR\tshortName\x12\x1a\n" +
-	"\bdistance\x18\x06 \x01(\x02R\bdistance\x12\x1a\n" +
-	"\bduration\x18\a \x01(\x05R\bduration\x12&\n" +
-	"\x0fstart_stop_name\x18\b \x01(\tR\rstartStopName\x12\"\n" +
-	"\rend_stop_name\x18\t \x01(\tR\vendStopName\x12\x17\n" +
-	"\aebms_id\x18\n" +
-	" \x01(\x03R\x06ebmsId\"B\n" +
-	"\x15CreateVariantResponse\x12)\n" +
-	"\avariant\x18\x01 \x01(\v2\x0f.api.v1.VariantR\avariant\"\xd4\x02\n" +
-	"\x14UpdateVariantRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x12\n" +
-	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1f\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12\x1c\n" +
+	"\aebms_id\x18\x02 \x01(\x03H\x00R\x06ebmsId\x88\x01\x01\x12\x1f\n" +
 	"\vis_outbound\x18\x03 \x01(\bR\n" +
 	"isOutbound\x12\x19\n" +
-	"\broute_id\x18\x04 \x01(\x03R\arouteId\x12 \n" +
-	"\vdescription\x18\x05 \x01(\tR\vdescription\x12\x1d\n" +
+	"\broute_id\x18\x04 \x01(\x03R\arouteId\x12%\n" +
+	"\vdescription\x18\x05 \x01(\tH\x01R\vdescription\x88\x01\x01\x12\"\n" +
 	"\n" +
-	"short_name\x18\x06 \x01(\tR\tshortName\x12\x1a\n" +
-	"\bdistance\x18\a \x01(\x02R\bdistance\x12\x1a\n" +
-	"\bduration\x18\b \x01(\x05R\bduration\x12&\n" +
-	"\x0fstart_stop_name\x18\t \x01(\tR\rstartStopName\x12\"\n" +
+	"short_name\x18\x06 \x01(\tH\x02R\tshortName\x88\x01\x01\x12\x1f\n" +
+	"\bdistance\x18\a \x01(\x02H\x03R\bdistance\x88\x01\x01\x12\x1f\n" +
+	"\bduration\x18\b \x01(\x05H\x04R\bduration\x88\x01\x01\x12+\n" +
+	"\x0fstart_stop_name\x18\t \x01(\tH\x05R\rstartStopName\x88\x01\x01\x12'\n" +
 	"\rend_stop_name\x18\n" +
-	" \x01(\tR\vendStopName\x12\x17\n" +
-	"\aebms_id\x18\v \x01(\x03R\x06ebmsId\"B\n" +
+	" \x01(\tH\x06R\vendStopName\x88\x01\x01B\n" +
+	"\n" +
+	"\b_ebms_idB\x0e\n" +
+	"\f_descriptionB\r\n" +
+	"\v_short_nameB\v\n" +
+	"\t_distanceB\v\n" +
+	"\t_durationB\x12\n" +
+	"\x10_start_stop_nameB\x10\n" +
+	"\x0e_end_stop_name\"B\n" +
+	"\x15CreateVariantResponse\x12)\n" +
+	"\avariant\x18\x01 \x01(\v2\x0f.api.v1.VariantR\avariant\"\x97\x04\n" +
+	"\x14UpdateVariantRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x17\n" +
+	"\x04name\x18\x02 \x01(\tH\x00R\x04name\x88\x01\x01\x12\x1c\n" +
+	"\aebms_id\x18\x03 \x01(\x03H\x01R\x06ebmsId\x88\x01\x01\x12$\n" +
+	"\vis_outbound\x18\x04 \x01(\bH\x02R\n" +
+	"isOutbound\x88\x01\x01\x12\x1e\n" +
+	"\broute_id\x18\x05 \x01(\x03H\x03R\arouteId\x88\x01\x01\x12%\n" +
+	"\vdescription\x18\x06 \x01(\tH\x04R\vdescription\x88\x01\x01\x12\"\n" +
+	"\n" +
+	"short_name\x18\a \x01(\tH\x05R\tshortName\x88\x01\x01\x12\x1f\n" +
+	"\bdistance\x18\b \x01(\x02H\x06R\bdistance\x88\x01\x01\x12\x1f\n" +
+	"\bduration\x18\t \x01(\x05H\aR\bduration\x88\x01\x01\x12+\n" +
+	"\x0fstart_stop_name\x18\n" +
+	" \x01(\tH\bR\rstartStopName\x88\x01\x01\x12'\n" +
+	"\rend_stop_name\x18\v \x01(\tH\tR\vendStopName\x88\x01\x01B\a\n" +
+	"\x05_nameB\n" +
+	"\n" +
+	"\b_ebms_idB\x0e\n" +
+	"\f_is_outboundB\v\n" +
+	"\t_route_idB\x0e\n" +
+	"\f_descriptionB\r\n" +
+	"\v_short_nameB\v\n" +
+	"\t_distanceB\v\n" +
+	"\t_durationB\x12\n" +
+	"\x10_start_stop_nameB\x10\n" +
+	"\x0e_end_stop_name\"B\n" +
 	"\x15UpdateVariantResponse\x12)\n" +
 	"\avariant\x18\x01 \x01(\v2\x0f.api.v1.VariantR\avariant\"#\n" +
 	"\x11GetVariantRequest\x12\x0e\n" +
@@ -777,22 +796,30 @@ const file_api_v1_variant_proto_rawDesc = "" +
 	"\avariant\x18\x01 \x01(\v2\x0f.api.v1.VariantR\avariant\"\x14\n" +
 	"\x12ListVariantRequest\"B\n" +
 	"\x13ListVariantResponse\x12+\n" +
-	"\bvariants\x18\x01 \x03(\v2\x0f.api.v1.VariantR\bvariants\"\xc7\x02\n" +
+	"\bvariants\x18\x01 \x03(\v2\x0f.api.v1.VariantR\bvariants\"\xd5\x03\n" +
 	"\aVariant\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x12\n" +
-	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1f\n" +
-	"\vis_outbound\x18\x03 \x01(\bR\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1c\n" +
+	"\aebms_id\x18\x03 \x01(\x03H\x00R\x06ebmsId\x88\x01\x01\x12\x1f\n" +
+	"\vis_outbound\x18\x04 \x01(\bR\n" +
 	"isOutbound\x12\x19\n" +
-	"\broute_id\x18\x04 \x01(\x03R\arouteId\x12 \n" +
-	"\vdescription\x18\x05 \x01(\tR\vdescription\x12\x1d\n" +
+	"\broute_id\x18\x05 \x01(\x03R\arouteId\x12%\n" +
+	"\vdescription\x18\x06 \x01(\tH\x01R\vdescription\x88\x01\x01\x12\"\n" +
 	"\n" +
-	"short_name\x18\x06 \x01(\tR\tshortName\x12\x1a\n" +
-	"\bdistance\x18\a \x01(\x02R\bdistance\x12\x1a\n" +
-	"\bduration\x18\b \x01(\x05R\bduration\x12&\n" +
-	"\x0fstart_stop_name\x18\t \x01(\tR\rstartStopName\x12\"\n" +
-	"\rend_stop_name\x18\n" +
-	" \x01(\tR\vendStopName\x12\x17\n" +
-	"\aebms_id\x18\v \x01(\x03R\x06ebmsId2\xa0\x03\n" +
+	"short_name\x18\a \x01(\tH\x02R\tshortName\x88\x01\x01\x12\x1f\n" +
+	"\bdistance\x18\b \x01(\x02H\x03R\bdistance\x88\x01\x01\x12\x1f\n" +
+	"\bduration\x18\t \x01(\x05H\x04R\bduration\x88\x01\x01\x12+\n" +
+	"\x0fstart_stop_name\x18\n" +
+	" \x01(\tH\x05R\rstartStopName\x88\x01\x01\x12'\n" +
+	"\rend_stop_name\x18\v \x01(\tH\x06R\vendStopName\x88\x01\x01B\n" +
+	"\n" +
+	"\b_ebms_idB\x0e\n" +
+	"\f_descriptionB\r\n" +
+	"\v_short_nameB\v\n" +
+	"\t_distanceB\v\n" +
+	"\t_durationB\x12\n" +
+	"\x10_start_stop_nameB\x10\n" +
+	"\x0e_end_stop_name2\xa0\x03\n" +
 	"\x0eVariantService\x12N\n" +
 	"\rCreateVariant\x12\x1c.api.v1.CreateVariantRequest\x1a\x1d.api.v1.CreateVariantResponse\"\x00\x12N\n" +
 	"\rUpdateVariant\x12\x1c.api.v1.UpdateVariantRequest\x1a\x1d.api.v1.UpdateVariantResponse\"\x00\x12E\n" +
@@ -857,6 +884,9 @@ func file_api_v1_variant_proto_init() {
 	if File_api_v1_variant_proto != nil {
 		return
 	}
+	file_api_v1_variant_proto_msgTypes[0].OneofWrappers = []any{}
+	file_api_v1_variant_proto_msgTypes[2].OneofWrappers = []any{}
+	file_api_v1_variant_proto_msgTypes[10].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

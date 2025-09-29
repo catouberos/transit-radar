@@ -25,12 +25,12 @@ type CreateRouteRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Number        string                 `protobuf:"bytes,1,opt,name=number,proto3" json:"number,omitempty"`
 	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Active        bool                   `protobuf:"varint,3,opt,name=active,proto3" json:"active,omitempty"`
-	OperationTime string                 `protobuf:"bytes,4,opt,name=operation_time,json=operationTime,proto3" json:"operation_time,omitempty"`
-	Organization  string                 `protobuf:"bytes,5,opt,name=organization,proto3" json:"organization,omitempty"`
-	Ticketing     string                 `protobuf:"bytes,6,opt,name=ticketing,proto3" json:"ticketing,omitempty"`
-	RouteType     string                 `protobuf:"bytes,7,opt,name=route_type,json=routeType,proto3" json:"route_type,omitempty"`
-	EbmsId        int64                  `protobuf:"varint,8,opt,name=ebms_id,json=ebmsId,proto3" json:"ebms_id,omitempty"`
+	EbmsId        *int64                 `protobuf:"varint,3,opt,name=ebms_id,json=ebmsId,proto3,oneof" json:"ebms_id,omitempty"`
+	Active        bool                   `protobuf:"varint,4,opt,name=active,proto3" json:"active,omitempty"`
+	OperationTime *string                `protobuf:"bytes,5,opt,name=operation_time,json=operationTime,proto3,oneof" json:"operation_time,omitempty"`
+	Organization  *string                `protobuf:"bytes,6,opt,name=organization,proto3,oneof" json:"organization,omitempty"`
+	Ticketing     *string                `protobuf:"bytes,7,opt,name=ticketing,proto3,oneof" json:"ticketing,omitempty"`
+	RouteType     *string                `protobuf:"bytes,8,opt,name=route_type,json=routeType,proto3,oneof" json:"route_type,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -79,6 +79,13 @@ func (x *CreateRouteRequest) GetName() string {
 	return ""
 }
 
+func (x *CreateRouteRequest) GetEbmsId() int64 {
+	if x != nil && x.EbmsId != nil {
+		return *x.EbmsId
+	}
+	return 0
+}
+
 func (x *CreateRouteRequest) GetActive() bool {
 	if x != nil {
 		return x.Active
@@ -87,38 +94,31 @@ func (x *CreateRouteRequest) GetActive() bool {
 }
 
 func (x *CreateRouteRequest) GetOperationTime() string {
-	if x != nil {
-		return x.OperationTime
+	if x != nil && x.OperationTime != nil {
+		return *x.OperationTime
 	}
 	return ""
 }
 
 func (x *CreateRouteRequest) GetOrganization() string {
-	if x != nil {
-		return x.Organization
+	if x != nil && x.Organization != nil {
+		return *x.Organization
 	}
 	return ""
 }
 
 func (x *CreateRouteRequest) GetTicketing() string {
-	if x != nil {
-		return x.Ticketing
+	if x != nil && x.Ticketing != nil {
+		return *x.Ticketing
 	}
 	return ""
 }
 
 func (x *CreateRouteRequest) GetRouteType() string {
-	if x != nil {
-		return x.RouteType
+	if x != nil && x.RouteType != nil {
+		return *x.RouteType
 	}
 	return ""
-}
-
-func (x *CreateRouteRequest) GetEbmsId() int64 {
-	if x != nil {
-		return x.EbmsId
-	}
-	return 0
 }
 
 type CreateRouteResponse struct {
@@ -167,15 +167,15 @@ func (x *CreateRouteResponse) GetRoute() *Route {
 
 type UpdateRouteRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            *int64                 `protobuf:"varint,1,opt,name=id,proto3,oneof" json:"id,omitempty"`
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	Number        *string                `protobuf:"bytes,2,opt,name=number,proto3,oneof" json:"number,omitempty"`
 	Name          *string                `protobuf:"bytes,3,opt,name=name,proto3,oneof" json:"name,omitempty"`
-	Active        *bool                  `protobuf:"varint,4,opt,name=active,proto3,oneof" json:"active,omitempty"`
-	OperationTime *string                `protobuf:"bytes,5,opt,name=operation_time,json=operationTime,proto3,oneof" json:"operation_time,omitempty"`
-	Organization  *string                `protobuf:"bytes,6,opt,name=organization,proto3,oneof" json:"organization,omitempty"`
-	Ticketing     *string                `protobuf:"bytes,7,opt,name=ticketing,proto3,oneof" json:"ticketing,omitempty"`
-	RouteType     *string                `protobuf:"bytes,8,opt,name=route_type,json=routeType,proto3,oneof" json:"route_type,omitempty"`
-	EbmsId        *int64                 `protobuf:"varint,9,opt,name=ebms_id,json=ebmsId,proto3,oneof" json:"ebms_id,omitempty"`
+	EbmsId        *int64                 `protobuf:"varint,4,opt,name=ebms_id,json=ebmsId,proto3,oneof" json:"ebms_id,omitempty"`
+	Active        *bool                  `protobuf:"varint,5,opt,name=active,proto3,oneof" json:"active,omitempty"`
+	OperationTime *string                `protobuf:"bytes,6,opt,name=operation_time,json=operationTime,proto3,oneof" json:"operation_time,omitempty"`
+	Organization  *string                `protobuf:"bytes,7,opt,name=organization,proto3,oneof" json:"organization,omitempty"`
+	Ticketing     *string                `protobuf:"bytes,8,opt,name=ticketing,proto3,oneof" json:"ticketing,omitempty"`
+	RouteType     *string                `protobuf:"bytes,9,opt,name=route_type,json=routeType,proto3,oneof" json:"route_type,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -211,8 +211,8 @@ func (*UpdateRouteRequest) Descriptor() ([]byte, []int) {
 }
 
 func (x *UpdateRouteRequest) GetId() int64 {
-	if x != nil && x.Id != nil {
-		return *x.Id
+	if x != nil {
+		return x.Id
 	}
 	return 0
 }
@@ -229,6 +229,13 @@ func (x *UpdateRouteRequest) GetName() string {
 		return *x.Name
 	}
 	return ""
+}
+
+func (x *UpdateRouteRequest) GetEbmsId() int64 {
+	if x != nil && x.EbmsId != nil {
+		return *x.EbmsId
+	}
+	return 0
 }
 
 func (x *UpdateRouteRequest) GetActive() bool {
@@ -264,13 +271,6 @@ func (x *UpdateRouteRequest) GetRouteType() string {
 		return *x.RouteType
 	}
 	return ""
-}
-
-func (x *UpdateRouteRequest) GetEbmsId() int64 {
-	if x != nil && x.EbmsId != nil {
-		return *x.EbmsId
-	}
-	return 0
 }
 
 type UpdateRouteResponse struct {
@@ -407,7 +407,7 @@ func (x *GetRouteResponse) GetRoute() *Route {
 
 type GetRouteByEbmsIDRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	EbmsId        int64                  `protobuf:"varint,1,opt,name=ebms_id,json=ebmsId,proto3" json:"ebms_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -442,9 +442,9 @@ func (*GetRouteByEbmsIDRequest) Descriptor() ([]byte, []int) {
 	return file_api_v1_route_proto_rawDescGZIP(), []int{6}
 }
 
-func (x *GetRouteByEbmsIDRequest) GetId() int64 {
+func (x *GetRouteByEbmsIDRequest) GetEbmsId() int64 {
 	if x != nil {
-		return x.Id
+		return x.EbmsId
 	}
 	return 0
 }
@@ -578,12 +578,12 @@ type Route struct {
 	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	Number        string                 `protobuf:"bytes,2,opt,name=number,proto3" json:"number,omitempty"`
 	Name          string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
-	Active        bool                   `protobuf:"varint,4,opt,name=active,proto3" json:"active,omitempty"`
-	OperationTime string                 `protobuf:"bytes,5,opt,name=operation_time,json=operationTime,proto3" json:"operation_time,omitempty"`
-	Organization  string                 `protobuf:"bytes,6,opt,name=organization,proto3" json:"organization,omitempty"`
-	Ticketing     string                 `protobuf:"bytes,7,opt,name=ticketing,proto3" json:"ticketing,omitempty"`
-	RouteType     string                 `protobuf:"bytes,8,opt,name=route_type,json=routeType,proto3" json:"route_type,omitempty"`
-	EbmsId        int64                  `protobuf:"varint,9,opt,name=ebms_id,json=ebmsId,proto3" json:"ebms_id,omitempty"`
+	EbmsId        *int64                 `protobuf:"varint,4,opt,name=ebms_id,json=ebmsId,proto3,oneof" json:"ebms_id,omitempty"`
+	Active        bool                   `protobuf:"varint,5,opt,name=active,proto3" json:"active,omitempty"`
+	OperationTime *string                `protobuf:"bytes,6,opt,name=operation_time,json=operationTime,proto3,oneof" json:"operation_time,omitempty"`
+	Organization  *string                `protobuf:"bytes,7,opt,name=organization,proto3,oneof" json:"organization,omitempty"`
+	Ticketing     *string                `protobuf:"bytes,8,opt,name=ticketing,proto3,oneof" json:"ticketing,omitempty"`
+	RouteType     *string                `protobuf:"bytes,9,opt,name=route_type,json=routeType,proto3,oneof" json:"route_type,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -639,6 +639,13 @@ func (x *Route) GetName() string {
 	return ""
 }
 
+func (x *Route) GetEbmsId() int64 {
+	if x != nil && x.EbmsId != nil {
+		return *x.EbmsId
+	}
+	return 0
+}
+
 func (x *Route) GetActive() bool {
 	if x != nil {
 		return x.Active
@@ -647,103 +654,109 @@ func (x *Route) GetActive() bool {
 }
 
 func (x *Route) GetOperationTime() string {
-	if x != nil {
-		return x.OperationTime
+	if x != nil && x.OperationTime != nil {
+		return *x.OperationTime
 	}
 	return ""
 }
 
 func (x *Route) GetOrganization() string {
-	if x != nil {
-		return x.Organization
+	if x != nil && x.Organization != nil {
+		return *x.Organization
 	}
 	return ""
 }
 
 func (x *Route) GetTicketing() string {
-	if x != nil {
-		return x.Ticketing
+	if x != nil && x.Ticketing != nil {
+		return *x.Ticketing
 	}
 	return ""
 }
 
 func (x *Route) GetRouteType() string {
-	if x != nil {
-		return x.RouteType
+	if x != nil && x.RouteType != nil {
+		return *x.RouteType
 	}
 	return ""
-}
-
-func (x *Route) GetEbmsId() int64 {
-	if x != nil {
-		return x.EbmsId
-	}
-	return 0
 }
 
 var File_api_v1_route_proto protoreflect.FileDescriptor
 
 const file_api_v1_route_proto_rawDesc = "" +
 	"\n" +
-	"\x12api/v1/route.proto\x12\x06api.v1\"\xf9\x01\n" +
+	"\x12api/v1/route.proto\x12\x06api.v1\"\xdf\x02\n" +
 	"\x12CreateRouteRequest\x12\x16\n" +
 	"\x06number\x18\x01 \x01(\tR\x06number\x12\x12\n" +
-	"\x04name\x18\x02 \x01(\tR\x04name\x12\x16\n" +
-	"\x06active\x18\x03 \x01(\bR\x06active\x12%\n" +
-	"\x0eoperation_time\x18\x04 \x01(\tR\roperationTime\x12\"\n" +
-	"\forganization\x18\x05 \x01(\tR\forganization\x12\x1c\n" +
-	"\tticketing\x18\x06 \x01(\tR\tticketing\x12\x1d\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1c\n" +
+	"\aebms_id\x18\x03 \x01(\x03H\x00R\x06ebmsId\x88\x01\x01\x12\x16\n" +
+	"\x06active\x18\x04 \x01(\bR\x06active\x12*\n" +
+	"\x0eoperation_time\x18\x05 \x01(\tH\x01R\roperationTime\x88\x01\x01\x12'\n" +
+	"\forganization\x18\x06 \x01(\tH\x02R\forganization\x88\x01\x01\x12!\n" +
+	"\tticketing\x18\a \x01(\tH\x03R\tticketing\x88\x01\x01\x12\"\n" +
 	"\n" +
-	"route_type\x18\a \x01(\tR\trouteType\x12\x17\n" +
-	"\aebms_id\x18\b \x01(\x03R\x06ebmsId\":\n" +
+	"route_type\x18\b \x01(\tH\x04R\trouteType\x88\x01\x01B\n" +
+	"\n" +
+	"\b_ebms_idB\x11\n" +
+	"\x0f_operation_timeB\x0f\n" +
+	"\r_organizationB\f\n" +
+	"\n" +
+	"_ticketingB\r\n" +
+	"\v_route_type\":\n" +
 	"\x13CreateRouteResponse\x12#\n" +
-	"\x05route\x18\x01 \x01(\v2\r.api.v1.RouteR\x05route\"\xa9\x03\n" +
-	"\x12UpdateRouteRequest\x12\x13\n" +
-	"\x02id\x18\x01 \x01(\x03H\x00R\x02id\x88\x01\x01\x12\x1b\n" +
-	"\x06number\x18\x02 \x01(\tH\x01R\x06number\x88\x01\x01\x12\x17\n" +
-	"\x04name\x18\x03 \x01(\tH\x02R\x04name\x88\x01\x01\x12\x1b\n" +
-	"\x06active\x18\x04 \x01(\bH\x03R\x06active\x88\x01\x01\x12*\n" +
-	"\x0eoperation_time\x18\x05 \x01(\tH\x04R\roperationTime\x88\x01\x01\x12'\n" +
-	"\forganization\x18\x06 \x01(\tH\x05R\forganization\x88\x01\x01\x12!\n" +
-	"\tticketing\x18\a \x01(\tH\x06R\tticketing\x88\x01\x01\x12\"\n" +
+	"\x05route\x18\x01 \x01(\v2\r.api.v1.RouteR\x05route\"\x9d\x03\n" +
+	"\x12UpdateRouteRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x1b\n" +
+	"\x06number\x18\x02 \x01(\tH\x00R\x06number\x88\x01\x01\x12\x17\n" +
+	"\x04name\x18\x03 \x01(\tH\x01R\x04name\x88\x01\x01\x12\x1c\n" +
+	"\aebms_id\x18\x04 \x01(\x03H\x02R\x06ebmsId\x88\x01\x01\x12\x1b\n" +
+	"\x06active\x18\x05 \x01(\bH\x03R\x06active\x88\x01\x01\x12*\n" +
+	"\x0eoperation_time\x18\x06 \x01(\tH\x04R\roperationTime\x88\x01\x01\x12'\n" +
+	"\forganization\x18\a \x01(\tH\x05R\forganization\x88\x01\x01\x12!\n" +
+	"\tticketing\x18\b \x01(\tH\x06R\tticketing\x88\x01\x01\x12\"\n" +
 	"\n" +
-	"route_type\x18\b \x01(\tH\aR\trouteType\x88\x01\x01\x12\x1c\n" +
-	"\aebms_id\x18\t \x01(\x03H\bR\x06ebmsId\x88\x01\x01B\x05\n" +
-	"\x03_idB\t\n" +
+	"route_type\x18\t \x01(\tH\aR\trouteType\x88\x01\x01B\t\n" +
 	"\a_numberB\a\n" +
-	"\x05_nameB\t\n" +
+	"\x05_nameB\n" +
+	"\n" +
+	"\b_ebms_idB\t\n" +
 	"\a_activeB\x11\n" +
 	"\x0f_operation_timeB\x0f\n" +
 	"\r_organizationB\f\n" +
 	"\n" +
 	"_ticketingB\r\n" +
-	"\v_route_typeB\n" +
-	"\n" +
-	"\b_ebms_id\":\n" +
+	"\v_route_type\":\n" +
 	"\x13UpdateRouteResponse\x12#\n" +
 	"\x05route\x18\x01 \x01(\v2\r.api.v1.RouteR\x05route\"!\n" +
 	"\x0fGetRouteRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x03R\x02id\"7\n" +
 	"\x10GetRouteResponse\x12#\n" +
-	"\x05route\x18\x01 \x01(\v2\r.api.v1.RouteR\x05route\")\n" +
-	"\x17GetRouteByEbmsIDRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x03R\x02id\"?\n" +
+	"\x05route\x18\x01 \x01(\v2\r.api.v1.RouteR\x05route\"2\n" +
+	"\x17GetRouteByEbmsIDRequest\x12\x17\n" +
+	"\aebms_id\x18\x01 \x01(\x03R\x06ebmsId\"?\n" +
 	"\x18GetRouteByEbmsIDResponse\x12#\n" +
 	"\x05route\x18\x01 \x01(\v2\r.api.v1.RouteR\x05route\"\x12\n" +
 	"\x10ListRouteRequest\":\n" +
 	"\x11ListRouteResponse\x12%\n" +
-	"\x06routes\x18\x01 \x03(\v2\r.api.v1.RouteR\x06routes\"\xfc\x01\n" +
+	"\x06routes\x18\x01 \x03(\v2\r.api.v1.RouteR\x06routes\"\xe2\x02\n" +
 	"\x05Route\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x16\n" +
 	"\x06number\x18\x02 \x01(\tR\x06number\x12\x12\n" +
-	"\x04name\x18\x03 \x01(\tR\x04name\x12\x16\n" +
-	"\x06active\x18\x04 \x01(\bR\x06active\x12%\n" +
-	"\x0eoperation_time\x18\x05 \x01(\tR\roperationTime\x12\"\n" +
-	"\forganization\x18\x06 \x01(\tR\forganization\x12\x1c\n" +
-	"\tticketing\x18\a \x01(\tR\tticketing\x12\x1d\n" +
+	"\x04name\x18\x03 \x01(\tR\x04name\x12\x1c\n" +
+	"\aebms_id\x18\x04 \x01(\x03H\x00R\x06ebmsId\x88\x01\x01\x12\x16\n" +
+	"\x06active\x18\x05 \x01(\bR\x06active\x12*\n" +
+	"\x0eoperation_time\x18\x06 \x01(\tH\x01R\roperationTime\x88\x01\x01\x12'\n" +
+	"\forganization\x18\a \x01(\tH\x02R\forganization\x88\x01\x01\x12!\n" +
+	"\tticketing\x18\b \x01(\tH\x03R\tticketing\x88\x01\x01\x12\"\n" +
 	"\n" +
-	"route_type\x18\b \x01(\tR\trouteType\x12\x17\n" +
-	"\aebms_id\x18\t \x01(\x03R\x06ebmsId2\x80\x03\n" +
+	"route_type\x18\t \x01(\tH\x04R\trouteType\x88\x01\x01B\n" +
+	"\n" +
+	"\b_ebms_idB\x11\n" +
+	"\x0f_operation_timeB\x0f\n" +
+	"\r_organizationB\f\n" +
+	"\n" +
+	"_ticketingB\r\n" +
+	"\v_route_type2\x80\x03\n" +
 	"\fRouteService\x12H\n" +
 	"\vCreateRoute\x12\x1a.api.v1.CreateRouteRequest\x1a\x1b.api.v1.CreateRouteResponse\"\x00\x12H\n" +
 	"\vUpdateRoute\x12\x1a.api.v1.UpdateRouteRequest\x1a\x1b.api.v1.UpdateRouteResponse\"\x00\x12?\n" +
@@ -808,7 +821,9 @@ func file_api_v1_route_proto_init() {
 	if File_api_v1_route_proto != nil {
 		return
 	}
+	file_api_v1_route_proto_msgTypes[0].OneofWrappers = []any{}
 	file_api_v1_route_proto_msgTypes[2].OneofWrappers = []any{}
+	file_api_v1_route_proto_msgTypes[10].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

@@ -14,8 +14,8 @@ service GeolocationService {
 
 message CreateGeolocationRequest {
   float degree = 1;
-  float latitude = 2;
-  float longitude = 3;
+  double latitude = 2;
+  double longitude = 3;
   float speed = 4;
   int64 vehicle_id = 5;
   int64 variant_id = 6;
@@ -43,10 +43,10 @@ message GetVehiclesByStationResponse {
 }
 
 message ListGeolocationByBoundingRequest {
-  float latitude = 1;
-  float longitude = 2;
-  float width = 3;
-  float height = 4;
+  double latitude = 1;
+  double longitude = 2;
+  double width = 3;
+  double height = 4;
 }
 
 message ListGeolocationByBoundingResponse {
@@ -57,8 +57,8 @@ message Vehicle {}
 
 message Geolocation {
   float degree = 1;
-  float latitude = 2;
-  float longitude = 3;
+  double latitude = 2;
+  double longitude = 3;
   float speed = 4;
   int64 vehicle_id = 5;
   int64 variant_id = 6;
