@@ -1,32 +1,29 @@
-package base
+package app
 
 import (
 	"io/fs"
 	"log/slog"
 
 	"github.com/catouberos/transit-radar/internal/models"
+	"github.com/catouberos/transit-radar/internal/route"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/jackc/pgx/v5/stdlib"
-	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/pressly/goose/v3"
 	"github.com/redis/go-redis/v9"
 )
 
 type App struct {
-	dbPool     *pgxpool.Pool
-	migrations fs.FS
-
-	redis *redis.Client
-
-	query *models.Queries
+	dbPool       *pgxpool.Pool
+	migrations   fs.FS
+	redis        *redis.Client
+	RouteService route.RouteService
 }
 
 func NewApp(dbConn *pgxpool.Pool, migrations fs.FS, redis *redis.Client) *App {
 	app := &App{
 		dbPool:     dbConn,
 		migrations: migrations,
-
-		redis: redis,
+		redis:      redis,
 	}
 
 	return app
@@ -38,17 +35,10 @@ func (app *App) Init() error {
 		return err
 	}
 
-	app.query = models.New(app.dbPool)
+	query := models.New(app.dbPool)
+	app.RouteService = route.NewRouteService(query, app.redis)
 
 	return nil
-}
-
-func (app *App) Query() *models.Queries {
-	return app.query
-}
-
-func (app *App) Redis() *redis.Client {
-	return app.redis
 }
 
 // runs migration if present
