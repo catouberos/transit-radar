@@ -54,6 +54,7 @@ message GetVariantResponse {
 
 message GetVariantByEbmsIDRequest {
   int64 ebms_id = 1;
+  int64 route_id = 2;
 }
 
 message GetVariantByEbmsIDResponse {
@@ -78,14 +79,4 @@ message Variant {
   optional int32 duration = 9;
   optional string start_stop_name = 10;
   optional string end_stop_name = 11;
-
-
-
-
-
-
-
-
-
-
 }
