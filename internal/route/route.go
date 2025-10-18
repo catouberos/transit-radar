@@ -3,6 +3,7 @@ package route
 import (
 	"context"
 	"fmt"
+	"log/slog"
 
 	"github.com/catouberos/transit-radar/internal/models"
 	"github.com/redis/go-redis/v9"
@@ -65,7 +66,7 @@ type ListParams struct {
 // IMPLEMENTATION
 
 func NewRouteService(query *models.Queries, redis *redis.Client) RouteService {
-	return RouteServiceImpl{
+	return &RouteServiceImpl{
 		query: query,
 		redis: redis,
 	}
@@ -93,13 +94,13 @@ func (s RouteServiceImpl) Create(ctx context.Context, params CreateParams) (Rout
 
 	err = s.cachePut(ctx, route)
 	if err != nil {
-		return route, err
+		slog.ErrorContext(ctx, "cannot put in cache", "routeID", route.ID, "error", err)
 	}
 
 	return route, nil
 }
 
-func (s RouteServiceImpl) Update(ctx context.Context, params UpdateParams) (Route, error) {
+func (s *RouteServiceImpl) Update(ctx context.Context, params UpdateParams) (Route, error) {
 	result, err := s.query.UpdateRoute(ctx, models.UpdateRouteParams{
 		Number:        params.Number,
 		Name:          params.Name,
@@ -110,7 +111,6 @@ func (s RouteServiceImpl) Update(ctx context.Context, params UpdateParams) (Rout
 		RouteType:     params.RouteType,
 		ID:            params.ID,
 	})
-
 	if err != nil {
 		return Route{}, err
 	}
@@ -118,13 +118,13 @@ func (s RouteServiceImpl) Update(ctx context.Context, params UpdateParams) (Rout
 
 	err = s.cachePut(ctx, route)
 	if err != nil {
-		return route, err
+		slog.ErrorContext(ctx, "cannot put in cache", "routeID", route.ID, "error", err)
 	}
 
 	return route, nil
 }
 
-func (s RouteServiceImpl) Get(ctx context.Context, params GetParams) (Route, error) {
+func (s *RouteServiceImpl) Get(ctx context.Context, params GetParams) (Route, error) {
 	if params.ID != nil {
 		route, err := s.cacheGet(ctx, *params.ID)
 		if err == nil {
@@ -144,7 +144,7 @@ func (s RouteServiceImpl) Get(ctx context.Context, params GetParams) (Route, err
 	return route, nil
 }
 
-func (s RouteServiceImpl) List(ctx context.Context, params ListParams) ([]Route, error) {
+func (s *RouteServiceImpl) List(ctx context.Context, params ListParams) ([]Route, error) {
 	result, err := s.query.ListRoute(ctx)
 	if err != nil {
 		return nil, err
@@ -158,13 +158,13 @@ func (s RouteServiceImpl) List(ctx context.Context, params ListParams) ([]Route,
 	return routes, nil
 }
 
-func (s RouteServiceImpl) cachePut(ctx context.Context, route Route) error {
+func (s *RouteServiceImpl) cachePut(ctx context.Context, route Route) error {
 	key := fmt.Sprintf(RouteCacheKey, route.ID)
 	_, err := s.redis.HSet(ctx, key, route).Result()
 	return err
 }
 
-func (s RouteServiceImpl) cacheGet(ctx context.Context, routeID int64) (Route, error) {
+func (s *RouteServiceImpl) cacheGet(ctx context.Context, routeID int64) (Route, error) {
 	key := fmt.Sprintf(RouteCacheKey, routeID)
 
 	route := Route{}

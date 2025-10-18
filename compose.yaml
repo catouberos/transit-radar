@@ -5,8 +5,8 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     ports:
       - 5432:5432
-  rabbitmq:
-    image: rabbitmq:4-alpine
+  redis:
+    image: redis:8.2
     ports:
-      - 5672:5672
-      - 15672:15672
+      - 6379:6379
+      - 6380:6380

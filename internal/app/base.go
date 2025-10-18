@@ -10,6 +10,7 @@ import (
 	"github.com/catouberos/transit-radar/internal/stop"
 	"github.com/catouberos/transit-radar/internal/stoptype"
 	"github.com/catouberos/transit-radar/internal/variant"
+	"github.com/catouberos/transit-radar/internal/variantstop"
 	"github.com/catouberos/transit-radar/internal/vehicle"
 	"github.com/catouberos/transit-radar/internal/vehicletype"
 
@@ -29,6 +30,7 @@ type App struct {
 	StopService        stop.StopService
 	StopTypeService    stoptype.StopTypeService
 	VariantService     variant.VariantService
+	VariantStopService variantstop.VariantStopService
 	VehicleService     vehicle.VehicleService
 	VehicleTypeService vehicletype.VehicleTypeService
 }
@@ -50,7 +52,14 @@ func (app *App) Init() error {
 	}
 
 	query := models.New(app.dbPool)
+	app.GeolocationService = geolocation.NewGeolocationService(query, app.redis)
 	app.RouteService = route.NewRouteService(query, app.redis)
+	app.StopService = stop.NewStopService(query, app.redis)
+	app.StopTypeService = stoptype.NewStopTypeService(query, app.redis)
+	app.VariantService = variant.NewVariantService(query, app.redis)
+	app.VariantStopService = variantstop.NewVariantStopService(query, app.redis)
+	app.VehicleService = vehicle.NewVehicleService(query, app.redis)
+	app.VehicleTypeService = vehicletype.NewVehicleTypeService(query, app.redis)
 
 	return nil
 }
@@ -68,7 +77,7 @@ func (app *App) runMigrations() error {
 
 	slog.Info("Running migrations...")
 
-	if err := goose.Up(db, "migrations"); err != nil {
+	if err := goose.Up(db, "."); err != nil {
 		return err
 	}
 

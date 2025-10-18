@@ -48,6 +48,7 @@ func (s *RPCServer) UpdateVariant(
 		Duration:      req.Msg.Duration,
 		StartStopName: req.Msg.StartStopName,
 		EndStopName:   req.Msg.EndStopName,
+		ID:            req.Msg.Id,
 	})
 	if err != nil {
 		return nil, err
@@ -92,7 +93,7 @@ func (s *RPCServer) GetVariantByEbmsID(
 	ctx context.Context,
 	req *connect.Request[apiv1.GetVariantByEbmsIDRequest],
 ) (*connect.Response[apiv1.GetVariantByEbmsIDResponse], error) {
-	variant, err := s.App.VariantService.Get(ctx, variant.GetParams{EbmsID: &req.Msg.EbmsId})
+	variant, err := s.App.VariantService.Get(ctx, variant.GetParams{EbmsID: &req.Msg.EbmsId, RouteID: &req.Msg.RouteId})
 	if err != nil {
 		return nil, err
 	}

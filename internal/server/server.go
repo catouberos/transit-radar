@@ -34,6 +34,9 @@ func (s *RPCServer) Serve() error {
 	path, handler = apiv1connect.NewVariantServiceHandler(s)
 	mux.Handle(path, withCORS(handler))
 
+	path, handler = apiv1connect.NewVariantStopServiceHandler(s)
+	mux.Handle(path, withCORS(handler))
+
 	return http.ListenAndServe(s.ListenAddr, mux)
 }
 

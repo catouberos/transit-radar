@@ -78,17 +78,19 @@ FROM
 WHERE
     id = coalesce($1, id)
     AND ebms_id = coalesce($2, ebms_id)
+    AND route_id = coalesce($3, route_id)
 LIMIT
     1
 `
 
 type GetVariantParams struct {
-	ID     *int64
-	EbmsID *int64
+	ID      *int64
+	EbmsID  *int64
+	RouteID *int64
 }
 
 func (q *Queries) GetVariant(ctx context.Context, arg GetVariantParams) (Variant, error) {
-	row := q.db.QueryRow(ctx, getVariant, arg.ID, arg.EbmsID)
+	row := q.db.QueryRow(ctx, getVariant, arg.ID, arg.EbmsID, arg.RouteID)
 	var i Variant
 	err := row.Scan(
 		&i.ID,

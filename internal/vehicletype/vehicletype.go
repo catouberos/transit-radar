@@ -36,7 +36,7 @@ type ListParams struct {
 }
 
 func NewVehicleTypeService(query *models.Queries, redis *redis.Client) VehicleTypeService {
-	return VehicleTypeServiceImpl{
+	return &VehicleTypeServiceImpl{
 		query: query,
 		redis: redis,
 	}
@@ -47,7 +47,7 @@ type VehicleTypeServiceImpl struct {
 	redis *redis.Client
 }
 
-func (s VehicleTypeServiceImpl) Create(ctx context.Context, params CreateParams) (VehicleType, error) {
+func (s *VehicleTypeServiceImpl) Create(ctx context.Context, params CreateParams) (VehicleType, error) {
 	result, err := s.query.CreateVehicleType(ctx, params.Name)
 	if err != nil {
 		return VehicleType{}, err
@@ -57,7 +57,7 @@ func (s VehicleTypeServiceImpl) Create(ctx context.Context, params CreateParams)
 	return stop, nil
 }
 
-func (s VehicleTypeServiceImpl) Update(ctx context.Context, params UpdateParams) (VehicleType, error) {
+func (s *VehicleTypeServiceImpl) Update(ctx context.Context, params UpdateParams) (VehicleType, error) {
 	result, err := s.query.UpdateVehicleType(ctx, models.UpdateVehicleTypeParams{
 		ID:   params.ID,
 		Name: params.Name,
@@ -70,7 +70,7 @@ func (s VehicleTypeServiceImpl) Update(ctx context.Context, params UpdateParams)
 	return stop, nil
 }
 
-func (s VehicleTypeServiceImpl) Get(ctx context.Context, params GetParams) (VehicleType, error) {
+func (s *VehicleTypeServiceImpl) Get(ctx context.Context, params GetParams) (VehicleType, error) {
 	result, err := s.query.GetVehicleType(ctx, models.GetVehicleTypeParams{
 		ID: params.ID,
 	})
@@ -82,7 +82,7 @@ func (s VehicleTypeServiceImpl) Get(ctx context.Context, params GetParams) (Vehi
 	return stop, nil
 }
 
-func (s VehicleTypeServiceImpl) List(ctx context.Context, params ListParams) ([]VehicleType, error) {
+func (s *VehicleTypeServiceImpl) List(ctx context.Context, params ListParams) ([]VehicleType, error) {
 	return nil, nil
 }
 

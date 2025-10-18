@@ -57,7 +57,7 @@ type ListByBoundingParams struct {
 
 var _ GeolocationService = (*GeolocationServiceImpl)(nil)
 
-func NewGeolocationService(query *models.Queries, redis *redis.Client) *GeolocationServiceImpl {
+func NewGeolocationService(query *models.Queries, redis *redis.Client) GeolocationService {
 	return &GeolocationServiceImpl{
 		query: query,
 		redis: redis,

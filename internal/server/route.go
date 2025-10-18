@@ -37,6 +37,7 @@ func (s *RPCServer) UpdateRoute(
 	req *connect.Request[apiv1.UpdateRouteRequest],
 ) (*connect.Response[apiv1.UpdateRouteResponse], error) {
 	result, err := s.App.RouteService.Update(ctx, route.UpdateParams{
+		ID:            req.Msg.Id,
 		Number:        req.Msg.Number,
 		Name:          req.Msg.Name,
 		EbmsID:        req.Msg.EbmsId,

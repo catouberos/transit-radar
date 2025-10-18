@@ -9,26 +9,6 @@ import (
 	"context"
 )
 
-const createVariantStop = `-- name: CreateVariantStop :one
-INSERT INTO
-    variants_stops(variant_id, stop_id, order_score)
-VALUES
-    ($1, $2, $3) RETURNING variant_id, stop_id, order_score
-`
-
-type CreateVariantStopParams struct {
-	VariantID  int64
-	StopID     int64
-	OrderScore int32
-}
-
-func (q *Queries) CreateVariantStop(ctx context.Context, arg CreateVariantStopParams) (VariantsStop, error) {
-	row := q.db.QueryRow(ctx, createVariantStop, arg.VariantID, arg.StopID, arg.OrderScore)
-	var i VariantsStop
-	err := row.Scan(&i.VariantID, &i.StopID, &i.OrderScore)
-	return i, err
-}
-
 const getVariantStopByStopID = `-- name: GetVariantStopByStopID :many
 SELECT
     variant_id, stop_id, order_score

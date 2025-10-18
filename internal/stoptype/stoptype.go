@@ -36,7 +36,7 @@ type ListParams struct {
 }
 
 func NewStopTypeService(query *models.Queries, redis *redis.Client) StopTypeService {
-	return StopTypeServiceImpl{
+	return &StopTypeServiceImpl{
 		query: query,
 		redis: redis,
 	}
@@ -47,7 +47,7 @@ type StopTypeServiceImpl struct {
 	redis *redis.Client
 }
 
-func (s StopTypeServiceImpl) Create(ctx context.Context, params CreateParams) (StopType, error) {
+func (s *StopTypeServiceImpl) Create(ctx context.Context, params CreateParams) (StopType, error) {
 	result, err := s.query.CreateStopType(ctx, params.Name)
 	if err != nil {
 		return StopType{}, err
@@ -57,7 +57,7 @@ func (s StopTypeServiceImpl) Create(ctx context.Context, params CreateParams) (S
 	return stop, nil
 }
 
-func (s StopTypeServiceImpl) Update(ctx context.Context, params UpdateParams) (StopType, error) {
+func (s *StopTypeServiceImpl) Update(ctx context.Context, params UpdateParams) (StopType, error) {
 	result, err := s.query.UpdateStopType(ctx, models.UpdateStopTypeParams{
 		ID:   params.ID,
 		Name: params.Name,
@@ -70,7 +70,7 @@ func (s StopTypeServiceImpl) Update(ctx context.Context, params UpdateParams) (S
 	return stop, nil
 }
 
-func (s StopTypeServiceImpl) Get(ctx context.Context, params GetParams) (StopType, error) {
+func (s *StopTypeServiceImpl) Get(ctx context.Context, params GetParams) (StopType, error) {
 	result, err := s.query.GetStopType(ctx, models.GetStopTypeParams{
 		ID: params.ID,
 	})
@@ -82,7 +82,7 @@ func (s StopTypeServiceImpl) Get(ctx context.Context, params GetParams) (StopTyp
 	return stop, nil
 }
 
-func (s StopTypeServiceImpl) List(ctx context.Context, params ListParams) ([]StopType, error) {
+func (s *StopTypeServiceImpl) List(ctx context.Context, params ListParams) ([]StopType, error) {
 	return nil, nil
 }
 

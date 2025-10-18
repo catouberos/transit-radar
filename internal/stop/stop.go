@@ -59,7 +59,7 @@ type ListParams struct {
 }
 
 func NewStopService(query *models.Queries, redis *redis.Client) StopService {
-	return StopServiceImpl{
+	return &StopServiceImpl{
 		query: query,
 		redis: redis,
 	}
@@ -70,7 +70,7 @@ type StopServiceImpl struct {
 	redis *redis.Client
 }
 
-func (s StopServiceImpl) Create(ctx context.Context, params CreateParams) (Stop, error) {
+func (s *StopServiceImpl) Create(ctx context.Context, params CreateParams) (Stop, error) {
 	result, err := s.query.CreateStop(ctx, models.CreateStopParams{
 		Code:      params.Code,
 		Name:      params.Name,
@@ -88,7 +88,7 @@ func (s StopServiceImpl) Create(ctx context.Context, params CreateParams) (Stop,
 	return stop, nil
 }
 
-func (s StopServiceImpl) Get(ctx context.Context, params GetParams) (Stop, error) {
+func (s *StopServiceImpl) Get(ctx context.Context, params GetParams) (Stop, error) {
 	result, err := s.query.GetStop(ctx, models.GetStopParams{
 		ID: &params.ID,
 	})
@@ -100,7 +100,7 @@ func (s StopServiceImpl) Get(ctx context.Context, params GetParams) (Stop, error
 	return stop, nil
 }
 
-func (s StopServiceImpl) GetByEbmsID(ctx context.Context, params GetByEbmsIDParams) (Stop, error) {
+func (s *StopServiceImpl) GetByEbmsID(ctx context.Context, params GetByEbmsIDParams) (Stop, error) {
 	result, err := s.query.GetStop(ctx, models.GetStopParams{
 		EbmsID: &params.EbmsID,
 	})
@@ -112,7 +112,7 @@ func (s StopServiceImpl) GetByEbmsID(ctx context.Context, params GetByEbmsIDPara
 	return stop, nil
 }
 
-func (s StopServiceImpl) List(ctx context.Context, params ListParams) ([]Stop, error) {
+func (s *StopServiceImpl) List(ctx context.Context, params ListParams) ([]Stop, error) {
 	return nil, nil
 }
 

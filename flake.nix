@@ -68,7 +68,8 @@
           sleek
 
           redli
-          rabbitmqadmin-ng
+
+          pmtiles
         ];
       };
     });

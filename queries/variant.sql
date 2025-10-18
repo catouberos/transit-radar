@@ -40,6 +40,7 @@ FROM
 WHERE
     id = coalesce(sqlc.narg('id'), id)
     AND ebms_id = coalesce(sqlc.narg('ebms_id'), ebms_id)
+    AND route_id = coalesce(sqlc.narg('route_id'), route_id)
 LIMIT
     1;
 

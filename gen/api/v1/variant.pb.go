@@ -440,6 +440,7 @@ func (x *GetVariantResponse) GetVariant() *Variant {
 type GetVariantByEbmsIDRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	EbmsId        int64                  `protobuf:"varint,1,opt,name=ebms_id,json=ebmsId,proto3" json:"ebms_id,omitempty"`
+	RouteId       int64                  `protobuf:"varint,2,opt,name=route_id,json=routeId,proto3" json:"route_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -477,6 +478,13 @@ func (*GetVariantByEbmsIDRequest) Descriptor() ([]byte, []int) {
 func (x *GetVariantByEbmsIDRequest) GetEbmsId() int64 {
 	if x != nil {
 		return x.EbmsId
+	}
+	return 0
+}
+
+func (x *GetVariantByEbmsIDRequest) GetRouteId() int64 {
+	if x != nil {
+		return x.RouteId
 	}
 	return 0
 }
@@ -789,9 +797,10 @@ const file_api_v1_variant_proto_rawDesc = "" +
 	"\x11GetVariantRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x03R\x02id\"?\n" +
 	"\x12GetVariantResponse\x12)\n" +
-	"\avariant\x18\x01 \x01(\v2\x0f.api.v1.VariantR\avariant\"4\n" +
+	"\avariant\x18\x01 \x01(\v2\x0f.api.v1.VariantR\avariant\"O\n" +
 	"\x19GetVariantByEbmsIDRequest\x12\x17\n" +
-	"\aebms_id\x18\x01 \x01(\x03R\x06ebmsId\"G\n" +
+	"\aebms_id\x18\x01 \x01(\x03R\x06ebmsId\x12\x19\n" +
+	"\broute_id\x18\x02 \x01(\x03R\arouteId\"G\n" +
 	"\x1aGetVariantByEbmsIDResponse\x12)\n" +
 	"\avariant\x18\x01 \x01(\v2\x0f.api.v1.VariantR\avariant\"\x14\n" +
 	"\x12ListVariantRequest\"B\n" +

@@ -56,15 +56,16 @@ type UpdateParams struct {
 }
 
 type GetParams struct {
-	ID     *int64
-	EbmsID *int64
+	ID      *int64
+	EbmsID  *int64
+	RouteID *int64
 }
 
 type ListParams struct {
 }
 
 func NewVariantService(query *models.Queries, redis *redis.Client) VariantService {
-	return VariantServiceImpl{
+	return &VariantServiceImpl{
 		query: query,
 		redis: redis,
 	}
@@ -75,7 +76,7 @@ type VariantServiceImpl struct {
 	redis *redis.Client
 }
 
-func (s VariantServiceImpl) Create(ctx context.Context, params CreateParams) (Variant, error) {
+func (s *VariantServiceImpl) Create(ctx context.Context, params CreateParams) (Variant, error) {
 	result, err := s.query.CreateVariant(ctx, models.CreateVariantParams{
 		Name:          params.Name,
 		EbmsID:        params.EbmsID,
@@ -96,7 +97,7 @@ func (s VariantServiceImpl) Create(ctx context.Context, params CreateParams) (Va
 	return stop, nil
 }
 
-func (s VariantServiceImpl) Update(ctx context.Context, params UpdateParams) (Variant, error) {
+func (s *VariantServiceImpl) Update(ctx context.Context, params UpdateParams) (Variant, error) {
 	result, err := s.query.UpdateVariant(ctx, models.UpdateVariantParams{
 		Name:          params.Name,
 		EbmsID:        params.EbmsID,
@@ -108,6 +109,7 @@ func (s VariantServiceImpl) Update(ctx context.Context, params UpdateParams) (Va
 		Duration:      params.Duration,
 		StartStopName: params.StartStopName,
 		EndStopName:   params.EndStopName,
+		ID:            params.ID,
 	})
 	if err != nil {
 		return Variant{}, err
@@ -117,10 +119,11 @@ func (s VariantServiceImpl) Update(ctx context.Context, params UpdateParams) (Va
 	return stop, nil
 }
 
-func (s VariantServiceImpl) Get(ctx context.Context, params GetParams) (Variant, error) {
+func (s *VariantServiceImpl) Get(ctx context.Context, params GetParams) (Variant, error) {
 	result, err := s.query.GetVariant(ctx, models.GetVariantParams{
-		ID:     params.ID,
-		EbmsID: params.EbmsID,
+		ID:      params.ID,
+		EbmsID:  params.EbmsID,
+		RouteID: params.RouteID,
 	})
 	if err != nil {
 		return Variant{}, err
@@ -130,7 +133,7 @@ func (s VariantServiceImpl) Get(ctx context.Context, params GetParams) (Variant,
 	return stop, nil
 }
 
-func (s VariantServiceImpl) List(ctx context.Context, params ListParams) ([]Variant, error) {
+func (s *VariantServiceImpl) List(ctx context.Context, params ListParams) ([]Variant, error) {
 	return nil, nil
 }
 

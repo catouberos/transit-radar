@@ -1,0 +1,52 @@
+syntax = "proto3";
+package api.v1;
+
+service VariantStopService {
+  rpc CreateVariantStop(CreateVariantStopRequest) returns (CreateVariantStopResponse) {}
+  rpc UpdateVariantStop(UpdateVariantStopRequest) returns (UpdateVariantStopResponse) {}
+  rpc ListVariantStop(ListVariantStopRequest) returns (ListVariantStopResponse) {}
+  rpc DeleteVariantStop(DeleteVariantStopRequest) returns (DeleteVariantStopResponse) {}
+}
+
+message CreateVariantStopRequest {
+  int64 variant_id = 1;
+  int64 stop_id = 2;
+  int32 order_score = 3;
+}
+
+message CreateVariantStopResponse {
+  VariantStop variant_stop = 1;
+}
+
+// update by variant_id and order_score
+message UpdateVariantStopRequest {
+  int64 variant_id = 1;
+  int32 order_score = 2;
+  int64 stop_id = 3;
+}
+
+message UpdateVariantStopResponse {
+  VariantStop variant_stop = 1;
+}
+
+message ListVariantStopRequest {
+  optional int64 variant_id = 1;
+  optional int64 stop_id = 2;
+}
+
+message ListVariantStopResponse {
+  repeated VariantStop variants_stops = 1;
+}
+
+message DeleteVariantStopRequest {
+  int64 variant_id = 1;
+  int32 order_score = 2;
+}
+
+message DeleteVariantStopResponse {}
+
+message VariantStop {
+  int64 variant_id = 1;
+  int64 stop_id = 2;
+  int32 order_score = 3;
+}
