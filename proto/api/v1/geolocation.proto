@@ -1,0 +1,43 @@
+syntax = "proto3";
+package api.v1;
+
+import "google/geo/type/viewport.proto";
+import "google/protobuf/timestamp.proto";
+import "google/type/latlng.proto";
+
+service GeolocationService {
+  rpc CreateGeolocation(CreateGeolocationRequest) returns (CreateGeolocationResponse) {}
+
+  rpc ListGeolocationByViewport(ListGeolocationByViewportRequest) returns (ListGeolocationByViewportResponse) {}
+}
+
+message CreateGeolocationRequest {
+  float degree = 1;
+  google.type.LatLng location = 2;
+  float speed = 3;
+  int64 vehicle_id = 4;
+  int64 variant_id = 5;
+  google.protobuf.Timestamp timestamp = 6;
+}
+
+message CreateGeolocationResponse {
+  Geolocation geolocation = 1;
+}
+
+message ListGeolocationByViewportRequest {
+  google.type.LatLng location = 1;
+  google.geo.type.Viewport viewport = 2;
+}
+
+message ListGeolocationByViewportResponse {
+  repeated Geolocation geolocations = 1;
+}
+
+message Geolocation {
+  float degree = 1;
+  google.type.LatLng location = 2;
+  float speed = 3;
+  int64 vehicle_id = 4;
+  int64 variant_id = 5;
+  google.protobuf.Timestamp timestamp = 6;
+}

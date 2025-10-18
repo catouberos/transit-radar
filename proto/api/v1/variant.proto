@@ -1,0 +1,78 @@
+syntax = "proto3";
+package api.v1;
+
+import "google/protobuf/struct.proto";
+
+service VariantService {
+  rpc CreateVariant(CreateVariantRequest) returns (CreateVariantResponse) {}
+  rpc UpdateVariant(UpdateVariantRequest) returns (UpdateVariantResponse) {}
+  rpc GetVariant(GetVariantRequest) returns (GetVariantResponse) {}
+  rpc GetVariantByAttributes(GetVariantByAttributesRequest) returns (GetVariantByAttributesResponse) {}
+  rpc ListVariant(ListVariantRequest) returns (ListVariantResponse) {}
+}
+
+message CreateVariantRequest {
+  int64 route_id = 1;
+  string name = 2;
+  optional string short_name = 3;
+  optional string description = 4;
+  optional float distance = 5;
+  int32 direction = 6;
+  optional int32 duration = 7;
+  google.protobuf.Struct attributes = 8;
+}
+
+message CreateVariantResponse {
+  Variant variant = 1;
+}
+
+message UpdateVariantRequest {
+  int64 id = 1;
+  optional int64 route_id = 2;
+  optional string name = 3;
+  optional string short_name = 4;
+  optional string description = 5;
+  optional float distance = 6;
+  optional int32 direction = 7;
+  optional int32 duration = 8;
+  optional google.protobuf.Struct attributes = 9;
+}
+
+message UpdateVariantResponse {
+  Variant variant = 1;
+}
+
+message GetVariantRequest {
+  int64 id = 1;
+}
+
+message GetVariantResponse {
+  Variant variant = 1;
+}
+
+message GetVariantByAttributesRequest {
+  google.protobuf.Struct attributes = 1;
+  optional int64 route_id = 2;
+}
+
+message GetVariantByAttributesResponse {
+  Variant variant = 1;
+}
+
+message ListVariantRequest {}
+
+message ListVariantResponse {
+  repeated Variant variants = 1;
+}
+
+message Variant {
+  int64 id = 1;
+  int64 route_id = 2;
+  string name = 3;
+  optional string short_name = 4;
+  optional string description = 5;
+  optional float distance = 6;
+  int32 direction = 7;
+  optional int32 duration = 8;
+  google.protobuf.Struct attributes = 9;
+}

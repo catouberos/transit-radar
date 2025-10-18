@@ -1,28 +1,36 @@
 -- name: CreateStop :one
 INSERT INTO
     stops (
+        parent_id,
         code,
         name,
-        type_id,
-        ebms_id,
+        "type",
         active,
-        latitude,
-        longitude
+        location,
+        attributes
     )
 VALUES
-    ($1, $2, $3, $4, $5, $6, $7) RETURNING *;
+    (
+        @parent_id,
+        @code,
+        @name,
+        @type,
+        @active,
+        sqlc.arg('location') :: EWKB,
+        @attributes
+    ) RETURNING *;
 
 -- name: UpdateStop :one
 UPDATE
     stops
 SET
+    parent_id = coalesce(sqlc.narg('parent_id'), parent_id),
     code = coalesce(sqlc.narg('code'), code),
     name = coalesce(sqlc.narg('name'), name),
-    type_id = coalesce(sqlc.narg('type_id'), type_id),
-    ebms_id = coalesce(sqlc.narg('ebms_id'), ebms_id),
+    "type" = coalesce(sqlc.narg('type'), "type"),
     active = coalesce(sqlc.narg('active'), active),
-    latitude = coalesce(sqlc.narg('latitude'), latitude),
-    longitude = coalesce(sqlc.narg('longitude'), longitude)
+    location = coalesce(sqlc.narg('location'), location),
+    attributes = coalesce(sqlc.narg('attributes'), attributes)
 WHERE
     id = sqlc.arg('id') RETURNING *;
 
@@ -33,7 +41,6 @@ FROM
     stops
 WHERE
     id = coalesce(sqlc.narg('id'), id)
-    AND ebms_id = coalesce(sqlc.narg('ebms_id'), ebms_id)
 LIMIT
     1;
 

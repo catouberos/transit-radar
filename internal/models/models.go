@@ -5,13 +5,116 @@
 package models
 
 import (
+	"database/sql/driver"
+	"fmt"
 	"time"
+
+	"github.com/cridenour/go-postgis"
 )
+
+type RouteType string
+
+const (
+	RouteTypeTram       RouteType = "tram"
+	RouteTypeMetro      RouteType = "metro"
+	RouteTypeRail       RouteType = "rail"
+	RouteTypeBus        RouteType = "bus"
+	RouteTypeFerry      RouteType = "ferry"
+	RouteTypeCableTram  RouteType = "cable_tram"
+	RouteTypeCableCar   RouteType = "cable_car"
+	RouteTypeFunicular  RouteType = "funicular"
+	RouteTypeTrolleybus RouteType = "trolleybus"
+	RouteTypeMonorail   RouteType = "monorail"
+)
+
+func (e *RouteType) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = RouteType(s)
+	case string:
+		*e = RouteType(s)
+	default:
+		return fmt.Errorf("unsupported scan type for RouteType: %T", src)
+	}
+	return nil
+}
+
+type NullRouteType struct {
+	RouteType RouteType
+	Valid     bool // Valid is true if RouteType is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullRouteType) Scan(value interface{}) error {
+	if value == nil {
+		ns.RouteType, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.RouteType.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullRouteType) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.RouteType), nil
+}
+
+type StopType string
+
+const (
+	StopTypeStopPlatform StopType = "stop_platform"
+	StopTypeStation      StopType = "station"
+	StopTypeEntranceExit StopType = "entrance_exit"
+	StopTypeGenericNode  StopType = "generic_node"
+	StopTypeBoardingArea StopType = "boarding_area"
+)
+
+func (e *StopType) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = StopType(s)
+	case string:
+		*e = StopType(s)
+	default:
+		return fmt.Errorf("unsupported scan type for StopType: %T", src)
+	}
+	return nil
+}
+
+type NullStopType struct {
+	StopType StopType
+	Valid    bool // Valid is true if StopType is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullStopType) Scan(value interface{}) error {
+	if value == nil {
+		ns.StopType, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.StopType.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullStopType) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.StopType), nil
+}
+
+type Agency struct {
+	ID   int64
+	Name string
+}
 
 type Geolocation struct {
 	Degree    float32
-	Latitude  float64
-	Longitude float64
+	Location  postgis.Point
 	Speed     float32
 	VehicleID int64
 	VariantID int64
@@ -19,45 +122,39 @@ type Geolocation struct {
 }
 
 type Route struct {
-	ID            int64
-	Number        string
-	Name          string
-	EbmsID        *int64
-	Active        bool
-	OperationTime *string
-	Organization  *string
-	Ticketing     *string
-	RouteType     *string
+	ID          int64
+	Number      string
+	Name        string
+	ShortName   *string
+	Description *string
+	Type        RouteType
+	Color       *string
+	AgencyID    int64
+	Active      bool
+	Attributes  []byte
 }
 
 type Stop struct {
-	ID        int64
-	Code      string
-	Name      string
-	TypeID    int64
-	EbmsID    *int64
-	Active    bool
-	Latitude  float32
-	Longitude float32
-}
-
-type StopType struct {
-	ID   int64
-	Name string
+	ID         int64
+	ParentID   *int64
+	Code       string
+	Name       string
+	Type       StopType
+	Active     bool
+	Location   postgis.Point
+	Attributes []byte
 }
 
 type Variant struct {
-	ID            int64
-	Name          string
-	EbmsID        *int64
-	IsOutbound    bool
-	RouteID       int64
-	Description   *string
-	ShortName     *string
-	Distance      *float32
-	Duration      *int32
-	StartStopName *string
-	EndStopName   *string
+	ID          int64
+	RouteID     int64
+	Name        string
+	ShortName   *string
+	Description string
+	Distance    float32
+	Direction   int32
+	Duration    *int32
+	Attributes  []byte
 }
 
 type VariantsStop struct {

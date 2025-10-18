@@ -12,121 +12,103 @@ import (
 const createVariant = `-- name: CreateVariant :one
 INSERT INTO
     variants (
-        name,
-        ebms_id,
-        is_outbound,
         route_id,
-        description,
+        name,
         short_name,
+        description,
         distance,
+        direction,
         duration,
-        start_stop_name,
-        end_stop_name
+        attributes
     )
 VALUES
-    ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id, name, ebms_id, is_outbound, route_id, description, short_name, distance, duration, start_stop_name, end_stop_name
+    ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id, route_id, name, short_name, description, distance, direction, duration, attributes
 `
 
 type CreateVariantParams struct {
-	Name          string
-	EbmsID        *int64
-	IsOutbound    bool
-	RouteID       int64
-	Description   *string
-	ShortName     *string
-	Distance      *float32
-	Duration      *int32
-	StartStopName *string
-	EndStopName   *string
+	RouteID     int64
+	Name        string
+	ShortName   *string
+	Description string
+	Distance    float32
+	Direction   int32
+	Duration    *int32
+	Attributes  []byte
 }
 
 func (q *Queries) CreateVariant(ctx context.Context, arg CreateVariantParams) (Variant, error) {
 	row := q.db.QueryRow(ctx, createVariant,
-		arg.Name,
-		arg.EbmsID,
-		arg.IsOutbound,
 		arg.RouteID,
-		arg.Description,
+		arg.Name,
 		arg.ShortName,
+		arg.Description,
 		arg.Distance,
+		arg.Direction,
 		arg.Duration,
-		arg.StartStopName,
-		arg.EndStopName,
+		arg.Attributes,
 	)
 	var i Variant
 	err := row.Scan(
 		&i.ID,
-		&i.Name,
-		&i.EbmsID,
-		&i.IsOutbound,
 		&i.RouteID,
-		&i.Description,
+		&i.Name,
 		&i.ShortName,
+		&i.Description,
 		&i.Distance,
+		&i.Direction,
 		&i.Duration,
-		&i.StartStopName,
-		&i.EndStopName,
+		&i.Attributes,
 	)
 	return i, err
 }
 
 const getVariant = `-- name: GetVariant :one
 SELECT
-    id, name, ebms_id, is_outbound, route_id, description, short_name, distance, duration, start_stop_name, end_stop_name
+    id, route_id, name, short_name, description, distance, direction, duration, attributes
 FROM
     variants
 WHERE
     id = coalesce($1, id)
-    AND ebms_id = coalesce($2, ebms_id)
-    AND route_id = coalesce($3, route_id)
+    AND route_id = coalesce($2, route_id)
 LIMIT
     1
 `
 
 type GetVariantParams struct {
 	ID      *int64
-	EbmsID  *int64
 	RouteID *int64
 }
 
 func (q *Queries) GetVariant(ctx context.Context, arg GetVariantParams) (Variant, error) {
-	row := q.db.QueryRow(ctx, getVariant, arg.ID, arg.EbmsID, arg.RouteID)
+	row := q.db.QueryRow(ctx, getVariant, arg.ID, arg.RouteID)
 	var i Variant
 	err := row.Scan(
 		&i.ID,
-		&i.Name,
-		&i.EbmsID,
-		&i.IsOutbound,
 		&i.RouteID,
-		&i.Description,
+		&i.Name,
 		&i.ShortName,
+		&i.Description,
 		&i.Distance,
+		&i.Direction,
 		&i.Duration,
-		&i.StartStopName,
-		&i.EndStopName,
+		&i.Attributes,
 	)
 	return i, err
 }
 
 const listVariant = `-- name: ListVariant :many
 SELECT
-    id, name, ebms_id, is_outbound, route_id, description, short_name, distance, duration, start_stop_name, end_stop_name
+    id, route_id, name, short_name, description, distance, direction, duration, attributes
 FROM
     variants
 WHERE
     route_id = coalesce($1, route_id)
-    AND is_outbound = coalesce($2, is_outbound)
 ORDER BY
     id
 `
 
-type ListVariantParams struct {
-	RouteID    *int64
-	IsOutbound *bool
-}
-
-func (q *Queries) ListVariant(ctx context.Context, arg ListVariantParams) ([]Variant, error) {
-	rows, err := q.db.Query(ctx, listVariant, arg.RouteID, arg.IsOutbound)
+func (q *Queries) ListVariant(ctx context.Context, routeID *int64) ([]Variant, error) {
+	rows, err := q.db.Query(ctx, listVariant, routeID)
 	if err != nil {
 		return nil, err
 	}
@@ -136,16 +118,14 @@ func (q *Queries) ListVariant(ctx context.Context, arg ListVariantParams) ([]Var
 		var i Variant
 		if err := rows.Scan(
 			&i.ID,
-			&i.Name,
-			&i.EbmsID,
-			&i.IsOutbound,
 			&i.RouteID,
-			&i.Description,
+			&i.Name,
 			&i.ShortName,
+			&i.Description,
 			&i.Distance,
+			&i.Direction,
 			&i.Duration,
-			&i.StartStopName,
-			&i.EndStopName,
+			&i.Attributes,
 		); err != nil {
 			return nil, err
 		}
@@ -161,61 +141,53 @@ const updateVariant = `-- name: UpdateVariant :one
 UPDATE
     variants
 SET
-    name = coalesce($1, name),
-    ebms_id = coalesce($2, ebms_id),
-    is_outbound = coalesce($3, is_outbound),
-    route_id = coalesce($4, route_id),
-    description = coalesce($5, description),
-    short_name = coalesce($6, short_name),
-    distance = coalesce($7, distance),
-    duration = coalesce($8, duration),
-    start_stop_name = coalesce($9, start_stop_name),
-    end_stop_name = coalesce($10, end_stop_name)
+    route_id = coalesce($1, route_id),
+    name = coalesce($2, name),
+    short_name = coalesce($3, short_name),
+    description = coalesce($4, description),
+    distance = coalesce($5, distance),
+    direction = coalesce($6, direction),
+    duration = coalesce($7, duration),
+    attributes = coalesce($8, attributes)
 WHERE
-    id = $11 RETURNING id, name, ebms_id, is_outbound, route_id, description, short_name, distance, duration, start_stop_name, end_stop_name
+    id = $9 RETURNING id, route_id, name, short_name, description, distance, direction, duration, attributes
 `
 
 type UpdateVariantParams struct {
-	Name          *string
-	EbmsID        *int64
-	IsOutbound    *bool
-	RouteID       *int64
-	Description   *string
-	ShortName     *string
-	Distance      *float32
-	Duration      *int32
-	StartStopName *string
-	EndStopName   *string
-	ID            int64
+	RouteID     *int64
+	Name        *string
+	ShortName   *string
+	Description *string
+	Distance    *float32
+	Direction   *int32
+	Duration    *int32
+	Attributes  []byte
+	ID          int64
 }
 
 func (q *Queries) UpdateVariant(ctx context.Context, arg UpdateVariantParams) (Variant, error) {
 	row := q.db.QueryRow(ctx, updateVariant,
-		arg.Name,
-		arg.EbmsID,
-		arg.IsOutbound,
 		arg.RouteID,
-		arg.Description,
+		arg.Name,
 		arg.ShortName,
+		arg.Description,
 		arg.Distance,
+		arg.Direction,
 		arg.Duration,
-		arg.StartStopName,
-		arg.EndStopName,
+		arg.Attributes,
 		arg.ID,
 	)
 	var i Variant
 	err := row.Scan(
 		&i.ID,
-		&i.Name,
-		&i.EbmsID,
-		&i.IsOutbound,
 		&i.RouteID,
-		&i.Description,
+		&i.Name,
 		&i.ShortName,
+		&i.Description,
 		&i.Distance,
+		&i.Direction,
 		&i.Duration,
-		&i.StartStopName,
-		&i.EndStopName,
+		&i.Attributes,
 	)
 	return i, err
 }

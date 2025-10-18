@@ -1,0 +1,94 @@
+syntax = "proto3";
+package api.v1;
+
+import "google/protobuf/struct.proto";
+import "google/type/color.proto";
+
+service RouteService {
+  rpc CreateRoute(CreateRouteRequest) returns (CreateRouteResponse) {}
+  rpc UpdateRoute(UpdateRouteRequest) returns (UpdateRouteResponse) {}
+  rpc GetRoute(GetRouteRequest) returns (GetRouteResponse) {}
+  rpc GetRouteByAttributes(GetRouteByAttributesRequest) returns (GetRouteByAttributesResponse) {}
+  rpc ListRoute(ListRouteRequest) returns (ListRouteResponse) {}
+}
+
+message CreateRouteRequest {
+  string number = 1;
+  string name = 2;
+  optional string short_name = 3;
+  optional string description = 4;
+  RouteType type = 5;
+  optional google.type.Color color = 6;
+  int64 agency_id = 7;
+  bool active = 8;
+  google.protobuf.Struct attributes = 9;
+}
+
+message CreateRouteResponse {
+  Route route = 1;
+}
+
+message UpdateRouteRequest {
+  int64 id = 1;
+  optional string number = 2;
+  optional string name = 3;
+  optional string short_name = 4;
+  optional string description = 5;
+  optional RouteType type = 6;
+  optional google.type.Color color = 7;
+  optional int64 agency_id = 8;
+  optional bool active = 9;
+  optional google.protobuf.Struct attributes = 10;
+}
+
+message UpdateRouteResponse {
+  Route route = 1;
+}
+
+message GetRouteRequest {
+  int64 id = 1;
+}
+
+message GetRouteResponse {
+  Route route = 1;
+}
+
+message GetRouteByAttributesRequest {
+  google.protobuf.Struct attributes = 1;
+}
+
+message GetRouteByAttributesResponse {
+  Route route = 1;
+}
+
+message ListRouteRequest {}
+
+message ListRouteResponse {
+  repeated Route routes = 1;
+}
+
+enum RouteType {
+  ROUTE_TYPE_TRAM = 0;
+  ROUTE_TYPE_METRO = 1;
+  ROUTE_TYPE_RAIL = 2;
+  ROUTE_TYPE_BUS = 3;
+  ROUTE_TYPE_FERRY = 4;
+  ROUTE_TYPE_CABLE_TRAM = 5;
+  ROUTE_TYPE_CABLE_CAR = 6;
+  ROUTE_TYPE_FUNICULAR = 7;
+  ROUTE_TYPE_TROLLEYBUS = 8;
+  ROUTE_TYPE_MONORAIL = 9;
+}
+
+message Route {
+  int64 id = 1;
+  string number = 2;
+  string name = 3;
+  optional string short_name = 4;
+  optional string description = 5;
+  RouteType type = 6;
+  optional google.type.Color color = 7;
+  int64 agency_id = 8;
+  bool active = 9;
+  google.protobuf.Struct attributes = 10;
+}

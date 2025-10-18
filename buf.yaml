@@ -1,10 +1,10 @@
 # For details on buf.yaml configuration, visit https://buf.build/docs/configuration/v2/buf-yaml
 version: v2
 modules:
-  - path: .
-    excludes:
-      - .direnv/
+  - path: proto
     name: buf.build/catou/transit-radar
+deps:
+  - buf.build/googleapis/googleapis
 lint:
   use:
     - STANDARD

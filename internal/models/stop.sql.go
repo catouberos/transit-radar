@@ -7,93 +7,97 @@ package models
 
 import (
 	"context"
+
+	"github.com/cridenour/go-postgis"
 )
 
 const createStop = `-- name: CreateStop :one
 INSERT INTO
     stops (
+        parent_id,
         code,
         name,
-        type_id,
-        ebms_id,
+        "type",
         active,
-        latitude,
-        longitude
+        location,
+        attributes
     )
 VALUES
-    ($1, $2, $3, $4, $5, $6, $7) RETURNING id, code, name, type_id, ebms_id, active, latitude, longitude
+    (
+        $1,
+        $2,
+        $3,
+        $4,
+        $5,
+        $6 :: EWKB,
+        $7
+    ) RETURNING id, parent_id, code, name, type, active, location, attributes
 `
 
 type CreateStopParams struct {
-	Code      string
-	Name      string
-	TypeID    int64
-	EbmsID    *int64
-	Active    bool
-	Latitude  float32
-	Longitude float32
+	ParentID   *int64
+	Code       string
+	Name       string
+	Type       StopType
+	Active     bool
+	Location   postgis.Point
+	Attributes []byte
 }
 
 func (q *Queries) CreateStop(ctx context.Context, arg CreateStopParams) (Stop, error) {
 	row := q.db.QueryRow(ctx, createStop,
+		arg.ParentID,
 		arg.Code,
 		arg.Name,
-		arg.TypeID,
-		arg.EbmsID,
+		arg.Type,
 		arg.Active,
-		arg.Latitude,
-		arg.Longitude,
+		arg.Location,
+		arg.Attributes,
 	)
 	var i Stop
 	err := row.Scan(
 		&i.ID,
+		&i.ParentID,
 		&i.Code,
 		&i.Name,
-		&i.TypeID,
-		&i.EbmsID,
+		&i.Type,
 		&i.Active,
-		&i.Latitude,
-		&i.Longitude,
+		&i.Location,
+		&i.Attributes,
 	)
 	return i, err
 }
 
 const getStop = `-- name: GetStop :one
 SELECT
-    id, code, name, type_id, ebms_id, active, latitude, longitude
+    id, parent_id, code, name, type, active, location, attributes
 FROM
     stops
 WHERE
     id = coalesce($1, id)
-    AND ebms_id = coalesce($2, ebms_id)
 LIMIT
     1
 `
 
-type GetStopParams struct {
-	ID     *int64
-	EbmsID *int64
-}
-
-func (q *Queries) GetStop(ctx context.Context, arg GetStopParams) (Stop, error) {
-	row := q.db.QueryRow(ctx, getStop, arg.ID, arg.EbmsID)
+func (q *Queries) GetStop(ctx context.Context, id *int64) (Stop, error) {
+	row := q.db.QueryRow(ctx, getStop, id)
 	var i Stop
 	err := row.Scan(
 		&i.ID,
+		&i.ParentID,
 		&i.Code,
 		&i.Name,
-		&i.TypeID,
-		&i.EbmsID,
+		&i.Type,
 		&i.Active,
-		&i.Latitude,
-		&i.Longitude,
+		&i.Location,
+		&i.Attributes,
 	)
 	return i, err
 }
 
 const listStop = `-- name: ListStop :many
 SELECT
-    id, code, name, type_id, ebms_id, active, latitude, longitude
+    id, parent_id, code, name, type, active, location, attributes
 FROM
     stops
 ORDER BY
@@ -111,13 +115,13 @@ func (q *Queries) ListStop(ctx context.Context) ([]Stop, error) {
 		var i Stop
 		if err := rows.Scan(
 			&i.ID,
+			&i.ParentID,
 			&i.Code,
 			&i.Name,
-			&i.TypeID,
-			&i.EbmsID,
+			&i.Type,
 			&i.Active,
-			&i.Latitude,
-			&i.Longitude,
+			&i.Location,
+			&i.Attributes,
 		); err != nil {
 			return nil, err
 		}
@@ -133,49 +137,49 @@ const updateStop = `-- name: UpdateStop :one
 UPDATE
     stops
 SET
-    code = coalesce($1, code),
-    name = coalesce($2, name),
-    type_id = coalesce($3, type_id),
-    ebms_id = coalesce($4, ebms_id),
+    parent_id = coalesce($1, parent_id),
+    code = coalesce($2, code),
+    name = coalesce($3, name),
+    "type" = coalesce($4, "type"),
     active = coalesce($5, active),
-    latitude = coalesce($6, latitude),
-    longitude = coalesce($7, longitude)
+    location = coalesce($6, location),
+    attributes = coalesce($7, attributes)
 WHERE
-    id = $8 RETURNING id, code, name, type_id, ebms_id, active, latitude, longitude
+    id = $8 RETURNING id, parent_id, code, name, type, active, location, attributes
 `
 
 type UpdateStopParams struct {
-	Code      *string
-	Name      *string
-	TypeID    *int64
-	EbmsID    *int64
-	Active    *bool
-	Latitude  *float32
-	Longitude *float32
-	ID        int64
+	ParentID   *int64
+	Code       *string
+	Name       *string
+	Type       NullStopType
+	Active     *bool
+	Location   postgis.Point
+	Attributes []byte
+	ID         int64
 }
 
 func (q *Queries) UpdateStop(ctx context.Context, arg UpdateStopParams) (Stop, error) {
 	row := q.db.QueryRow(ctx, updateStop,
+		arg.ParentID,
 		arg.Code,
 		arg.Name,
-		arg.TypeID,
-		arg.EbmsID,
+		arg.Type,
 		arg.Active,
-		arg.Latitude,
-		arg.Longitude,
+		arg.Location,
+		arg.Attributes,
 		arg.ID,
 	)
 	var i Stop
 	err := row.Scan(
 		&i.ID,
+		&i.ParentID,
 		&i.Code,
 		&i.Name,
-		&i.TypeID,
-		&i.EbmsID,
+		&i.Type,
 		&i.Active,
-		&i.Latitude,
-		&i.Longitude,
+		&i.Location,
+		&i.Attributes,
 	)
 	return i, err
 }

@@ -14,88 +14,90 @@ INSERT INTO
     routes (
         number,
         name,
-        ebms_id,
-        operation_time,
-        organization,
-        ticketing,
-        route_type
+        short_name,
+        description,
+        "type",
+        color,
+        agency_id,
+        active,
+        attributes
     )
 VALUES
-    ($1, $2, $3, $4, $5, $6, $7) RETURNING id, number, name, ebms_id, active, operation_time, organization, ticketing, route_type
+    ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id, number, name, short_name, description, type, color, agency_id, active, attributes
 `
 
 type CreateRouteParams struct {
-	Number        string
-	Name          string
-	EbmsID        *int64
-	OperationTime *string
-	Organization  *string
-	Ticketing     *string
-	RouteType     *string
+	Number      string
+	Name        string
+	ShortName   *string
+	Description *string
+	Type        RouteType
+	Color       *string
+	AgencyID    int64
+	Active      bool
+	Attributes  []byte
 }
 
 func (q *Queries) CreateRoute(ctx context.Context, arg CreateRouteParams) (Route, error) {
 	row := q.db.QueryRow(ctx, createRoute,
 		arg.Number,
 		arg.Name,
-		arg.EbmsID,
-		arg.OperationTime,
-		arg.Organization,
-		arg.Ticketing,
-		arg.RouteType,
+		arg.ShortName,
+		arg.Description,
+		arg.Type,
+		arg.Color,
+		arg.AgencyID,
+		arg.Active,
+		arg.Attributes,
 	)
 	var i Route
 	err := row.Scan(
 		&i.ID,
 		&i.Number,
 		&i.Name,
-		&i.EbmsID,
+		&i.ShortName,
+		&i.Description,
+		&i.Type,
+		&i.Color,
+		&i.AgencyID,
 		&i.Active,
-		&i.OperationTime,
-		&i.Organization,
-		&i.Ticketing,
-		&i.RouteType,
+		&i.Attributes,
 	)
 	return i, err
 }
 
 const getRoute = `-- name: GetRoute :one
 SELECT
-    id, number, name, ebms_id, active, operation_time, organization, ticketing, route_type
+    id, number, name, short_name, description, type, color, agency_id, active, attributes
 FROM
     routes
 WHERE
     id = coalesce($1, id)
-    AND ebms_id = coalesce($2, ebms_id)
 LIMIT
     1
 `
 
-type GetRouteParams struct {
-	ID     *int64
-	EbmsID *int64
-}
-
-func (q *Queries) GetRoute(ctx context.Context, arg GetRouteParams) (Route, error) {
-	row := q.db.QueryRow(ctx, getRoute, arg.ID, arg.EbmsID)
+func (q *Queries) GetRoute(ctx context.Context, id *int64) (Route, error) {
+	row := q.db.QueryRow(ctx, getRoute, id)
 	var i Route
 	err := row.Scan(
 		&i.ID,
 		&i.Number,
 		&i.Name,
-		&i.EbmsID,
+		&i.ShortName,
+		&i.Description,
+		&i.Type,
+		&i.Color,
+		&i.AgencyID,
 		&i.Active,
-		&i.OperationTime,
-		&i.Organization,
-		&i.Ticketing,
-		&i.RouteType,
+		&i.Attributes,
 	)
 	return i, err
 }
 
 const listRoute = `-- name: ListRoute :many
 SELECT
-    id, number, name, ebms_id, active, operation_time, organization, ticketing, route_type
+    id, number, name, short_name, description, type, color, agency_id, active, attributes
 FROM
     routes
 ORDER BY
@@ -115,12 +117,13 @@ func (q *Queries) ListRoute(ctx context.Context) ([]Route, error) {
 			&i.ID,
 			&i.Number,
 			&i.Name,
-			&i.EbmsID,
+			&i.ShortName,
+			&i.Description,
+			&i.Type,
+			&i.Color,
+			&i.AgencyID,
 			&i.Active,
-			&i.OperationTime,
-			&i.Organization,
-			&i.Ticketing,
-			&i.RouteType,
+			&i.Attributes,
 		); err != nil {
 			return nil, err
 		}
@@ -138,35 +141,41 @@ UPDATE
 SET
     number = coalesce($1, number),
     name = coalesce($2, name),
-    ebms_id = coalesce($3, ebms_id),
-    operation_time = coalesce($4, operation_time),
-    organization = coalesce($5, organization),
-    ticketing = coalesce($6, ticketing),
-    route_type = coalesce($7, route_type)
+    short_name = coalesce($3, short_name),
+    description = coalesce($4, description),
+    "type" = coalesce($5, "type"),
+    color = coalesce($6, color),
+    agency_id = coalesce($7, agency_id),
+    active = coalesce($8, active),
+    attributes = coalesce($9, attributes)
 WHERE
-    id = $8 RETURNING id, number, name, ebms_id, active, operation_time, organization, ticketing, route_type
+    id = $10 RETURNING id, number, name, short_name, description, type, color, agency_id, active, attributes
 `
 
 type UpdateRouteParams struct {
-	Number        *string
-	Name          *string
-	EbmsID        *int64
-	OperationTime *string
-	Organization  *string
-	Ticketing     *string
-	RouteType     *string
-	ID            int64
+	Number      *string
+	Name        *string
+	ShortName   *string
+	Description *string
+	Type        NullRouteType
+	Color       *string
+	AgencyID    *int64
+	Active      *bool
+	Attributes  []byte
+	ID          int64
 }
 
 func (q *Queries) UpdateRoute(ctx context.Context, arg UpdateRouteParams) (Route, error) {
 	row := q.db.QueryRow(ctx, updateRoute,
 		arg.Number,
 		arg.Name,
-		arg.EbmsID,
-		arg.OperationTime,
-		arg.Organization,
-		arg.Ticketing,
-		arg.RouteType,
+		arg.ShortName,
+		arg.Description,
+		arg.Type,
+		arg.Color,
+		arg.AgencyID,
+		arg.Active,
+		arg.Attributes,
 		arg.ID,
 	)
 	var i Route
@@ -174,12 +183,13 @@ func (q *Queries) UpdateRoute(ctx context.Context, arg UpdateRouteParams) (Route
 		&i.ID,
 		&i.Number,
 		&i.Name,
-		&i.EbmsID,
+		&i.ShortName,
+		&i.Description,
+		&i.Type,
+		&i.Color,
+		&i.AgencyID,
 		&i.Active,
-		&i.OperationTime,
-		&i.Organization,
-		&i.Ticketing,
-		&i.RouteType,
+		&i.Attributes,
 	)
 	return i, err
 }

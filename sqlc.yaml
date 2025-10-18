@@ -15,6 +15,12 @@ sql:
             go_type:
               import: "github.com/google/uuid"
               type: "UUID"
+          - db_type: "ewkb"
+            go_type: "github.com/cridenour/go-postgis.Point"
+          - column: "geolocations.location"
+            go_type: "github.com/cridenour/go-postgis.Point"
+          - column: "stops.location"
+            go_type: "github.com/cridenour/go-postgis.Point"
           - db_type: "timestamptz"
             go_type: "time.Time"
           - db_type: "timestamptz"

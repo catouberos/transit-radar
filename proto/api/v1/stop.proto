@@ -1,0 +1,83 @@
+syntax = "proto3";
+package api.v1;
+
+import "google/protobuf/struct.proto";
+import "google/type/latlng.proto";
+
+service StopService {
+  rpc CreateStop(CreateStopRequest) returns (CreateStopResponse) {}
+  rpc UpdateStop(UpdateStopRequest) returns (UpdateStopResponse) {}
+  rpc GetStop(GetStopRequest) returns (GetStopResponse) {}
+  rpc GetStopByAttributes(GetStopByAttributesRequest) returns (GetStopByAttributesResponse) {}
+  rpc ListStop(ListStopRequest) returns (ListStopResponse) {}
+}
+
+message CreateStopRequest {
+  optional int64 parent_id = 1;
+  string code = 2;
+  string name = 3;
+  StopType type = 4;
+  bool active = 5;
+  google.type.LatLng location = 6;
+  google.protobuf.Struct attributes = 7;
+}
+
+message CreateStopResponse {
+  Stop stop = 1;
+}
+
+message UpdateStopRequest {
+  int64 id = 1;
+  optional int64 parent_id = 2;
+  optional string code = 3;
+  optional string name = 4;
+  optional StopType type = 5;
+  optional bool active = 6;
+  optional google.type.LatLng location = 7;
+  optional google.protobuf.Struct attributes = 8;
+}
+
+message UpdateStopResponse {
+  Stop stop = 1;
+}
+
+message GetStopRequest {
+  int64 id = 1;
+}
+
+message GetStopResponse {
+  Stop stop = 1;
+}
+
+message GetStopByAttributesRequest {
+  google.protobuf.Struct attributes = 1;
+}
+
+message GetStopByAttributesResponse {
+  Stop stop = 1;
+}
+
+message ListStopRequest {}
+
+message ListStopResponse {
+  repeated Stop variants = 1;
+}
+
+enum StopType {
+  STOP_TYPE_STOP_PLATFORM = 0;
+  STOP_TYPE_STATION = 1;
+  STOP_TYPE_ENTRACE_EXIT = 2;
+  STOP_TYPE_GENERIC_NODE = 3;
+  STOP_TYPE_BOARDING_AREA = 4;
+}
+
+message Stop {
+  int64 id = 1;
+  optional int64 parent_id = 2;
+  string code = 3;
+  string name = 4;
+  StopType type = 5;
+  bool active = 6;
+  google.type.LatLng location = 7;
+  google.protobuf.Struct attributes = 8;
+}

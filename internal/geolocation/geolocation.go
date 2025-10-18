@@ -8,6 +8,8 @@ import (
 	"time"
 
 	"github.com/catouberos/transit-radar/internal/models"
+	"github.com/catouberos/transit-radar/types"
+	"github.com/cridenour/go-postgis"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -23,19 +25,17 @@ type GeolocationService interface {
 }
 
 type Geolocation struct {
-	Degree    float32   `redis:"degree"`
-	Latitude  float64   `redis:"latitude"`
-	Longitude float64   `redis:"longitude"`
-	Speed     float32   `redis:"speed"`
-	VehicleID int64     `redis:"vehicle_id"`
-	VariantID int64     `redis:"variant_id"`
-	Timestamp time.Time `redis:"timestamp"`
+	Degree    float32      `redis:"degree"`
+	Location  types.LatLng `redis:"-"`
+	Speed     float32      `redis:"speed"`
+	VehicleID int64        `redis:"vehicle_id"`
+	VariantID int64        `redis:"variant_id"`
+	Timestamp time.Time    `redis:"timestamp"`
 }
 
 type CreateParams struct {
 	Degree    float32
-	Latitude  float64
-	Longitude float64
+	Location  types.LatLng
 	Speed     float32
 	VehicleID int64
 	VariantID int64
@@ -71,9 +71,11 @@ type GeolocationServiceImpl struct {
 
 func (s *GeolocationServiceImpl) Create(ctx context.Context, params CreateParams) (Geolocation, error) {
 	result, err := s.query.CreateGeolocation(ctx, models.CreateGeolocationParams{
-		Degree:    params.Degree,
-		Latitude:  params.Latitude,
-		Longitude: params.Longitude,
+		Degree: params.Degree,
+		Location: postgis.Point{
+			X: params.Location.Longitude,
+			Y: params.Location.Latitude,
+		},
 		Speed:     params.Speed,
 		VehicleID: params.VehicleID,
 		VariantID: params.VariantID,

@@ -2,15 +2,21 @@
 INSERT INTO
     geolocations (
         degree,
-        latitude,
-        longitude,
+        location,
         speed,
         vehicle_id,
         variant_id,
-        "timestamp"
+        timestamp
     )
 VALUES
-    ($1, $2, $3, $4, $5, $6, $7) RETURNING *;
+    (
+        @degree,
+        @location :: EWKB,
+        @speed,
+        @vehicle_id,
+        @variant_id,
+        @timestamp
+    ) RETURNING *;
 
 -- name: GetGeolocation :one
 SELECT

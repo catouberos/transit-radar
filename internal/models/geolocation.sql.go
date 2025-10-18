@@ -8,27 +8,34 @@ package models
 import (
 	"context"
 	"time"
+
+	"github.com/cridenour/go-postgis"
 )
 
 const createGeolocation = `-- name: CreateGeolocation :one
 INSERT INTO
     geolocations (
         degree,
-        latitude,
-        longitude,
+        location,
         speed,
         vehicle_id,
         variant_id,
-        "timestamp"
+        timestamp
     )
 VALUES
-    ($1, $2, $3, $4, $5, $6, $7) RETURNING degree, latitude, longitude, speed, vehicle_id, variant_id, timestamp
+    (
+        $1,
+        $2 :: EWKB,
+        $3,
+        $4,
+        $5,
+        $6
+    ) RETURNING degree, location, speed, vehicle_id, variant_id, timestamp
 `
 
 type CreateGeolocationParams struct {
 	Degree    float32
-	Latitude  float64
-	Longitude float64
+	Location  postgis.Point
 	Speed     float32
 	VehicleID int64
 	VariantID int64
@@ -38,8 +45,7 @@ type CreateGeolocationParams struct {
 func (q *Queries) CreateGeolocation(ctx context.Context, arg CreateGeolocationParams) (Geolocation, error) {
 	row := q.db.QueryRow(ctx, createGeolocation,
 		arg.Degree,
-		arg.Latitude,
-		arg.Longitude,
+		arg.Location,
 		arg.Speed,
 		arg.VehicleID,
 		arg.VariantID,
@@ -48,8 +54,7 @@ func (q *Queries) CreateGeolocation(ctx context.Context, arg CreateGeolocationPa
 	var i Geolocation
 	err := row.Scan(
 		&i.Degree,
-		&i.Latitude,
-		&i.Longitude,
+		&i.Location,
 		&i.Speed,
 		&i.VehicleID,
 		&i.VariantID,
@@ -60,7 +65,7 @@ func (q *Queries) CreateGeolocation(ctx context.Context, arg CreateGeolocationPa
 
 const getGeolocation = `-- name: GetGeolocation :one
 SELECT
-    degree, latitude, longitude, speed, vehicle_id, variant_id, timestamp
+    degree, location, speed, vehicle_id, variant_id, timestamp
 FROM
     geolocations
 WHERE
@@ -76,8 +81,7 @@ func (q *Queries) GetGeolocation(ctx context.Context, vehicleID *int64) (Geoloca
 	var i Geolocation
 	err := row.Scan(
 		&i.Degree,
-		&i.Latitude,
-		&i.Longitude,
+		&i.Location,
 		&i.Speed,
 		&i.VehicleID,
 		&i.VariantID,
@@ -88,7 +92,7 @@ func (q *Queries) GetGeolocation(ctx context.Context, vehicleID *int64) (Geoloca
 
 const listGeolocation = `-- name: ListGeolocation :many
 SELECT
-    degree, latitude, longitude, speed, vehicle_id, variant_id, timestamp
+    degree, location, speed, vehicle_id, variant_id, timestamp
 FROM
     geolocations
 WHERE
@@ -115,8 +119,7 @@ func (q *Queries) ListGeolocation(ctx context.Context, arg ListGeolocationParams
 		var i Geolocation
 		if err := rows.Scan(
 			&i.Degree,
-			&i.Latitude,
-			&i.Longitude,
+			&i.Location,
 			&i.Speed,
 			&i.VehicleID,
 			&i.VariantID,
