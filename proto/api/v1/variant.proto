@@ -7,8 +7,7 @@ service VariantService {
   rpc CreateVariant(CreateVariantRequest) returns (CreateVariantResponse) {}
   rpc UpdateVariant(UpdateVariantRequest) returns (UpdateVariantResponse) {}
   rpc GetVariant(GetVariantRequest) returns (GetVariantResponse) {}
-  rpc GetVariantByAttributes(GetVariantByAttributesRequest) returns (GetVariantByAttributesResponse) {}
-  rpc ListVariant(ListVariantRequest) returns (ListVariantResponse) {}
+  rpc ListVariants(ListVariantsRequest) returns (ListVariantsResponse) {}
 }
 
 message CreateVariantRequest {
@@ -50,19 +49,17 @@ message GetVariantResponse {
   Variant variant = 1;
 }
 
-message GetVariantByAttributesRequest {
-  google.protobuf.Struct attributes = 1;
-  optional string route_id = 2;
+message ListVariantsRequest {
+  string filter = 5;
+  string order_by = 6;
+
+  int32 page_size = 10;
+  string page_token = 11;
 }
 
-message GetVariantByAttributesResponse {
-  Variant variant = 1;
-}
-
-message ListVariantRequest {}
-
-message ListVariantResponse {
+message ListVariantsResponse {
   repeated Variant variants = 1;
+  string next_page_token = 2;
 }
 
 message Variant {

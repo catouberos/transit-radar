@@ -8,7 +8,6 @@ service RouteService {
   rpc CreateRoute(CreateRouteRequest) returns (CreateRouteResponse) {}
   rpc UpdateRoute(UpdateRouteRequest) returns (UpdateRouteResponse) {}
   rpc GetRoute(GetRouteRequest) returns (GetRouteResponse) {}
-  rpc GetRouteByAttributes(GetRouteByAttributesRequest) returns (GetRouteByAttributesResponse) {}
   rpc ListRoutes(ListRoutesRequest) returns (ListRoutesResponse) {}
 }
 
@@ -50,14 +49,6 @@ message GetRouteRequest {
 }
 
 message GetRouteResponse {
-  Route route = 1;
-}
-
-message GetRouteByAttributesRequest {
-  google.protobuf.Struct attributes = 1;
-}
-
-message GetRouteByAttributesResponse {
   Route route = 1;
 }
 
