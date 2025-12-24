@@ -12,7 +12,7 @@ service VariantService {
 }
 
 message CreateVariantRequest {
-  int64 route_id = 1;
+  string route_id = 1;
   string name = 2;
   optional string short_name = 3;
   optional string description = 4;
@@ -27,8 +27,8 @@ message CreateVariantResponse {
 }
 
 message UpdateVariantRequest {
-  int64 id = 1;
-  optional int64 route_id = 2;
+  string id = 1;
+  optional string route_id = 2;
   optional string name = 3;
   optional string short_name = 4;
   optional string description = 5;
@@ -43,7 +43,7 @@ message UpdateVariantResponse {
 }
 
 message GetVariantRequest {
-  int64 id = 1;
+  string id = 1;
 }
 
 message GetVariantResponse {
@@ -52,7 +52,7 @@ message GetVariantResponse {
 
 message GetVariantByAttributesRequest {
   google.protobuf.Struct attributes = 1;
-  optional int64 route_id = 2;
+  optional string route_id = 2;
 }
 
 message GetVariantByAttributesResponse {
@@ -66,8 +66,8 @@ message ListVariantResponse {
 }
 
 message Variant {
-  int64 id = 1;
-  int64 route_id = 2;
+  string id = 1;
+  string route_id = 2;
   string name = 3;
   optional string short_name = 4;
   optional string description = 5;

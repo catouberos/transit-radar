@@ -15,8 +15,8 @@ message CreateGeolocationRequest {
   float degree = 1;
   google.type.LatLng location = 2;
   float speed = 3;
-  int64 vehicle_id = 4;
-  int64 variant_id = 5;
+  string vehicle_id = 4;
+  string variant_id = 5;
   google.protobuf.Timestamp timestamp = 6;
 }
 
@@ -37,7 +37,7 @@ message Geolocation {
   float degree = 1;
   google.type.LatLng location = 2;
   float speed = 3;
-  int64 vehicle_id = 4;
-  int64 variant_id = 5;
+  string vehicle_id = 4;
+  string variant_id = 5;
   google.protobuf.Timestamp timestamp = 6;
 }
