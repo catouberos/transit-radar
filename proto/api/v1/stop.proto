@@ -13,7 +13,7 @@ service StopService {
 }
 
 message CreateStopRequest {
-  optional int64 parent_id = 1;
+  optional string parent_id = 1;
   string code = 2;
   string name = 3;
   StopType type = 4;
@@ -27,8 +27,8 @@ message CreateStopResponse {
 }
 
 message UpdateStopRequest {
-  int64 id = 1;
-  optional int64 parent_id = 2;
+  string id = 1;
+  optional string parent_id = 2;
   optional string code = 3;
   optional string name = 4;
   optional StopType type = 5;
@@ -42,7 +42,7 @@ message UpdateStopResponse {
 }
 
 message GetStopRequest {
-  int64 id = 1;
+  string id = 1;
 }
 
 message GetStopResponse {
@@ -72,8 +72,8 @@ enum StopType {
 }
 
 message Stop {
-  int64 id = 1;
-  optional int64 parent_id = 2;
+  string id = 1;
+  optional string parent_id = 2;
   string code = 3;
   string name = 4;
   StopType type = 5;

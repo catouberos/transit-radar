@@ -9,8 +9,8 @@ service VariantStopService {
 }
 
 message CreateVariantStopRequest {
-  int64 variant_id = 1;
-  int64 stop_id = 2;
+  string variant_id = 1;
+  string stop_id = 2;
   int32 order_score = 3;
 }
 
@@ -20,9 +20,9 @@ message CreateVariantStopResponse {
 
 // update by variant_id and order_score
 message UpdateVariantStopRequest {
-  int64 variant_id = 1;
+  string variant_id = 1;
   int32 order_score = 2;
-  int64 stop_id = 3;
+  string stop_id = 3;
 }
 
 message UpdateVariantStopResponse {
@@ -30,8 +30,8 @@ message UpdateVariantStopResponse {
 }
 
 message ListVariantStopRequest {
-  optional int64 variant_id = 1;
-  optional int64 stop_id = 2;
+  optional string variant_id = 1;
+  optional string stop_id = 2;
 }
 
 message ListVariantStopResponse {
@@ -39,14 +39,14 @@ message ListVariantStopResponse {
 }
 
 message DeleteVariantStopRequest {
-  int64 variant_id = 1;
+  string variant_id = 1;
   int32 order_score = 2;
 }
 
 message DeleteVariantStopResponse {}
 
 message VariantStop {
-  int64 variant_id = 1;
-  int64 stop_id = 2;
+  string variant_id = 1;
+  string stop_id = 2;
   int32 order_score = 3;
 }

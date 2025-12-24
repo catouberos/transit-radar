@@ -19,7 +19,7 @@ message CreateRouteRequest {
   optional string description = 4;
   RouteType type = 5;
   optional google.type.Color color = 6;
-  int64 agency_id = 7;
+  string agency_id = 7;
   bool active = 8;
   google.protobuf.Struct attributes = 9;
 }
@@ -29,14 +29,14 @@ message CreateRouteResponse {
 }
 
 message UpdateRouteRequest {
-  int64 id = 1;
+  string id = 1;
   optional string number = 2;
   optional string name = 3;
   optional string short_name = 4;
   optional string description = 5;
   optional RouteType type = 6;
   optional google.type.Color color = 7;
-  optional int64 agency_id = 8;
+  optional string agency_id = 8;
   optional bool active = 9;
   optional google.protobuf.Struct attributes = 10;
 }
@@ -46,7 +46,7 @@ message UpdateRouteResponse {
 }
 
 message GetRouteRequest {
-  int64 id = 1;
+  string id = 1;
 }
 
 message GetRouteResponse {
@@ -81,14 +81,14 @@ enum RouteType {
 }
 
 message Route {
-  int64 id = 1;
+  string id = 1;
   string number = 2;
   string name = 3;
   optional string short_name = 4;
   optional string description = 5;
   RouteType type = 6;
   optional google.type.Color color = 7;
-  int64 agency_id = 8;
+  string agency_id = 8;
   bool active = 9;
   google.protobuf.Struct attributes = 10;
 }
