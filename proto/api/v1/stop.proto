@@ -64,6 +64,7 @@ message ListStopResponse {
 }
 
 enum StopType {
+  STOP_TYPE_UNSPECIFIED = 0;
   STOP_TYPE_STOP_PLATFORM = 1;
   STOP_TYPE_STATION = 2;
   STOP_TYPE_ENTRACE_EXIT = 3;

@@ -68,6 +68,7 @@ message ListRouteResponse {
 }
 
 enum RouteType {
+  ROUTE_TYPE_UNSPECIFIED = 0;
   ROUTE_TYPE_TRAM = 1;
   ROUTE_TYPE_METRO = 2;
   ROUTE_TYPE_RAIL = 3;
