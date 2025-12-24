@@ -9,7 +9,7 @@ service RouteService {
   rpc UpdateRoute(UpdateRouteRequest) returns (UpdateRouteResponse) {}
   rpc GetRoute(GetRouteRequest) returns (GetRouteResponse) {}
   rpc GetRouteByAttributes(GetRouteByAttributesRequest) returns (GetRouteByAttributesResponse) {}
-  rpc ListRoute(ListRouteRequest) returns (ListRouteResponse) {}
+  rpc ListRoutes(ListRoutesRequest) returns (ListRoutesResponse) {}
 }
 
 message CreateRouteRequest {
@@ -61,10 +61,17 @@ message GetRouteByAttributesResponse {
   Route route = 1;
 }
 
-message ListRouteRequest {}
+message ListRoutesRequest {
+  string filter = 5;
+  string order_by = 6;
 
-message ListRouteResponse {
+  int32 page_size = 10;
+  string page_token = 11;
+}
+
+message ListRoutesResponse {
   repeated Route routes = 1;
+  string next_page_token = 2;
 }
 
 enum RouteType {
