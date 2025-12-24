@@ -1,0 +1,33 @@
+name: Buf (release)
+on:
+  push:
+    branches:
+      - main
+    # https://github.com/bufbuild/buf-action/blob/8f4a1456a0ab6a1eb80ba68e53832e6fcfacc16c/examples/push-on-changes/buf-ci.yaml
+    paths:
+      - '**.proto'
+      - '**/buf.yaml'
+      - '**/buf.lock'
+      - '**/buf.md'
+      - '**/README.md'
+      - '**/LICENSE'
+permissions:
+  contents: read
+  pull-requests: write
+jobs:
+  buf:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        with:
+          persist-credentials: false
+      - name: Run buf
+        uses: bufbuild/buf-action@8f4a1456a0ab6a1eb80ba68e53832e6fcfacc16c # v1.3.0
+        with:
+          # Publishing schema changes to the BSR requires a BSR authentication token.
+          token: ${{ secrets.BUF_TOKEN }}
+          # Include this line if you only want to set up the Action and do nothing else.
+          # setup_only: true
+          # Include a GitHub token to ensure API requests aren't rate limited.
+          # github_token: ${{ secrets.GITHUB_TOKEN }}
