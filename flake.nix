@@ -70,6 +70,10 @@
           redli
 
           pmtiles
+
+          n-m3u8dl-re
+          bento4
+          shaka-packager
         ];
       };
     });

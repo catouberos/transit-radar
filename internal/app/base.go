@@ -4,6 +4,7 @@ import (
 	"io/fs"
 	"log/slog"
 
+	"github.com/catouberos/transit-radar/internal/config"
 	"github.com/catouberos/transit-radar/internal/geolocation"
 	"github.com/catouberos/transit-radar/internal/models"
 	"github.com/catouberos/transit-radar/internal/route"
@@ -24,6 +25,8 @@ type App struct {
 	dbPool     *pgxpool.Pool
 	migrations fs.FS
 	redis      *redis.Client
+
+	config *config.Config
 
 	GeolocationService geolocation.GeolocationService
 	RouteService       route.RouteService

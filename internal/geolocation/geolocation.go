@@ -2,7 +2,7 @@ package geolocation
 
 import (
 	"context"
-	"fmt"
+	"log/slog"
 	"strconv"
 	"strings"
 	"time"
@@ -11,10 +11,6 @@ import (
 	"github.com/catouberos/transit-radar/types"
 	"github.com/cridenour/go-postgis"
 	"github.com/redis/go-redis/v9"
-)
-
-const (
-	cacheKey = "geolocation:vehicle:%d"
 )
 
 type GeolocationService interface {
@@ -47,7 +43,8 @@ type GetParams struct {
 }
 
 type ListParams struct {
-	Limit int32
+	Limit  int32
+	Offset int32
 }
 
 type ListByBoundingParams struct {
@@ -55,21 +52,21 @@ type ListByBoundingParams struct {
 	Unit                               string
 }
 
-var _ GeolocationService = (*GeolocationServiceImpl)(nil)
+var _ GeolocationService = (*geolocationService)(nil)
 
 func NewGeolocationService(query *models.Queries, redis *redis.Client) GeolocationService {
-	return &GeolocationServiceImpl{
+	return &geolocationService{
 		query: query,
 		redis: redis,
 	}
 }
 
-type GeolocationServiceImpl struct {
+type geolocationService struct {
 	query *models.Queries
 	redis *redis.Client
 }
 
-func (s *GeolocationServiceImpl) Create(ctx context.Context, params CreateParams) (Geolocation, error) {
+func (s *geolocationService) Create(ctx context.Context, params CreateParams) (Geolocation, error) {
 	result, err := s.query.CreateGeolocation(ctx, models.CreateGeolocationParams{
 		Degree: params.Degree,
 		Location: postgis.Point{
@@ -86,14 +83,17 @@ func (s *GeolocationServiceImpl) Create(ctx context.Context, params CreateParams
 	}
 	geolocation := buildGeolocation(result)
 
-	// TODO: error handling
-	s.cachePut(ctx, geolocation)
-	s.geoPut(ctx, geolocation)
+	if err := s.cachePut(ctx, geolocation); err != nil {
+		slog.WarnContext(ctx, "cannot cache geolocation", "error", err)
+	}
+	if err := s.geoPut(ctx, geolocation); err != nil {
+		slog.WarnContext(ctx, "cannot cache geolocation", "error", err)
+	}
 
 	return geolocation, nil
 }
 
-func (s *GeolocationServiceImpl) Get(ctx context.Context, params GetParams) (Geolocation, error) {
+func (s *geolocationService) Get(ctx context.Context, params GetParams) (Geolocation, error) {
 	cached, err := s.cacheGet(ctx, params.VehicleID)
 	if err == nil {
 		return cached, nil
@@ -108,7 +108,7 @@ func (s *GeolocationServiceImpl) Get(ctx context.Context, params GetParams) (Geo
 	return geolocation, nil
 }
 
-func (s *GeolocationServiceImpl) List(ctx context.Context, params ListParams) ([]Geolocation, error) {
+func (s *geolocationService) List(ctx context.Context, params ListParams) ([]Geolocation, error) {
 	result, err := s.query.ListGeolocation(ctx, models.ListGeolocationParams{
 		Limit: params.Limit,
 	})
@@ -124,7 +124,7 @@ func (s *GeolocationServiceImpl) List(ctx context.Context, params ListParams) ([
 	return geolocations, nil
 }
 
-func (s *GeolocationServiceImpl) ListByBounding(ctx context.Context, params ListByBoundingParams) ([]Geolocation, error) {
+func (s *geolocationService) ListByBounding(ctx context.Context, params ListByBoundingParams) ([]Geolocation, error) {
 	cmd := s.redis.GeoSearchLocation(ctx, "geolocations", &redis.GeoSearchLocationQuery{
 		GeoSearchQuery: redis.GeoSearchQuery{
 			Latitude:  params.Latitude,
@@ -167,51 +167,14 @@ func (s *GeolocationServiceImpl) ListByBounding(ctx context.Context, params List
 	return geolocations, nil
 }
 
-func (s *GeolocationServiceImpl) geoPut(ctx context.Context, geolocation Geolocation) error {
-	cmd := s.redis.GeoAdd(ctx, "geolocations", &redis.GeoLocation{
-		Name:      fmt.Sprintf(cacheKey, geolocation.VehicleID),
-		Latitude:  geolocation.Latitude,
-		Longitude: geolocation.Longitude,
-	})
-	if err := cmd.Err(); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (s *GeolocationServiceImpl) cachePut(ctx context.Context, geolocation Geolocation) error {
-	cmd := s.redis.HSet(ctx, fmt.Sprintf(cacheKey, geolocation.VehicleID), geolocation)
-	if err := cmd.Err(); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (s *GeolocationServiceImpl) cacheGet(ctx context.Context, vehicleID int64) (Geolocation, error) {
-	return s.cacheGetRaw(ctx, fmt.Sprintf(cacheKey, vehicleID))
-}
-
-func (s *GeolocationServiceImpl) cacheGetRaw(ctx context.Context, key string) (Geolocation, error) {
-	cmd := s.redis.HGetAll(ctx, key)
-	if err := cmd.Err(); err != nil {
-		return Geolocation{}, err
-	}
-
-	var geolocation Geolocation
-	if err := cmd.Scan(&geolocation); err != nil {
-		return Geolocation{}, err
-	}
-
-	return geolocation, nil
-}
-
 func buildGeolocation(model models.Geolocation) Geolocation {
 	return Geolocation{
-		Degree:    model.Degree,
-		Latitude:  model.Latitude,
-		Longitude: model.Longitude,
+		Degree: model.Degree,
+		Location: types.LatLng{
+			// in lng/lat order
+			Longitude: model.Location.X,
+			Latitude:  model.Location.Y,
+		},
 		Speed:     model.Speed,
 		VehicleID: model.VehicleID,
 		VariantID: model.VariantID,
